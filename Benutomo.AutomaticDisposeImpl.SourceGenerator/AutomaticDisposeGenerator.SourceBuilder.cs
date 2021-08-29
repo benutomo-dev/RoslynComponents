@@ -259,23 +259,20 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 WriteDisposeCoreMethod();
 
-                if (ExistsAsyncDisposableMember)
+                if (IsAssignableTypeSymbolToIAsyncDisposable(_classDeclarationSymbol))
                 {
-                    if (IsAssignableTypeSymbolToIAsyncDisposable(_classDeclarationSymbol))
+                    if (!IsAsyncDisposableSubClass)
                     {
-                        if (!IsAsyncDisposableSubClass)
-                        {
-                            WriteIAsyncDisposableDisposeAsyncMethod();
-                        }
+                        WriteIAsyncDisposableDisposeAsyncMethod();
+                    }
 
-                        WriteDisposeAsyncCoreMethod();
-                    }
-                    else
-                    {
-                        // AnalyzerでIAsyncDisposableインターフェイスを実装している型のフィールドとプロパティに対するSG0003の報告を実装
-                    }
+                    WriteDisposeAsyncCoreMethod();
                 }
-                
+                else
+                {
+                    // AnalyzerでIAsyncDisposableインターフェイスを実装している型のフィールドとプロパティに対するSG0003の報告を実装
+                }
+
                 return;
 
 
