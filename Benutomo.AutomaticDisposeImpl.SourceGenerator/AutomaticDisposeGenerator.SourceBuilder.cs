@@ -89,6 +89,11 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 WriteBody();
 
                 WriteTypeDeclarationEnd();
+
+#if DEBUG
+                var code = _sourceBuilder.ToString();
+                ;
+#endif
             }
 
             void PutIndentSpace()
