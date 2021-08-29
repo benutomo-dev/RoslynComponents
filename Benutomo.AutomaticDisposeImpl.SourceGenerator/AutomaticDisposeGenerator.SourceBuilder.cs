@@ -49,6 +49,10 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             bool IsInheritalbeClass => !_classDeclarationSymbol.IsValueType && !_classDeclarationSymbol.IsSealed;
 
+            bool IsIDisposableIntafeceImplementer => IsAssignableTypeSymbolToIDisposable(_classDeclarationSymbol);
+
+            bool IsIAsyncDisposableIntafeceImplementer => IsAssignableTypeSymbolToIAsyncDisposable(_classDeclarationSymbol);
+
             bool IsDisposableSubClass => IsAssignableTypeSymbolToIDisposable(_classDeclarationSymbol.BaseType);
 
             bool IsAsyncDisposableSubClass => IsAssignableTypeSymbolToIAsyncDisposable(_classDeclarationSymbol.BaseType);
@@ -58,7 +62,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             public SourceBuilder(GeneratorExecutionContext context, INamedTypeSymbol classDeclarationSymbol, AttributeData automaticDisposeAttributeData)
             {
                 _classDeclarationSymbol = classDeclarationSymbol;
-                _automaticDisposeContextChecker = new AutomaticDisposeContextChecker(context.Compilation.GetTypeByMetadataName(AutomaticDisposeImplModeAttributeFullyQualifiedMetadataName), automaticDisposeAttributeData);
+                _automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeAttributeData);
 
                 var explicitlyDeclaredInstanceFields = _classDeclarationSymbol.GetMembers().OfType<IFieldSymbol>().Where(v => !v.IsImplicitlyDeclared && !v.IsStatic);
                 var explicitlyDeclaredInstanceProperties = _classDeclarationSymbol.GetMembers().OfType<IPropertySymbol>().Where(v => !v.IsImplicitlyDeclared && !v.IsStatic);
@@ -161,11 +165,19 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     }
                     if (isDesingationType)
                     {
-                        _sourceBuilder.Append(" : global::System.IDisposable");
+                        // なくてもいいが生成されたコードだけを見ても実装対象となっているインターフェイスが分かるようにしておく
 
-                        if (IsAssignableTypeSymbolToIAsyncDisposable(_classDeclarationSymbol))
+                        if (IsIDisposableIntafeceImplementer && IsIAsyncDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(", global::System.IAsyncDisposable");
+                            _sourceBuilder.Append(" : global::System.IDisposable, global::System.IAsyncDisposable");
+                        }
+                        else if (IsIDisposableIntafeceImplementer)
+                        {
+                            _sourceBuilder.Append(" : global::System.IDisposable");
+                        }
+                        else if (IsIAsyncDisposableIntafeceImplementer)
+                        {
+                            _sourceBuilder.Append(" : global::System.IAsyncDisposable");
                         }
                     }
                     _sourceBuilder.AppendLine("");
@@ -245,21 +257,25 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 {
                     _sourceBuilder.AppendLine();
                     PutIndentSpace(); _sourceBuilder.AppendLine("private int __generator_internal_unmanagedResourceReleaseState = 0;");
-                }
 
-                if (EnableFinalize)
-                {
                     WriteFinalizer();
                 }
 
-                if (!IsDisposableSubClass)
+                if (IsIDisposableIntafeceImplementer || EnableFinalize)
                 {
-                    WriteIDisposableDisposeMethod();
+                    WriteDisposeCoreMethod();
                 }
 
-                WriteDisposeCoreMethod();
+                if (IsIDisposableIntafeceImplementer)
+                {
+                    if (!IsDisposableSubClass)
+                    {
+                        WriteIDisposableDisposeMethod();
+                    }
 
-                if (IsAssignableTypeSymbolToIAsyncDisposable(_classDeclarationSymbol))
+                }
+
+                if (IsIAsyncDisposableIntafeceImplementer)
                 {
                     if (!IsAsyncDisposableSubClass)
                     {
@@ -308,8 +324,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         PutIndentSpace(); _sourceBuilder.AppendLine("if (dispose_state == __generator_internal_BeNotInitiatedAnyDispose)");
                         BeginBlock();
                         {
-                            PutIndentSpace(); _sourceBuilder.AppendLine("// Dispose managed members and release unmaneged resources.");
-                            PutIndentSpace(); _sourceBuilder.AppendLine("Dispose(disposing: true);");
+                            if (IsIDisposableIntafeceImplementer || EnableFinalize)
+                            {
+                                _sourceBuilder.AppendLine();
+                                PutIndentSpace(); _sourceBuilder.AppendLine("// Dispose managed members and release unmaneged resources.");
+                                PutIndentSpace(); _sourceBuilder.AppendLine("Dispose(disposing: true);");
+                            }
 
                             if (EnableFinalize)
                             {
@@ -489,8 +509,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         {
                             PutIndentSpace(); _sourceBuilder.AppendLine("await DisposeAsyncCore().ConfigureAwait(false);");
 
-                            PutIndentSpace(); _sourceBuilder.AppendLine("// Release unmaneged resources.");
-                            PutIndentSpace(); _sourceBuilder.AppendLine("Dispose(disposing: false);");
+                            if (IsIDisposableIntafeceImplementer || EnableFinalize)
+                            {
+                                _sourceBuilder.AppendLine();
+                                PutIndentSpace(); _sourceBuilder.AppendLine("// Release unmaneged resources.");
+                                PutIndentSpace(); _sourceBuilder.AppendLine("Dispose(disposing: false);");
+                            }
 
                             if (EnableFinalize)
                             {

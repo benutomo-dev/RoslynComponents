@@ -17,6 +17,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         internal const string AutomaticDisposeImplAttribute_SelfDisposeMethod = "SelfDisposeMethod";
         internal const string AutomaticDisposeImplAttribute_SelfDisposeAsyncMethod = "SelfDisposeAsyncMethod";
 
+        internal const string AutomaticDisposeImplModeAttributeName = "AutomaticDisposeImplModeAttribute";
         internal const string AutomaticDisposeImplModeAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplModeAttribute";
 
         /// <summary>
@@ -146,7 +147,7 @@ namespace Benutomo
                         continue;
                     }
 
-                    if (!IsAssignableTypeSymbolToIDisposable(anotatedClassDeclaration.symbol))
+                    if (!IsAssignableTypeSymbolToIDisposable(anotatedClassDeclaration.symbol) && !IsAssignableTypeSymbolToIAsyncDisposable(anotatedClassDeclaration.symbol))
                     {
                         // AnalyzerでSG0002の報告を実装
                         continue;
@@ -179,6 +180,26 @@ namespace Benutomo
             if (typeSymbol is null) return false;
 
             if (typeSymbol.Name != AutomaticDisposeImplAttributeName) return false;
+
+            var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
+
+            if (containingNamespaceSymbol is null) return false;
+
+            if (containingNamespaceSymbol.Name != AttribureProvideNameSpace) return false;
+
+            if (containingNamespaceSymbol.ContainingNamespace is null) return false;
+
+            if (!containingNamespaceSymbol.ContainingNamespace.IsGlobalNamespace) return false;
+
+            return true;
+        }
+
+
+        internal static bool IsAutomaticDisposeImplModeAnnotationTypeSymbol(ITypeSymbol? typeSymbol)
+        {
+            if (typeSymbol is null) return false;
+
+            if (typeSymbol.Name != AutomaticDisposeImplModeAttributeName) return false;
 
             var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
 

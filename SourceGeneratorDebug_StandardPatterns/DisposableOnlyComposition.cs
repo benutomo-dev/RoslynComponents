@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace SourceGeneratorDebug_StandardPatterns.Nest
+namespace SourceGeneratorDebug_StandardPatterns
 {
     [AutomaticDisposeImpl]
     public partial class DisposableOnlyComposition1 : IDisposable
@@ -25,7 +25,10 @@ namespace SourceGeneratorDebug_StandardPatterns.Nest
             _binaryReaderGetonlyProperty = binaryReaderGetonlyProperty;
         }
     }
-
+}
+ 
+namespace SourceGeneratorDebug_StandardPatterns.Nest
+{
     [AutomaticDisposeImpl]
     public partial class DisposableOnlyComposition2 : IDisposable, IAsyncDisposable
     {
@@ -45,6 +48,34 @@ namespace SourceGeneratorDebug_StandardPatterns.Nest
             _binaryReaderReadonlyFieald = binaryReaderReadonlyFieald;
             _binaryReaderProperty = binaryReaderProperty;
             _binaryReaderGetonlyProperty = binaryReaderGetonlyProperty;
+        }
+    }
+}
+
+namespace SourceGeneratorDebug_StandardPatterns
+{
+    namespace Nest
+    {
+        [AutomaticDisposeImpl]
+        public partial class DisposableOnlyComposition3 : IAsyncDisposable
+        {
+            BinaryReader _binaryReaderFieald;
+            readonly BinaryReader _binaryReaderReadonlyFieald;
+            static BinaryReader s_binaryReaderFieald = null;
+            static readonly BinaryReader s_binaryReaderReadonlyFieald = null;
+
+            BinaryReader _binaryReaderProperty { get; set; }
+            BinaryReader _binaryReaderGetonlyProperty { get; }
+            static BinaryReader s_binaryReaderProperty { get; set; }
+            static BinaryReader s_binaryReaderGetonlyProperty { get; }
+
+            public DisposableOnlyComposition3(BinaryReader binaryReaderFieald, BinaryReader binaryReaderReadonlyFieald, BinaryReader binaryReaderProperty, BinaryReader binaryReaderGetonlyProperty)
+            {
+                _binaryReaderFieald = binaryReaderFieald ?? s_binaryReaderFieald ?? s_binaryReaderReadonlyFieald;
+                _binaryReaderReadonlyFieald = binaryReaderReadonlyFieald;
+                _binaryReaderProperty = binaryReaderProperty;
+                _binaryReaderGetonlyProperty = binaryReaderGetonlyProperty;
+            }
         }
     }
 }
