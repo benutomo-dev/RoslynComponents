@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
@@ -7,18 +8,24 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     [Generator]
     public partial class AutomaticDisposeGenerator : ISourceGenerator
     {
-        internal const string AttribureProvideNameSpace = "Benutomo";
+        internal const string AttributeDefinedNameSpace = "Benutomo";
 
         internal const string AutomaticDisposeImplAttributeCoreName = "AutomaticDisposeImpl";
         internal const string AutomaticDisposeImplAttributeName = "AutomaticDisposeImplAttribute";
         internal const string AutomaticDisposeImplAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplAttribute";
         internal const string AutomaticDisposeImplAttribute_DefaultMode = "DefaultMode";
-        internal const string AutomaticDisposeImplAttribute_ReleaseUnmanagedResourcesMethod = "ReleaseUnmanagedResourcesMethod";
-        internal const string AutomaticDisposeImplAttribute_SelfDisposeMethod = "SelfDisposeMethod";
-        internal const string AutomaticDisposeImplAttribute_SelfDisposeAsyncMethod = "SelfDisposeAsyncMethod";
 
         internal const string AutomaticDisposeImplModeAttributeName = "AutomaticDisposeImplModeAttribute";
         internal const string AutomaticDisposeImplModeAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplModeAttribute";
+
+        internal const string UnmanagedResourceReleaseMethodAttributeName = "UnmanagedResourceReleaseMethodAttribute";
+        internal const string UnmanagedResourceReleaseMethodAttributeFullyQualifiedMetadataName = "Benutomo.UnmanagedResourceReleaseMethodAttribute";
+
+        internal const string ManagedObjectDisposeMethodAttributeName = "ManagedObjectDisposeMethodAttribute";
+        internal const string ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName = "Benutomo.ManagedObjectDisposeMethodAttribute";
+
+        internal const string ManagedObjectAsyncDisposeMethodAttributeName = "ManagedObjectAsyncDisposeMethodAttribute";
+        internal const string ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName = "Benutomo.ManagedObjectAsyncDisposeMethodAttribute";
 
         /// <summary>
         /// <see cref="AutomaticDisposeImplMode"/>定数内の定義と一致させること
@@ -63,27 +70,13 @@ namespace Benutomo
     public class AutomaticDisposeImplAttribute : Attribute
     {
         /// <summary>
-        /// メンバ毎の<see cref=""AutomaticDisposeImplMode"" />に<see cref=""AutomaticDisposeImplMode.Default"" />が指定されている場合にフォールバックする設定。
+        /// メンバ毎の<see cref=""AutomaticDisposeImplMode"" />に<see cref=""AutomaticDisposeImplMode.Default"" />が指定されている場合の既定値を設定する。
         /// </summary>
         public AutomaticDisposeImplMode DefaultMode { get; set; }
-
-        /// <summary>
-        /// アンマネージドリソースの手動解放を実装したメソッドを指定する。このメソッドは通常の破棄およびGCのファイナライズのタイミング自動実装側から呼び出される。一般的な場合において実装者はここに指定したメソッドを自分自身で呼び出す必要はない。
-        /// </summary>
-        public string? ReleaseUnmanagedResourcesMethod { get; set; }
-
-        /// <summary>
-        /// マネージドリソースの手動解放を実装するメソッド(引数なしで戻り値はvoid)を指定する。このメソッドは通常の破棄で自動実装側から呼び出される。一般的な場合において実装者はここに指定したメソッドを自分自身で呼び出す必要はない。明示的なDisposeがされずにGCのファイナライズによる解放が発生した場合にこのメソッドは呼び出されないことに注意。アンマネージドリソースの解放は<see cref=""ReleaseUnmanagedResourcesMethod""/>で指定するメソッドで行うこと。
-        /// </summary>
-        public string? SelfDisposeMethod { get; set; }
-
-        /// <summary>
-        /// マネージドリソースの非同期処理による手動解放を実装するメソッド(引数なしで戻り値は<see cref=""System.Threading.ValueTask"" />などawait可能な型)を指定する。このメソッドは通常の破棄で自動実装側から呼び出される。一般的な場合において実装者はここに指定したメソッドを自分自身で呼び出す必要はない。<see cref=""SelfDisposeAsyncMethod""/>と<see cref=""SelfDisposeMethod""/>で指定されたメソッドは破棄が同期的におこなわれたか非同期的におこなわれたかによってどちらか一方のみしか呼び出されないため、どちらが呼び出されても手動破棄の対象に漏れがないように実装すること。
-        /// </summary>
-        public string? SelfDisposeAsyncMethod { get; set; }
     }
 }
 ";
+
         const string AutomaticDisposeImplModeAttributeSource = @"
 using System;
 
@@ -114,6 +107,69 @@ namespace Benutomo
 }
 ";
 
+        const string UnmanagedResourceReleaseMethodAttributeSource = @"
+using System;
+
+#nullable enable
+
+namespace Benutomo
+{
+    /// <summary>
+    /// <see cref=""Benutomo.AutomaticDisposeImplAttribute""/>を利用しているクラスで、ユーザが実装するアンマネージドリソースの解放を行うメソッド(引数なしで戻り値はvoid)に付与する。このメソッドはこのオブジェクトのDispose()またはDisposeAsync()、デストラクタのいずれかが初めて実行された時に自動実装コードから呼び出される。この属性を付与したメソッドは、実装者の責任でGCのファイナライズスレッドから呼び出されても問題無いように実装しなければならないことに注意すること。
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class UnmanagedResourceReleaseMethodAttribute : Attribute
+    {
+        /// <summary>
+        /// <inheritdoc cref=""Benutomo.UnmanagedResourceReleaseMethodAttribute""/>
+        /// </summary>
+        public UnmanagedResourceReleaseMethodAttribute() { }
+    }
+}
+";
+
+        const string ManagedObjectDisposeMethodAttributeSource = @"
+using System;
+
+#nullable enable
+
+namespace Benutomo
+{
+    /// <summary>
+    /// <see cref=""Benutomo.AutomaticDisposeImplAttribute""/>を利用しているクラスで、ユーザが実装するマネージドオブジェクトを同期的な処理による破棄を行うメソッドに付与する。このメソッドはデストラクタからは呼び出されない。デストラクタからも呼び出される必要がある場合は<see cref=""Benutomo.UnmanagedResourceReleaseMethodAttribute"">を使用すること。この属性を付与するメソッドは引数なしで戻り値はvoidである必要がある。このメソッドはこのオブジェクトのDispose()が初めて実行された時に自動実装コードから呼び出される。ただし、このメソッドを所有するクラスがIAsyncDisposableも実装していて、かつ、DisposeAsync()によってこのオブジェクトが破棄された場合は、この属性が付与されているメソッドは呼び出されず、<see cref=""Benutomo.ManagedObjectAsyncDisposeMethodAttribute"">が付与されているメソッドが呼び出される。
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ManagedObjectDisposeMethodAttribute : Attribute
+    {
+        /// <summary>
+        /// <inheritdoc cref=""Benutomo.ManagedObjectDisposeMethodAttribute""/>
+        /// </summary>
+        public ManagedObjectDisposeMethodAttribute() { }
+    }
+}
+";
+
+        const string ManagedObjectAsyncDisposeMethodAttributeSource = @"
+using System;
+
+#nullable enable
+
+namespace Benutomo
+{
+    /// <summary>
+    /// <see cref=""Benutomo.AutomaticDisposeImplAttribute""/>を利用しているクラスで、ユーザが実装するマネージドオブジェクトを非同期的な処理による破棄を行うメソッドに付与する。このメソッドはデストラクタからは呼び出されない。デストラクタからも呼び出される必要がある場合はデストラクタで必要な処理を全て同期的に行うようにした上で<see cref=""Benutomo.UnmanagedResourceReleaseMethodAttribute"">を使用すること。この属性を付与するメソッドは引数なしで戻り値は<see cref=""System.Threading.ValueTask"" />などawait可能な型である必要がある。このメソッドはこのオブジェクトのDisposeAsync()が初めて実行された時に自動実装コードから呼び出される。ただし、このメソッドを所有するクラスがIDisposableも実装していて、かつ、Dispose()によってこのオブジェクトが破棄された場合は、この属性が付与されているメソッドは呼び出されず、<see cref=""Benutomo.ManagedObjectDisposeMethodAttribute"">が付与されているメソッドが呼び出される。
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ManagedObjectAsyncDisposeMethodAttribute : Attribute
+    {
+        /// <summary>
+        /// <inheritdoc cref=""Benutomo.ManagedObjectAsyncDisposeMethodAttribute""/>
+        /// </summary>
+        public ManagedObjectAsyncDisposeMethodAttribute() { }
+    }
+}
+";
+
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForPostInitialization(PostInitialization);
@@ -125,6 +181,9 @@ namespace Benutomo
             context.AddSource("AutomaticDisposeImplAttribute.cs", AutomaticDisposeImplAttributeSource);
             context.AddSource("AutomaticDisposeImplMode.cs", AutomaticDisposeImplModeSource);
             context.AddSource("AutomaticDisposeImplModeAttribute.cs", AutomaticDisposeImplModeAttributeSource);
+            context.AddSource("UnmanagedResourceReleaseMethodAttribute.cs", UnmanagedResourceReleaseMethodAttributeSource);
+            context.AddSource("ManagedObjectDisposeMethodAttribute.cs", ManagedObjectDisposeMethodAttributeSource);
+            context.AddSource("ManagedObjectAsyncDisposeMethodAttribute.cs", ManagedObjectAsyncDisposeMethodAttributeSource);
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -147,7 +206,7 @@ namespace Benutomo
                         continue;
                     }
 
-                    if (!IsAssignableTypeSymbolToIDisposable(anotatedClassDeclaration.symbol) && !IsAssignableTypeSymbolToIAsyncDisposable(anotatedClassDeclaration.symbol))
+                    if (!IsAssignableToIDisposable(anotatedClassDeclaration.symbol) && !IsAssignableToIAsyncDisposable(anotatedClassDeclaration.symbol))
                     {
                         // AnalyzerでSG0002の報告を実装
                         continue;
@@ -174,18 +233,20 @@ namespace Benutomo
             }
         }
 
-
-        internal static bool IsAutomaticDisposeImplAnnotationTypeSymbol(ITypeSymbol? typeSymbol)
+        private static bool IsXSymbolImpl(ITypeSymbol? typeSymbol, string ns1, string typeName)
         {
+            Debug.Assert(!ns1.Contains("."));
+            Debug.Assert(!typeName.Contains("."));
+
             if (typeSymbol is null) return false;
 
-            if (typeSymbol.Name != AutomaticDisposeImplAttributeName) return false;
+            if (typeSymbol.Name != typeName) return false;
 
             var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
 
             if (containingNamespaceSymbol is null) return false;
 
-            if (containingNamespaceSymbol.Name != AttribureProvideNameSpace) return false;
+            if (containingNamespaceSymbol.Name != ns1) return false;
 
             if (containingNamespaceSymbol.ContainingNamespace is null) return false;
 
@@ -195,96 +256,63 @@ namespace Benutomo
         }
 
 
-        internal static bool IsAutomaticDisposeImplModeAnnotationTypeSymbol(ITypeSymbol? typeSymbol)
+        private static bool IsAssignableToIXImpl(ITypeSymbol? typeSymbol, Func<ITypeSymbol, bool> isXTypeFunc, Func<ITypeSymbol, bool> isAssignableToXFunc)
         {
             if (typeSymbol is null) return false;
 
-            if (typeSymbol.Name != AutomaticDisposeImplModeAttributeName) return false;
+            if (isXTypeFunc(typeSymbol)) return true;
 
-            var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
-
-            if (containingNamespaceSymbol is null) return false;
-
-            if (containingNamespaceSymbol.Name != AttribureProvideNameSpace) return false;
-
-            if (containingNamespaceSymbol.ContainingNamespace is null) return false;
-
-            if (!containingNamespaceSymbol.ContainingNamespace.IsGlobalNamespace) return false;
-
-            return true;
-        }
-
-        internal static bool IsAssignableTypeSymbolToIDisposable(ITypeSymbol? typeSymbol)
-        {
-            if (typeSymbol is null) return false;
-
-            if (IsIDisposable(typeSymbol)) return true;
-
-            if (typeSymbol.AllInterfaces.Any(IsIDisposable)) return true;
+            if (typeSymbol.AllInterfaces.Any((Func<INamedTypeSymbol, bool>)isXTypeFunc)) return true;
 
             // ジェネリック型の型パラメータの場合は型パラメータの制約を再帰的に確認
-            if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && typeParameterSymbol.ConstraintTypes.Any(IsAssignableTypeSymbolToIDisposable))
+            if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && typeParameterSymbol.ConstraintTypes.Any(isAssignableToXFunc))
             {
                 return true;
             }
 
             return false;
         }
-
-        internal static bool IsAssignableTypeSymbolToIAsyncDisposable(ITypeSymbol? typeSymbol)
+        private static bool IsXAttributedMemberImpl(ISymbol? symbol, Func<INamedTypeSymbol,bool> isXAttributeSymbol)
         {
-            if (typeSymbol is null) return false;
+            if (symbol is null) return false;
 
-            if (IsIAsyncDisposable(typeSymbol)) return true;
-
-            if (typeSymbol.AllInterfaces.Any(IsIAsyncDisposable)) return true;
-
-            // ジェネリック型の型パラメータの場合は型パラメータの制約を再帰的に確認
-            if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && typeParameterSymbol.ConstraintTypes.Any(IsAssignableTypeSymbolToIAsyncDisposable))
+            foreach (var attributeData in symbol.GetAttributes())
             {
-                return true;
+                if (attributeData.AttributeClass is not null && isXAttributeSymbol(attributeData.AttributeClass))
+                {
+                    return true;
+                }
             }
 
             return false;
         }
 
-        internal static bool IsIDisposable(ITypeSymbol? typeSymbol)
-        {
-            if (typeSymbol is null) return false;
 
-            if (typeSymbol.Name != "IDisposable") return false;
+        internal static bool IsAutomaticDisposeImplAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, AutomaticDisposeImplAttributeName);
 
-            var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
+        internal static bool IsAutomaticDisposeImplModeAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, AutomaticDisposeImplModeAttributeName);
 
-            if (containingNamespaceSymbol is null) return false;
+        internal static bool IsUnmanagedResourceReleaseMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, UnmanagedResourceReleaseMethodAttributeName);
 
-            if (containingNamespaceSymbol.Name != "System") return false;
+        internal static bool IsManagedObjectDisposeMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, ManagedObjectDisposeMethodAttributeName);
 
-            if (containingNamespaceSymbol.ContainingNamespace is null) return false;
+        internal static bool IsManagedObjectAsyncDisposeMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, ManagedObjectAsyncDisposeMethodAttributeName);
 
-            if (!containingNamespaceSymbol.ContainingNamespace.IsGlobalNamespace) return false;
+        internal static bool IsIDisposable(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, "System", "IDisposable");
 
-            return true;
-        }
+        internal static bool IsIAsyncDisposable(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, "System", "IAsyncDisposable");
 
-        internal static bool IsIAsyncDisposable(ITypeSymbol? typeSymbol)
-        {
-            if (typeSymbol is null) return false;
+        internal static bool IsAssignableToIDisposable(ITypeSymbol? typeSymbol) => IsAssignableToIXImpl(typeSymbol, IsIDisposable, IsAssignableToIDisposable);
 
-            if (typeSymbol.Name != "IAsyncDisposable") return false;
+        internal static bool IsAssignableToIAsyncDisposable(ITypeSymbol? typeSymbol) => IsAssignableToIXImpl(typeSymbol, IsIAsyncDisposable, IsAssignableToIAsyncDisposable);
 
-            var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
+        internal static bool IsAutomaticDisposeImplModeAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsAutomaticDisposeImplModeAttribute);
 
-            if (containingNamespaceSymbol is null) return false;
+        internal static bool IsUnmanagedResourceReleaseMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsUnmanagedResourceReleaseMethodAttribute);
 
-            if (containingNamespaceSymbol.Name != "System") return false;
+        internal static bool IsManagedObjectDisposeMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsManagedObjectDisposeMethodAttribute);
 
-            if (containingNamespaceSymbol.ContainingNamespace is null) return false;
-
-            if (!containingNamespaceSymbol.ContainingNamespace.IsGlobalNamespace) return false;
-
-            return true;
-        }
+        internal static bool IsManagedObjectAsyncDisposeMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsManagedObjectAsyncDisposeMethodAttribute);
 
         internal static bool IsAutomaticDisposeImplSubClass(INamedTypeSymbol? namedTypeSymbol)
         {
@@ -293,7 +321,7 @@ namespace Benutomo
                 return false;
             }
 
-            var isAutomaticDisposeImplAnnotationed = namedTypeSymbol.GetAttributes().Select(attrData => attrData.AttributeClass).Any(IsAutomaticDisposeImplAnnotationTypeSymbol);
+            var isAutomaticDisposeImplAnnotationed = namedTypeSymbol.GetAttributes().Select(attrData => attrData.AttributeClass).Any(IsAutomaticDisposeImplAttribute);
 
             if (isAutomaticDisposeImplAnnotationed)
             {

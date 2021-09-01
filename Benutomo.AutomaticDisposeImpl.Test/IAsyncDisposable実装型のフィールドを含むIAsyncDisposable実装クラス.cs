@@ -17,7 +17,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             internal IAutomaticImplSupportedAsyncDisposable disposable = null; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 
-        [AutomaticDisposeImpl(ReleaseUnmanagedResourcesMethod = nameof(SelfImplFinalize), SelfDisposeMethod = nameof(SelfImplSyncDispose), SelfDisposeAsyncMethod = nameof(SelfImplDisposeAsync))]
+        [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚ÌŽ©“®ŽÀ‘•‚Å‚ÍIDisposable‚à•K{*/
         {
             internal ImplicitAsyncDisposableImplementClass baseDisposable = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
@@ -31,18 +31,21 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             public int BaseImplSyncDisposeCallCount => Thread.VolatileRead(ref baseImplSyncDisposeCallCount);
             public int BaseImplAsyncDisposeCallCount => Thread.VolatileRead(ref baseImplAsyncDisposeCallCount);
             public int BaseImplTotalDisposeCallCount => Thread.VolatileRead(ref baseImplTotalDisposeCallCount);
-
+            
+            [UnmanagedResourceReleaseMethod]
             void SelfImplFinalize()
             {
                 Interlocked.Increment(ref baseImplReleaseUnmanagedResourceCallCount);
             }
 
+            [ManagedObjectDisposeMethod]
             void SelfImplSyncDispose()
             {
                 Interlocked.Increment(ref baseImplSyncDisposeCallCount);
                 Interlocked.Increment(ref baseImplTotalDisposeCallCount);
             }
 
+            [ManagedObjectAsyncDisposeMethod]
             ValueTask SelfImplDisposeAsync()
             {
                 Interlocked.Increment(ref baseImplAsyncDisposeCallCount);
@@ -51,7 +54,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             }
         }
 
-        [AutomaticDisposeImpl(ReleaseUnmanagedResourcesMethod = nameof(SelfImplFinalize), SelfDisposeMethod = nameof(SelfImplSyncDispose), SelfDisposeAsyncMethod = nameof(SelfImplDisposeAsync))]
+        [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
             internal ImplicitAsyncDisposableImplementClass selfDisposable = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
@@ -66,17 +69,20 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             public int SelfImplAsyncDisposeCallCount => Thread.VolatileRead(ref selfImplAsyncDisposeCallCount);
             public int SelfImplTotalDisposeCallCount => Thread.VolatileRead(ref selfImplTotalDisposeCallCount);
 
+            [UnmanagedResourceReleaseMethod]
             void SelfImplFinalize()
             {
                 Interlocked.Increment(ref selfImplReleaseUnmanagedResourceCallCount);
             }
 
+            [ManagedObjectDisposeMethod]
             void SelfImplSyncDispose()
             {
                 Interlocked.Increment(ref selfImplSyncDisposeCallCount);
                 Interlocked.Increment(ref selfImplTotalDisposeCallCount);
             }
 
+            [ManagedObjectAsyncDisposeMethod]
             ValueTask SelfImplDisposeAsync()
             {
                 Interlocked.Increment(ref selfImplAsyncDisposeCallCount);

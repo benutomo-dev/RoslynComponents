@@ -16,7 +16,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             internal IDisposable disposable = null;
         }
 
-        [AutomaticDisposeImpl(ReleaseUnmanagedResourcesMethod = nameof(SelfImplFinalize), SelfDisposeMethod = nameof(SelfImplSyncDispose))]
+        [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
             internal ImplicitDisposableImplementClass baseDisposable = new();
@@ -27,18 +27,20 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             public int BaseImplReleaseUnmanagedResourceCallCount => Thread.VolatileRead(ref baseImplReleaseUnmanagedResourceCallCount);
             public int BaseImplDisposeCallCount => Thread.VolatileRead(ref baseImplDisposeCallCount);
 
+            [UnmanagedResourceReleaseMethod]
             void SelfImplFinalize()
             {
                 Interlocked.Increment(ref baseImplReleaseUnmanagedResourceCallCount);
             }
 
+            [ManagedObjectDisposeMethod]
             void SelfImplSyncDispose()
             {
                 Interlocked.Increment(ref baseImplDisposeCallCount);
             }
         }
 
-        [AutomaticDisposeImpl(ReleaseUnmanagedResourcesMethod = nameof(SelfImplFinalize), SelfDisposeMethod = nameof(SelfImplSyncDispose))]
+        [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
             internal ImplicitDisposableImplementClass selfDisposable = new();
@@ -49,11 +51,13 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             public int SelfImplReleaseUnmanagedResourceCallCount => Thread.VolatileRead(ref selfImplReleaseUnmanagedResourceCallCount);
             public int SelfImplDisposeCallCount => Thread.VolatileRead(ref selfImplDisposeCallCount);
 
+            [UnmanagedResourceReleaseMethod]
             void SelfImplFinalize()
             {
                 Interlocked.Increment(ref selfImplReleaseUnmanagedResourceCallCount);
             }
 
+            [ManagedObjectDisposeMethod]
             void SelfImplSyncDispose()
             {
                 Interlocked.Increment(ref selfImplDisposeCallCount);

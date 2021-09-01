@@ -20,7 +20,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             internal IAutomaticImplSupportedAsyncDisposable disposable = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
-        [AutomaticDisposeImpl(ReleaseUnmanagedResourcesMethod = nameof(SelfImplFinalize), SelfDisposeMethod = nameof(SelfImplSyncDispose), SelfDisposeAsyncMethod = nameof(SelfImplDisposeAsync))]
+        [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
             internal ImplicitAsyncDisposableImplementClass baseDisposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
@@ -35,26 +35,31 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             public int BaseImplAsyncDisposeCallCount => Thread.VolatileRead(ref baseImplAsyncDisposeCallCount);
             public int BaseImplTotalDisposeCallCount => Thread.VolatileRead(ref baseImplTotalDisposeCallCount);
 
+            [UnmanagedResourceReleaseMethod]
             void SelfImplFinalize()
             {
                 Interlocked.Increment(ref baseImplReleaseUnmanagedResourceCallCount);
             }
 
+            [ManagedObjectDisposeMethod]
             void SelfImplSyncDispose()
             {
                 Interlocked.Increment(ref baseImplSyncDisposeCallCount);
                 Interlocked.Increment(ref baseImplTotalDisposeCallCount);
             }
 
+#pragma warning disable SG0011 // ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています
+            [ManagedObjectAsyncDisposeMethod]
             ValueTask SelfImplDisposeAsync()
             {
                 Interlocked.Increment(ref baseImplAsyncDisposeCallCount);
                 Interlocked.Increment(ref baseImplTotalDisposeCallCount);
                 return default;
             }
+#pragma warning restore SG0011 // ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています
         }
 
-        [AutomaticDisposeImpl(ReleaseUnmanagedResourcesMethod = nameof(SelfImplFinalize), SelfDisposeMethod = nameof(SelfImplSyncDispose), SelfDisposeAsyncMethod = nameof(SelfImplDisposeAsync))]
+        [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
             internal ImplicitAsyncDisposableImplementClass selfDisposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
@@ -69,23 +74,28 @@ namespace Benutomo.AutomaticDisposeImpl.Test
             public int SelfImplAsyncDisposeCallCount => Thread.VolatileRead(ref selfImplAsyncDisposeCallCount);
             public int SelfImplTotalDisposeCallCount => Thread.VolatileRead(ref selfImplTotalDisposeCallCount);
 
+            [UnmanagedResourceReleaseMethod]
             void SelfImplFinalize()
             {
                 Interlocked.Increment(ref selfImplReleaseUnmanagedResourceCallCount);
             }
 
+            [ManagedObjectDisposeMethod]
             void SelfImplSyncDispose()
             {
                 Interlocked.Increment(ref selfImplSyncDisposeCallCount);
                 Interlocked.Increment(ref selfImplTotalDisposeCallCount);
             }
 
+#pragma warning disable SG0011 // ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています
+            [ManagedObjectAsyncDisposeMethod]
             ValueTask SelfImplDisposeAsync()
             {
                 Interlocked.Increment(ref selfImplAsyncDisposeCallCount);
                 Interlocked.Increment(ref selfImplTotalDisposeCallCount);
                 return default;
             }
+#pragma warning restore SG0011 // ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています
         }
 
         [AutomaticDisposeImpl]

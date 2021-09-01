@@ -23,36 +23,41 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
             {
-                if (context.Node is not ClassDeclarationSyntax classDeclarationSyntax)
+                if (context.Node is ClassDeclarationSyntax classDeclarationSyntax)
                 {
-                    return;
+                    if (context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol)
+                    {
+                        return;
+                    }
+
+                    if (!ClassDeclarationTable.TryGetValue(namedTypeSymbol, out var classDeclarationSyntaxes))
+                    {
+                        classDeclarationSyntaxes = new List<ClassDeclarationSyntax>();
+                        ClassDeclarationTable.Add(namedTypeSymbol, classDeclarationSyntaxes);
+                    }
+
+                    classDeclarationSyntaxes.Add(classDeclarationSyntax);
+
+                    bool isAutomaticDisposeImplAnnotationedDeclaration = false;
+                    
+                    foreach (var attributeList in classDeclarationSyntax.AttributeLists)
+                    {
+                        foreach (var attribute in attributeList.Attributes)
+                        {
+                            if (IsAutomaticDisposeImplAttribute(context.SemanticModel.GetTypeInfo(attribute).Type))
+                            {
+                                isAutomaticDisposeImplAnnotationedDeclaration = true;
+                                goto LOOP_END_isAutomaticDisposeImplAnnotationedDeclaration;
+                            }
+                        }
+                    }
+                    LOOP_END_isAutomaticDisposeImplAnnotationedDeclaration:
+
+                    if (isAutomaticDisposeImplAnnotationedDeclaration)
+                    {
+                        AnotatedClassDeclarations.Add((classDeclarationSyntax, namedTypeSymbol));
+                    }
                 }
-
-                if (context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol namedTypeSymbol)
-                {
-                    return;
-                }
-
-                if (!ClassDeclarationTable.TryGetValue(namedTypeSymbol, out var classDeclarationSyntaxes))
-                {
-                    classDeclarationSyntaxes = new List<ClassDeclarationSyntax>();
-                    ClassDeclarationTable.Add(namedTypeSymbol, classDeclarationSyntaxes);
-                }
-
-                classDeclarationSyntaxes.Add(classDeclarationSyntax);
-
-                var isAutomaticDisposeImplAnnotationedDeclaration = classDeclarationSyntax.AttributeLists.SelectMany(attrList => attrList.Attributes)
-                                                                                                         .Select(attributeSyntax => context.SemanticModel.GetTypeInfo(attributeSyntax).Type)
-                                                                                                         .Any(IsAutomaticDisposeImplAnnotationTypeSymbol);
-
-                if (!isAutomaticDisposeImplAnnotationedDeclaration)
-                {
-                    return;
-                }
-
-                AnotatedClassDeclarations.Add((classDeclarationSyntax, namedTypeSymbol));
-
-                return;
             }
         }
     }

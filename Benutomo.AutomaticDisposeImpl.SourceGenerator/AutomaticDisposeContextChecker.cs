@@ -21,7 +21,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         public bool IsDisabledModeField(IFieldSymbol fieldSymbol)
         {
-            var automaticDisposeModeAttributeData = fieldSymbol.GetAttributes().SingleOrDefault(attr => AutomaticDisposeGenerator.IsAutomaticDisposeImplModeAnnotationTypeSymbol(attr.AttributeClass));
+            var automaticDisposeModeAttributeData = fieldSymbol.GetAttributes().SingleOrDefault(attr => AutomaticDisposeGenerator.IsAutomaticDisposeImplModeAttribute(attr.AttributeClass));
 
             var modeValue = automaticDisposeModeAttributeData?.ConstructorArguments.SingleOrDefault().Value;
 
@@ -38,7 +38,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         public bool IsDisabledModeProperty(IPropertySymbol propertySymbol)
         {
-            var automaticDisposeModeAttributeData = propertySymbol.GetAttributes().SingleOrDefault(attr => AutomaticDisposeGenerator.IsAutomaticDisposeImplModeAnnotationTypeSymbol(attr.AttributeClass));
+            var automaticDisposeModeAttributeData = propertySymbol.GetAttributes().SingleOrDefault(attr => AutomaticDisposeGenerator.IsAutomaticDisposeImplModeAttribute(attr.AttributeClass));
 
             var modeValue = automaticDisposeModeAttributeData?.ConstructorArguments.SingleOrDefault().Value;
 

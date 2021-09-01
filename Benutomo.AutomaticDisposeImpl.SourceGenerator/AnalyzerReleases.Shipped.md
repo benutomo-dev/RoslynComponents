@@ -7,9 +7,21 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-SG0001  | Usage     | Error    | AutomaticDisposeImpl属性を付与する型にはpartialキーワードが必須です。, [Documentation](https://www.google.co.jp/)
-SG0002  | Usage     | Error    | AutomaticDisposeImpl属性を付与する型にはIDisposableまたはIAsyncDisposableインターフェイスが必要, [Documentation](https://www.google.co.jp/)
-SG0003  | Usage     | Warning  | メンバの非同期破棄メソッドを利用するためにはIAsyncDisposableインターフェイスが必要, [Documentation](https://www.google.co.jp/)
-SG0004  | Usage     | Warning  | 非同期破棄のみをサポートするメンバはIDiposableのみを実装するクラスの自動破棄対象外, [Documentation](https://www.google.co.jp/)
-SG9998  | Execution | Error    | ソース生成の失敗, [Documentation](https://www.google.co.jp/)
-SG9999  | Execution | Error    | 異常終了, [Documentation](https://www.google.co.jp/)
+SG0001  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0002  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0003  | Usage     | Warning  | AutomaticDisposeAnalyzer
+SG0004  | Usage     | Warning  | AutomaticDisposeAnalyzer
+SG0005  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0006  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0007  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0008  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0009  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0010  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0011  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0012  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0013  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0014  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG0015  | Usage     | Warning  | AutomaticDisposeAnalyzer
+SG0016  | Usage     | Error    | AutomaticDisposeAnalyzer
+SG9998  | Execution | Error    | AutomaticDisposeAnalyzer
+SG9999  | Execution | Error    | AutomaticDisposeAnalyzer
