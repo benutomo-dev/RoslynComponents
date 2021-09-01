@@ -16,7 +16,7 @@
     <PackageVersion>0.0.0.3</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
-    <PackageTags>codegen;codegeneration;codegenerater;sourcegen;sourcegeneration;sourcegenerater;source;generation;idisposable;iasyncdisposable;disepose;disposeasync</PackageTags>
+    <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;idisposable;iasyncdisposable;disepose;disposeasync</PackageTags>
     <PackageProjectUrl>https://github.com/benutomo-dev/AutomaticDisposeImpl</PackageProjectUrl>
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
