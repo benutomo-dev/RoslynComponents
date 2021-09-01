@@ -36,7 +36,7 @@ namespace Benutomo
     /// <summary>
     /// 破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを自動実装Disposeの対象とすることに関する振る舞いの指定。
     /// </summary>
-    public enum AutomaticDisposeImplMode
+    internal enum AutomaticDisposeImplMode
     {
         /// <summary>
         /// デフォルト。メンバに指定した場合はクラス全体の設定と同じとする。クラス全体もデフォルトの場合は破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバは<see cref=""Enable"" />を設定した場合と同様に扱う。
@@ -67,7 +67,7 @@ namespace Benutomo
     /// 指定したクラスに破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを破棄する<see cref=""System.IDisposable.Dispose"" />メソッドおよび<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッド(当該クラスに<see cref=""System.IAsyncDisposable"" />インターフェイスが含まれている場合のみ)を自動実装する。
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class AutomaticDisposeImplAttribute : Attribute
+    internal class AutomaticDisposeImplAttribute : Attribute
     {
         /// <summary>
         /// メンバ毎の<see cref=""AutomaticDisposeImplMode"" />に<see cref=""AutomaticDisposeImplMode.Default"" />が指定されている場合の既定値を設定する。
@@ -88,7 +88,7 @@ namespace Benutomo
     /// メンバの破棄の自動実装の設定を明示する属性。
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class AutomaticDisposeImplModeAttribute : Attribute
+    internal class AutomaticDisposeImplModeAttribute : Attribute
     {
         /// <summary>
         /// 自動実装Disposeの対象とするか否かに関する設定。
@@ -118,7 +118,7 @@ namespace Benutomo
     /// <see cref=""Benutomo.AutomaticDisposeImplAttribute""/>を利用しているクラスで、ユーザが実装するアンマネージドリソースの解放を行うメソッド(引数なしで戻り値はvoid)に付与する。このメソッドはこのオブジェクトのDispose()またはDisposeAsync()、デストラクタのいずれかが初めて実行された時に自動実装コードから呼び出される。この属性を付与したメソッドは、実装者の責任でGCのファイナライズスレッドから呼び出されても問題無いように実装しなければならないことに注意すること。
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class UnmanagedResourceReleaseMethodAttribute : Attribute
+    internal class UnmanagedResourceReleaseMethodAttribute : Attribute
     {
         /// <summary>
         /// <inheritdoc cref=""Benutomo.UnmanagedResourceReleaseMethodAttribute""/>
@@ -139,7 +139,7 @@ namespace Benutomo
     /// <see cref=""Benutomo.AutomaticDisposeImplAttribute""/>を利用しているクラスで、ユーザが実装するマネージドオブジェクトを同期的な処理による破棄を行うメソッドに付与する。このメソッドはデストラクタからは呼び出されない。デストラクタからも呼び出される必要がある場合は<see cref=""Benutomo.UnmanagedResourceReleaseMethodAttribute"">を使用すること。この属性を付与するメソッドは引数なしで戻り値はvoidである必要がある。このメソッドはこのオブジェクトのDispose()が初めて実行された時に自動実装コードから呼び出される。ただし、このメソッドを所有するクラスがIAsyncDisposableも実装していて、かつ、DisposeAsync()によってこのオブジェクトが破棄された場合は、この属性が付与されているメソッドは呼び出されず、<see cref=""Benutomo.ManagedObjectAsyncDisposeMethodAttribute"">が付与されているメソッドが呼び出される。
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class ManagedObjectDisposeMethodAttribute : Attribute
+    internal class ManagedObjectDisposeMethodAttribute : Attribute
     {
         /// <summary>
         /// <inheritdoc cref=""Benutomo.ManagedObjectDisposeMethodAttribute""/>
@@ -160,7 +160,7 @@ namespace Benutomo
     /// <see cref=""Benutomo.AutomaticDisposeImplAttribute""/>を利用しているクラスで、ユーザが実装するマネージドオブジェクトを非同期的な処理による破棄を行うメソッドに付与する。このメソッドはデストラクタからは呼び出されない。デストラクタからも呼び出される必要がある場合はデストラクタで必要な処理を全て同期的に行うようにした上で<see cref=""Benutomo.UnmanagedResourceReleaseMethodAttribute"">を使用すること。この属性を付与するメソッドは引数なしで戻り値は<see cref=""System.Threading.ValueTask"" />などawait可能な型である必要がある。このメソッドはこのオブジェクトのDisposeAsync()が初めて実行された時に自動実装コードから呼び出される。ただし、このメソッドを所有するクラスがIDisposableも実装していて、かつ、Dispose()によってこのオブジェクトが破棄された場合は、この属性が付与されているメソッドは呼び出されず、<see cref=""Benutomo.ManagedObjectDisposeMethodAttribute"">が付与されているメソッドが呼び出される。
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class ManagedObjectAsyncDisposeMethodAttribute : Attribute
+    internal class ManagedObjectAsyncDisposeMethodAttribute : Attribute
     {
         /// <summary>
         /// <inheritdoc cref=""Benutomo.ManagedObjectAsyncDisposeMethodAttribute""/>
