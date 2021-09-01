@@ -61,76 +61,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             //context.RegisterSemanticModelAction(AnalyzeSemanticModel);
         }
 
-        private static void AnalyzeSemanticModel(SemanticModelAnalysisContext context)
-        {
-            //var automaticDisposeImplAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(AutomaticDisposeGenerator.AutomaticDisposeImplAttributeFullyQualifiedMetadataName);
-
-            //var automaticDisposeImplModeAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(AutomaticDisposeGenerator.AutomaticDisposeImplModeAttributeFullyQualifiedMetadataName);
-
-            //var automaticDisposeImplDesignations = context.SemanticModel.SyntaxTree.GetRoot()
-            //                                                                       .DescendantNodes()
-            //                                                                       .TakeWhile(_ => !context.CancellationToken.IsCancellationRequested)
-            //                                                                       .OfType<ClassDeclarationSyntax>()
-            //                                                                       .Select(classDeclarationSyntax => context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax))
-            //                                                                       .OfType<INamedTypeSymbol>()
-            //                                                                       .Where(symbol => AutomaticDisposeGenerator.IsAssignableTypeSymbolToIDisposable(symbol) && !AutomaticDisposeGenerator.IsAssignableTypeSymbolToIAsyncDisposable(symbol))
-            //                                                                       .Select(symbol => (symbol, attributeData: symbol.GetAttributes().SingleOrDefault(attrData => AutomaticDisposeGenerator.IsAutomaticDisposeImplAnnotationTypeSymbol(attrData.AttributeClass))!))
-            //                                                                       .Where(v => v.attributeData is not null)
-            //                                                                       .ToArray();
-
-            //foreach (var automaticDisposeImplDesignation in automaticDisposeImplDesignations)
-            //{
-            //    context.CancellationToken.ThrowIfCancellationRequested();
-
-            //    AutomaticDisposeContextChecker automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeImplDesignation.attributeData);
-
-            //    var memberAndLocationPairs = automaticDisposeImplDesignation.symbol.GetMembers()
-            //                                                                       .Select(member => (member, location: member.Locations.FirstOrDefault(location => location.SourceTree == context.SemanticModel.SyntaxTree)!))
-            //                                                                       .Where(v => v.location is not null);
-
-            //    foreach (var memberAndLocationPair in memberAndLocationPairs)
-            //    {
-            //        context.CancellationToken.ThrowIfCancellationRequested();
-
-            //        var member = memberAndLocationPair.member;
-            //        var location = memberAndLocationPair.location;
-
-            //        if (member.IsImplicitlyDeclared || member.IsStatic)
-            //        {
-            //            continue;
-            //        }
-
-            //        if (member is IFieldSymbol fieldSymbol)
-            //        {
-            //            if (!AutomaticDisposeGenerator.IsAssignableTypeSymbolToIAsyncDisposable(fieldSymbol.Type))
-            //            {
-            //                continue;
-            //            }
-
-            //            if (automaticDisposeContextChecker.IsDisabledModeField(fieldSymbol))
-            //            {
-            //                continue;
-            //            }
-
-            //            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, fieldSymbol.Name, automaticDisposeImplDesignation.symbol.Name));
-            //        }
-            //        else if (member is IPropertySymbol propertySymbol)
-            //        {
-            //            if (!AutomaticDisposeGenerator.IsAssignableTypeSymbolToIAsyncDisposable(propertySymbol.Type))
-            //            {
-            //                continue;
-            //            }
-
-            //            if (automaticDisposeContextChecker.IsDisabledModeProperty(propertySymbol))
-            //            {
-            //                continue;
-            //            }
-
-            //            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, propertySymbol.Name, automaticDisposeImplDesignation.symbol.Name));
-            //        }
-            //    }
-            //}
-        }
+        //private static void AnalyzeSemanticModel(SemanticModelAnalysisContext context)
+        //{
+        //}
 
         private static void AnalyzeNamedTypeSymbol(SymbolAnalysisContext context)
         {
