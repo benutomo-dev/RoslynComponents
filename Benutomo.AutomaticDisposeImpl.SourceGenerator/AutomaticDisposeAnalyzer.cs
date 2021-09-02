@@ -543,7 +543,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     }
                 }
 
-                if (managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
+                if (isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
                 {
                     if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
                     {
