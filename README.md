@@ -158,7 +158,7 @@ partial class Sample
 
 ```cs 
 [AutomaticDisposeImpl(DefaultMode = AutomaticDisposeImplMode.Disable)] // メンバの自動破棄の規定値を無効に変更
-partial class UserDefinedDisposeImplMethod2 : IDisposable, IAsyncDisposable
+partial class AutomaticDisposeImplMode : IDisposable, IAsyncDisposable
 {
     IDisposable _ignoredDisposable1; // 規定値が無効であるため、このメンバのDispose()は自動実装コードからは呼び出されません。
 
