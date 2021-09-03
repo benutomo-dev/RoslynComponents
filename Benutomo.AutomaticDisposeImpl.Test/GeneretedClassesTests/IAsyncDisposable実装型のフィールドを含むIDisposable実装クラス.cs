@@ -10,20 +10,20 @@ using Xunit;
 // VisualStudioの警告表示を目視確認をするときだけコメントアウトする
 #pragma warning disable SG0003
 
-namespace Benutomo.AutomaticDisposeImpl.Test
+namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
 {
-    public partial class IAsyncDisposable実装型のプロパティを含むIDisposable実装クラス
+    public partial class IAsyncDisposable実装型のフィールドを含むIDisposable実装クラス
     {
         [AutomaticDisposeImpl]
-        partial class NullPropertyClass : IDisposable
+        partial class NullFieldClass : IDisposable
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable { get; set; } = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal IAutomaticImplSupportedAsyncDisposable disposable = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
-            internal ImplicitAsyncDisposableImplementClass baseDisposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal ImplicitAsyncDisposableImplementClass baseDisposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             int baseImplReleaseUnmanagedResourceCallCount;
             int baseImplSyncDisposeCallCount;
@@ -62,7 +62,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
-            internal ImplicitAsyncDisposableImplementClass selfDisposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal ImplicitAsyncDisposableImplementClass selfDisposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             int selfImplReleaseUnmanagedResourceCallCount;
             int selfImplSyncDisposeCallCount;
@@ -99,54 +99,54 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [AutomaticDisposeImpl]
-        partial class GetonlyPropertyClass : IDisposable
+        partial class ReadonlyFieldClass : IDisposable
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable { get; } // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal readonly IAutomaticImplSupportedAsyncDisposable disposable; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
-            public GetonlyPropertyClass(IAutomaticImplSupportedAsyncDisposable disposable)
+            public ReadonlyFieldClass(IAutomaticImplSupportedAsyncDisposable disposable)
             {
                 this.disposable = disposable;
             }
         }
 
         [AutomaticDisposeImpl]
-        partial class GenericTypePropertyClass<T> : IDisposable where T : IDisposable, IAsyncDisposable
+        partial class GenericTypeFieldClass<T> : IDisposable where T : IDisposable, IAsyncDisposable
         {
-            internal T disposable { get; } // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal T disposable; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
-            public GenericTypePropertyClass(T disposable)
+            public GenericTypeFieldClass(T disposable)
             {
                 this.disposable = disposable;
             }
         }
 
         [AutomaticDisposeImpl]
-        partial class InterfacePropertyClass : IDisposable
+        partial class InterfaceFieldClass : IDisposable
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable { get; set; } // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal IAutomaticImplSupportedAsyncDisposable disposable; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
-            public InterfacePropertyClass(IAutomaticImplSupportedAsyncDisposable disposable)
+            public InterfaceFieldClass(IAutomaticImplSupportedAsyncDisposable disposable)
             {
                 this.disposable = disposable;
             }
         }
 
         [AutomaticDisposeImpl]
-        partial class ImplicitAsyncDisposableImplementClassPropertyClass : IDisposable
+        partial class ImplicitAsyncDisposableImplementClassFieldClass : IDisposable
         {
-            internal ImplicitAsyncDisposableImplementClass disposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal ImplicitAsyncDisposableImplementClass disposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [AutomaticDisposeImpl]
-        partial class ExplicitAsyncDisposableImplemetnClassPropertyClass : IDisposable
+        partial class ExplicitAsyncDisposableImplemetnClassFieldClass : IDisposable
         {
-            internal ExplicitAsyncDisposableImplemetnClass disposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            internal ExplicitAsyncDisposableImplemetnClass disposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [Fact]
-        public void プロパティがnull値となっている場合でもDisposeで例外は発生しない()
+        public void フィールドがnull値となっている場合でもDisposeで例外は発生しない()
         {
-            var testeeObject = new NullPropertyClass();
+            var testeeObject = new NullFieldClass();
             testeeObject.Dispose();
         }
 
@@ -249,7 +249,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [Fact]
-        public void getonlyプロパティに対する自動実装()
+        public void readonlyフィールドに対する自動実装()
         {
             // IAsyncDisposableを実装している型のメンバを自動破棄するためにはメンバがIDisposableも実装している必要があるので
             // テストでは両方のインターフェイスを合成したIAutomaticImplSupportedAsyncDisposableを使用
@@ -258,17 +258,19 @@ namespace Benutomo.AutomaticDisposeImpl.Test
 
             disposableMock.Setup(v => v.Dispose());
 
-            var testeeObject = new GetonlyPropertyClass(disposableMock.Object);
+            var testeeObject = new ReadonlyFieldClass(disposableMock.Object);
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeの呼び出しが伝搬していない。");
+
+            testeeObject.IsDisposed.Should().BeTrue("Disposeの完了後は真でなければならない。");
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "２回目以降のDisposeの呼び出しが伝搬してしまっている。");
         }
 
         [Fact]
-        public void ジェネリック型プロパティに対する自動実装()
+        public void ジェネリック型フィールドに対する自動実装()
         {
             // IAsyncDisposableを実装している型のメンバを自動破棄するためにはメンバがIDisposableも実装している必要があるので
             // テストでは両方のインターフェイスを合成したIAutomaticImplSupportedAsyncDisposableを使用
@@ -277,17 +279,19 @@ namespace Benutomo.AutomaticDisposeImpl.Test
 
             disposableMock.Setup(v => v.Dispose());
 
-            var testeeObject = new GenericTypePropertyClass<IAutomaticImplSupportedAsyncDisposable>(disposableMock.Object);
+            var testeeObject = new GenericTypeFieldClass<IAutomaticImplSupportedAsyncDisposable>(disposableMock.Object);
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeの呼び出しが伝搬していない。");
+
+            testeeObject.IsDisposed.Should().BeTrue("Disposeの完了後は真でなければならない。");
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "２回目以降のDisposeの呼び出しが伝搬してしまっている。");
         }
 
         [Fact]
-        public void IDisposable型のプロパティに対する自動実装()
+        public void IAsyncDisposable型のフィールドに対する自動実装()
         {
             // IAsyncDisposableを実装している型のメンバを自動破棄するためにはメンバがIDisposableも実装している必要があるので
             // テストでは両方のインターフェイスを合成したIAutomaticImplSupportedAsyncDisposableを使用
@@ -296,34 +300,40 @@ namespace Benutomo.AutomaticDisposeImpl.Test
 
             disposableMock.Setup(v => v.Dispose());
 
-            var testeeObject = new InterfacePropertyClass(disposableMock.Object);
+            var testeeObject = new InterfaceFieldClass(disposableMock.Object);
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeの呼び出しが伝搬していない。");
+
+            testeeObject.IsDisposed.Should().BeTrue("Disposeの完了後は真でなければならない。");
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "２回目以降のDisposeの呼び出しが伝搬してしまっている。");
         }
 
         [Fact]
-        public void IAsyncDisposableを直接実装している型のプロパティに対する自動実装()
+        public void IAsyncDisposableを直接実装している型のフィールドに対する自動実装()
         {
-            var testeeObject = new ImplicitAsyncDisposableImplementClassPropertyClass();
+            var testeeObject = new ImplicitAsyncDisposableImplementClassFieldClass();
 
             testeeObject.Dispose();
             testeeObject.disposable.ManagedContextSyncDisposeCount.Should().Be(1, "最初のDisposeの呼び出しは伝搬されなければならない。");
+
+            testeeObject.IsDisposed.Should().BeTrue("Disposeの完了後は真でなければならない。");
 
             testeeObject.Dispose();
             testeeObject.disposable.ManagedContextSyncDisposeCount.Should().Be(1, "２回目以降のDisposeの呼び出しが伝搬してはいけない。");
         }
 
         [Fact]
-        public void IAsyncDisposableを直接明示的に実装している型のプロパティに対する自動実装()
+        public void IAsyncDisposableを直接明示的に実装している型のフィールドに対する自動実装()
         {
-            var testeeObject = new ExplicitAsyncDisposableImplemetnClassPropertyClass();
+            var testeeObject = new ExplicitAsyncDisposableImplemetnClassFieldClass();
 
             testeeObject.Dispose();
             testeeObject.disposable.ManagedContextSyncDisposeCount.Should().Be(1, "最初のDisposeの呼び出しは伝搬されなければならない。");
+
+            testeeObject.IsDisposed.Should().BeTrue("Disposeの完了後は真でなければならない。");
 
             testeeObject.Dispose();
             testeeObject.disposable.ManagedContextSyncDisposeCount.Should().Be(1, "２回目以降のDisposeの呼び出しが伝搬してはいけない。");

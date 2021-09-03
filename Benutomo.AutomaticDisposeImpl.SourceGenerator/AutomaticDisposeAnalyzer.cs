@@ -91,12 +91,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             isEnabledByDefault: true);
 
         /// <summary>
-        /// IDisposableを実装していないクラスのメソッドに対してManagedObjectDisposeMethod属性を付与することはできません。
+        /// IDisposableを実装していないクラスでManagedObjectDisposeMethod属性を使用することは出来ません。ManagedObjectDisposeMethod属性を付与したメソッドは、IDisposable.Dispose()の呼び出しと対応します。このメソッドはIAsyncDisposable.DisposeAsync()の自動実装コードからは呼び出されません。
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_SG0007 = new DiagnosticDescriptor(
             "SG0007",
-            "ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています",
-            "IDisposableを実装していないクラスのメソッドに対してManagedObjectDisposeMethod属性を付与することはできません。",
+            "ManagedObjectDisposeMethod属性がIDisposableインターフェースを実装していないクラスで使用されています。",
+            "IDisposableを実装していないクラスでManagedObjectDisposeMethod属性を使用することは出来ません。ManagedObjectDisposeMethod属性を付与したメソッドは、IDisposable.Dispose()の呼び出しと対応します。このメソッドはIAsyncDisposable.DisposeAsync()の自動実装コードからは呼び出されません。",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
@@ -135,12 +135,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             isEnabledByDefault: true);
 
         /// <summary>
-        /// IAsyncDisposableを実装していないクラスのメソッドに対してManagedObjectAsyncDisposeMethod属性を付与することはできません。
+        /// IAsyncDisposableを実装していないクラスでManagedObjectAsyncDisposeMethod属性を使用することは出来ません。ManagedObjectAsyncDisposeMethod属性を付与したメソッドは、IAsyncDisposable.DisposeAsync()の呼び出しと対応します。このメソッドはIDisposable.Dispose()の自動実装コードからは呼び出されません。
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_SG0011 = new DiagnosticDescriptor(
             "SG0011",
-            "ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています",
-            "IAsyncDisposableを実装していないクラスのメソッドに対してManagedObjectAsyncDisposeMethod属性を付与することはできません。",
+            "ManagedObjectAsyncDisposeMethod属性がIAsyncDisposableインターフェースを実装していないクラスのメソッドに付与されています",
+            "IAsyncDisposableを実装していないクラスでManagedObjectAsyncDisposeMethod属性を使用することは出来ません。ManagedObjectAsyncDisposeMethod属性を付与したメソッドは、IAsyncDisposable.DisposeAsync()の呼び出しと対応します。このメソッドはIDisposable.Dispose()の自動実装コードからは呼び出されません。",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
@@ -150,7 +150,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_SG0012 = new DiagnosticDescriptor(
             "SG0012",
-            "ManagedObjectDisposeMethod属性がAutomaticDisposeImpl属性を付与されていないクラスのメソッドに付与されています",
+            "ManagedObjectAsyncDisposeMethod属性がAutomaticDisposeImpl属性を付与されていないクラスのメソッドに付与されています",
             "AutomaticDisposeImpl属性を付与していないクラスのメソッドに対してManagedObjectAsyncDisposeMethod属性を付与することはできません。",
             "Usage",
             DiagnosticSeverity.Error,
@@ -448,7 +448,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     }
                     else
                     {
-                        if (isAssignableToIAsyncDisposable)
+                        if (isAssignableToIDisposable)
                         {
                             // 自動実装対象クラスがIDisposableのみを実装
 
@@ -543,15 +543,22 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     }
                 }
 
-                if (isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
+                if (isAssignableToIDisposable && isAssignableToIAsyncDisposable)
                 {
-                    if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
+                    // 自動実装対象として指定されたクラスがIDisposableとIAsyncDisposableの両方を実装
+
+                    if (managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, classDeclarationSyntax.Identifier.GetLocation(), managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
-                    }
-                    else
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, namedTypeSymbol.Locations[0], managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
+                        // ユーザ実装の破棄が非同期側にしか存在していない
+
+                        if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, classDeclarationSyntax.Identifier.GetLocation(), managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
+                        }
+                        else
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, namedTypeSymbol.Locations[0], managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
+                        }
                     }
                 }
 
