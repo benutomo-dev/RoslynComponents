@@ -115,25 +115,25 @@ using System;
 
 // 同期的な破棄(IDisposable)を自動実装
 [AutomaticDisposeImpl]
-partial class Sample : IDisposable
+partial class Sample1 : IDisposable
 {
 }
 
 // 非同期的な破棄(IAsyncDisposable)を自動実装
 [AutomaticDisposeImpl]
-partial class Sample : IAsyncDisposable
+partial class Sample2 : IAsyncDisposable
 {
 }
 
 // 同期的な破棄(IDisposable)と非同期的な破棄(IAsyncDisposable)を自動実装
 [AutomaticDisposeImpl]
-partial class Sample : IDisposable, IAsyncDisposable
+partial class Sample3 : IDisposable, IAsyncDisposable
 {
 }
 
 // インターフェイスが明示的に実装されていないため、NG。IDisposableとIAsyncDisposableの少なくとどちらか一方の実装が必要。
 [AutomaticDisposeImpl]
-partial class Sample
+partial class Sample4
 {
 }
 ```
