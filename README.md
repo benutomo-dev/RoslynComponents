@@ -140,7 +140,7 @@ partial class Sample
 
 ℹ 自動実装コードからメンバの破棄が行われるのは呼び出し方に関わらず(自動実装クラスの`Dispose()`と`DisposeAysnc()`のどちらが先に何回呼び出されても)、最大１回です。標準の[Disposeパターン](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose#implement-the-dispose-pattern)と同様に重複する呼び出しは無視されます。
 
-ℹ 自動実装されたメンバの破棄で生じた例外は、リリースビルド時は無視され、デバッグビルド時はDebug.Fail()によって、デバッガを停止させます。標準的な`Dispose()`等は例外を発生させることなく複数回の呼び出しが可能である必要があります([Disposeメソッドの実装](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose))。自動実装されるコードはそれが守られていることを期待しているため、破棄で例外を発生させるメンバが存在する場合は、後述する方法で破棄の自動実装対象から除外し、独自処理メソッドの中で破棄と例外のハンドリングを行って下さい。
+ℹ 自動実装されたメンバの破棄で生じた例外は、リリースビルド時は無視され、デバッグビルド時はDebug.Fail()によってデバッガを停止させます。標準的な`Dispose()`等は例外を発生させることなく複数回の呼び出しが可能である必要があります([Disposeメソッドの実装](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose))。自動実装されるコードはそれが守られていることを期待しているため、破棄で例外を発生させるメンバが存在する場合は、後述する方法で破棄の自動実装対象から除外し、独自処理メソッドの中で破棄と例外のハンドリングを行って下さい。
 
 ### 破棄の自動実装から除外したいメンバを指定する
 
