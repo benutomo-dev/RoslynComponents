@@ -222,4 +222,4 @@ partial class UserDefinedFinalizeImplSample : IDisposable, IAsyncDisposable
 }
 ```
 
-ℹ `[UnmanagedResourceReleaseMethod]`属性を使用したクラスはデストラクタも自動実装されます。そのため、明示的に`Dispose()`または`DisposeAsync()`の呼び出しがされずにガーベジコレクトさた場合もガーベジコレクタのファイナライズで`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドが呼び出されます。
+ℹ `[UnmanagedResourceReleaseMethod]`属性を使用したクラスはファイナライザも自動実装されます。そのため、明示的に`Dispose()`または`DisposeAsync()`の呼び出しがされずにオブジェクトがガーベジコレクトされた場合もガーベジコレクタのファイナライズのタイミングで自動実装されたファイナライザを経由して`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドが呼び出されます。
