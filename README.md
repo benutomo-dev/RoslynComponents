@@ -224,4 +224,4 @@ partial class UserDefinedFinalizeImplSample : IDisposable, IAsyncDisposable
 
 ℹ `[UnmanagedResourceReleaseMethod]`属性を使用したクラスはファイナライザも自動実装されます。そのため、明示的に`Dispose()`または`DisposeAsync()`の呼び出しがされずにオブジェクトがガーベジコレクトされた場合もガーベジコレクタのファイナライズのタイミングで自動実装されたファイナライザを経由して`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドが呼び出されます。
 
-ℹ `[UnmanagedResourceReleaseMethod]`属性を付与したメソッドはオブジェクトが生成されてから消滅するまでに、その間の明示的な破棄の有無や回数に関わらず、自動実装側からの呼び出し回数が必ず１回なることが保証されます。
+ℹ `[ManagedObjectDisposeMethod]`属性で破棄を自動実装したクラスは`IDisposable`と`IAsyncDisposable`を直接実装している`seald`クラスであるか、継承関係にある親クラス・子クラスが[同期](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose#implement-the-dispose-pattern)および[非同期](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-disposeasync#implement-the-async-dispose-pattern)の破棄パターンを正しく実装している限り、`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドはオブジェクトが生成されてから消滅するまでに、その間の明示的な破棄の有無や回数に関わらず、自動実装側からの呼び出し回数が必ず１回なることが保証されます。
