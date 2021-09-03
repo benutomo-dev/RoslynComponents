@@ -213,8 +213,6 @@ sample.Dipose();
 
 `IDisposable.Dipose()`などで自動破棄できるメンバのほかに、`System.IntPtr`等を利用してアンマネージドリソースのハンドルなどを保持している場合は`[UnmanagedResourceReleaseMethod]`属性を利用することで、アンマネージドリソースの破棄を行うメソッドを自動実装されるコードから呼び出させることができます。
 
-`[UnmanagedResourceReleaseMethod]`属性を使用したクラスはデストラクタも自動実装されます。そのため、明示的に`Dispose()`または`DisposeAsync()`の呼び出しがされずにガーベジコレクトさた場合もガーベジコレクタのファイナライズスレッドで`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドが呼び出されます。
-
 ```cs
 [AutomaticDisposeImpl]
 partial class UserDefinedFinalizeImplSample : IDisposable, IAsyncDisposable
@@ -223,3 +221,5 @@ partial class UserDefinedFinalizeImplSample : IDisposable, IAsyncDisposable
     void UnmanagedResourceReleaseMethod() { } // 自動実装のDispose(),DiposeAsync(),~UserDefinedFinalizeImplSample()から呼び出される。アンマネージドリソースの破棄はここで実装することができる。
 }
 ```
+
+ℹ `[UnmanagedResourceReleaseMethod]`属性を使用したクラスはデストラクタも自動実装されます。そのため、明示的に`Dispose()`または`DisposeAsync()`の呼び出しがされずにガーベジコレクトさた場合もガーベジコレクタのファイナライズで`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドが呼び出されます。
