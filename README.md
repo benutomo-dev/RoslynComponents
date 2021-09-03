@@ -15,22 +15,25 @@ using Benutomo;
 
 namespace SampleCode
 {
+    // 自動実装を適用するクラス
     [AutomaticDisposeImpl]
     public partial class DisposeableTest : IDisposable, IAsyncDisposable
     {
         // DisposeableTestのDipose()とDiposeAsync()は自動実装されるため、定義不要
         
-        // IDisposable.Dispose()による破棄が可能なメンバ
+        // IDisposable.Dispose()による破棄が可能なフィールド
         ConsoleOutputDisposable consoleOutputDisposable = new ConsoleOutputDisposable();
 
-        // IDisposable.Dispose()とIAsyncDisposable.DisposeAsync()のどちらでも破棄が可能なメンバ
-        ConsoleOutputAsyncDisposable consoleOutputAsyncDisposable = new ConsoleOutputAsyncDisposable();
+        // IDisposable.Dispose()とIAsyncDisposable.DisposeAsync()のどちらでも破棄が可能なプロパティ
+        ConsoleOutputAsyncDisposable consoleOutputAsyncDisposable { get; } = new ConsoleOutputAsyncDisposable();
 
         public DisposeableTest()
         {
             Console.WriteLine("Created new DisposeableTest");
         }
     }
+    
+    // 以降は、出力例のためのコード
 
     class Program
     {
@@ -78,7 +81,7 @@ namespace SampleCode
 
 ### サンプルコードを実行した際の出力例
 以下のようにクラス内に含まれる`IDisposable`または`IAsyncDisposable`を実装したメンバの`Dispose()`と`DisposeAsync()`は、自動実装されたコードから呼び出されます。
-自動実装クラスの`DisposeAsync()`はメンバの破棄にも基本は`DisposeAsync()`を呼び出しますが、メンバが`IDisposable`しか実装していない場合は`Dispose()`を呼び出します。
+自動実装クラスの`DisposeAsync()`は基本的にメンバの破棄にも`DisposeAsync()`を呼び出しますが、メンバが`IDisposable`しか実装していない場合は`Dispose()`を使用して破棄します。
 ```
 Created new DisposeableTest
 Begin disposeTestInstance.Dispose()
@@ -104,7 +107,7 @@ Install-Package Benutomo.AutomaticDisposeImpl.SourceGenerator
 ```
 
 ### 基本
-以下のように、破棄の自動実装を使用したいクラスを含むC#のソースコードの先頭部に`using Benutomo;`を追加し、`IDisposable`を実装しているクラスに`partial`キーワードと`[AutomaticDisposeImpl]`属性を追加します。自動実装する意味がありませんが、メンバは空でも問題ありません。ただし、`IDisposable`と`IAsyncDisposable`は利用者側のコードで実装を明記する必要があります。
+以下のように、破棄の自動実装を使用したいクラスを含むC#のソースコードの先頭部に`using Benutomo;`を追加し、`IDisposable`を実装しているクラスに`partial`キーワードと`[AutomaticDisposeImpl]`属性を追加します。自動実装する意味がありませんが、メンバは空でも問題ありません。ただし、`IDisposable`と`IAsyncDisposable`は利用者側のコードで明記する必要があります。
 
 ```cs
 using Benutomo;
@@ -135,11 +138,15 @@ partial class Sample
 }
 ```
 
+ℹ 自動実装コードからメンバの破棄が行われるのは呼び出し方に関わらず(自動実装クラスの`Dispose()`と`DisposeAysnc()`のどちらが先に何回呼び出されても)、最大１回です。標準の[Disposeパターン](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose#implement-the-dispose-pattern)と同様に重複する呼び出しは無視されます。
+
+ℹ 自動実装されたメンバの破棄で生じた例外は、リリースビルド時は無視され、デバッグビルド時はDebug.Fail()によって、デバッガを停止させます。標準的な`Dispose()`等は例外を発生させることなく複数回の呼び出しが可能である必要があります([Disposeメソッドの実装](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose))。自動実装されるコードはそれが守られていることを期待しているため、破棄で例外を発生させるメンバが存在する場合は、後述する方法で破棄の自動実装対象から除外し、独自処理メソッドの中で破棄と例外のハンドリングを行って下さい。
+
 ### 破棄の自動実装から除外したいメンバを指定する
 
-`[AutomaticDisposeImpl]`属性のオプション(DefaultMode)と`[AutomaticDisposeImplMode]`属性を使用すると、破棄の自動実装の対象をコントロールすることができます。
+`[AutomaticDisposeImpl]`属性のオプション(`DefaultMode`)と`[AutomaticDisposeImplMode]`属性を使用すると、破棄の自動実装の対象をコントロールすることができます。
 
-`[AutomaticDisposeImpl]`属性の`DefaultMode`に`AutomaticDisposeImplMode.Disable`を指定すると、クラス全体の自動実装コードからの破棄の呼び出しのデフォルトが無効になります(`Dispose()`メソッドと'DisposeAsync()'メソッドは作られますがデフォルトではメンバの破棄をしなくなります)。
+`[AutomaticDisposeImpl]`属性の`DefaultMode`に`AutomaticDisposeImplMode.Disable`を指定すると、クラス全体の自動実装コードからの破棄の呼び出しのデフォルトが無効になります(`Dispose()`メソッドと`DisposeAsync()`メソッドは作られますがデフォルトではメンバの破棄をしなくなります)。
 
 また、メンバに対して`[AutomaticDisposeImplMode]`属性を付与することでメンバごとにクラスのデフォルトと異なる設定を適用することができます。設定できるモードは以下の３値です。
 
@@ -163,7 +170,7 @@ partial class UserDefinedDisposeImplMethod2 : IDisposable, IAsyncDisposable
 }
 ```
 
-### Dispose()などが呼び出されるタイミングで自動実装される処理と同時に独自の処理も実行する
+### Dispose()などが呼び出されるタイミングで自動実装されるメンバの破棄と同時に独自の処理も実行する
 
 `[ManagedObjectDisposeMethod]`属性と`[ManagedObjectAsyncDisposeMethod]`属性を使用すると、自動実装される`Dispose()`および、`DisposeAsync()`の中からユーザ側のコードで実装されるメソッドを呼び出させることができます。
 
@@ -179,9 +186,9 @@ partial class UserDefinedDisposeImplSample : IDisposable, IAsyncDisposable
 }
 ```
 
-`[ManagedObjectDisposeMethod]`属性を付与するメソッドは戻り値がvoidかつ引数の存在しないインスタンスメソッドである必要があります。
+`[ManagedObjectDisposeMethod]`属性を付与するメソッドは戻り値が`void`かつ引数の存在しないインスタンスメソッドである必要があります。
 
-`[ManagedObjectAsyncDisposeMethod]`属性を付与するメソッドは戻り値がValueTaskまたはTaskかつ引数の存在しないインスタンスメソッドである必要があります。
+`[ManagedObjectAsyncDisposeMethod]`属性を付与するメソッドは戻り値が`ValueTask`または`Task`かつ引数の存在しないインスタンスメソッドである必要があります。
 
 どちらの場合も、一つのクラス内で同じ属性を複数のメソッドに付与することはできません。
 
@@ -196,7 +203,11 @@ await sample.DiposeAsync();
 sample.Dipose();
 ```
 
-のように呼び出された場合、ユーザのメソッドが呼ばれるのは最初の`sample.Dispose()`のタイミングで`ManagedObjectDisposeMethod()`が呼び出される１回のみです。そのあとに続く`await sample.DiposeAsync()`と２回目の`sample.Dispose()`は完全に無視されます。上記の例で`ManagedObjectDisposeMethodAsync()`が呼び出されることはありません。`ManagedObjectDisposeMethod()`も最初の１回のみ呼び出されます。
+のように呼び出された場合、ユーザのメソッドが呼ばれるのは最初の`sample.Dispose()`のタイミングで`ManagedObjectDisposeMethod()`が呼び出される１回のみです。そのあとに続く`await sample.DiposeAsync()`と２回目の`sample.Dispose()`は完全に無視されます。上記の例で`ManagedObjectDisposeMethodAsync()`が呼び出されることはありません。
+
+もし、最初の破棄が`await sample.DiposeAsync()`で行われた場合は、`ManagedObjectDisposeMethodAsync()`が１回のみ呼び出され、それ以降は同様に無視されます。
+
+⚠ **自動実装のメンバ破棄と独自の処理の実行順は不確定です**。将来のバージョンでは順番が入れ替わる可能性がありますので、現在の自動実装の順番に依存しないように注意して下さい。
 
 ### アンマネージドリソースの破棄
 
