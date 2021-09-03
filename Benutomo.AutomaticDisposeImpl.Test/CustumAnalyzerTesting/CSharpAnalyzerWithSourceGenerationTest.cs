@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis.Testing.Verifiers;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using Benutomo.AutomaticDisposeImpl.SourceGenerator;
 using System.Threading;
 
 namespace Benutomo.AutomaticDisposeImpl.Test.CustumAnalyzerTesting

@@ -1,10 +1,4 @@
-﻿using Benutomo.AutomaticDisposeImpl.SourceGenerator;
-using FluentAssertions;
-using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
-using System;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.CodeAnalysis.Testing;
 using System.Threading.Tasks;
 using Xunit;
 
