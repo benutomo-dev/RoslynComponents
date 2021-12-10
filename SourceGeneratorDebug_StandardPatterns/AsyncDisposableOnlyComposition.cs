@@ -1,6 +1,5 @@
 ﻿using Benutomo;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 class AsyncOnlyDisposable : IAsyncDisposable

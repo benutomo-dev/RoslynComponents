@@ -6,22 +6,22 @@ using System.Linq;
 using System.Threading;
 using Xunit;
 
-namespace Benutomo.AutomaticDisposeImpl.Test
+namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
 {
-    public partial class IDisposable実装型のフィールドを含むIDisposable実装クラス
+    public partial class IDisposable実装型のプロパティを含むIDisposable実装クラス
     {
         [AutomaticDisposeImpl]
-        partial class NullFieldClass : IDisposable
+        partial class NullPropertyClass : IDisposable
         {
             [EnableAutomaticDispose]
-            internal IDisposable? disposable = null;
+            internal IDisposable? disposable { get; set; } = null;
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
             [EnableAutomaticDispose]
-            internal ImplicitDisposableImplementClass baseDisposable = new();
+            internal ImplicitDisposableImplementClass baseDisposable { get; set; } = new();
 
             int baseImplReleaseUnmanagedResourceCallCount;
             int baseImplDisposeCallCount;
@@ -46,7 +46,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
             [EnableAutomaticDispose]
-            internal ImplicitDisposableImplementClass selfDisposable = new();
+            internal ImplicitDisposableImplementClass selfDisposable { get; set; } = new();
 
             int selfImplReleaseUnmanagedResourceCallCount;
             int selfImplDisposeCallCount;
@@ -68,59 +68,59 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [AutomaticDisposeImpl]
-        partial class ReadonlyFieldClass : IDisposable
+        partial class GetonlyPropertyClass : IDisposable
         {
             [EnableAutomaticDispose]
-            internal readonly IDisposable disposable;
+            internal IDisposable disposable { get; }
 
-            public ReadonlyFieldClass(IDisposable disposable)
+            public GetonlyPropertyClass(IDisposable disposable)
             {
                 this.disposable = disposable;
             }
         }
 
         [AutomaticDisposeImpl]
-        partial class GenericTypeFieldClass<T> : IDisposable where T : IDisposable
+        partial class GenericTypePropertyClass<T> : IDisposable where T : IDisposable
         {
             [EnableAutomaticDispose]
-            internal T disposable;
+            internal T disposable { get; }
 
-            public GenericTypeFieldClass(T disposable)
+            public GenericTypePropertyClass(T disposable)
             {
                 this.disposable = disposable;
             }
         }
 
         [AutomaticDisposeImpl]
-        partial class InterfaceFieldClass : IDisposable
+        partial class InterfacePropertyClass : IDisposable
         {
             [EnableAutomaticDispose]
-            internal IDisposable disposable;
+            internal IDisposable disposable { get; set; }
 
-            public InterfaceFieldClass(IDisposable disposable)
+            public InterfacePropertyClass(IDisposable disposable)
             {
                 this.disposable = disposable;
             }
         }
 
         [AutomaticDisposeImpl]
-        partial class ImplicitDisposableImplementClassFieldClass : IDisposable
+        partial class ImplicitDisposableImplementClassPropertyClass : IDisposable
         {
             [EnableAutomaticDispose]
-            internal ImplicitDisposableImplementClass disposable = new();
+            internal ImplicitDisposableImplementClass disposable { get; set; } = new();
         }
 
         [AutomaticDisposeImpl]
-        partial class ExplicitDisposableImplemetnClassFieldClass : IDisposable
+        partial class ExplicitDisposableImplemetnClassPropertyClass : IDisposable
         {
             [EnableAutomaticDispose]
-            internal ExplicitDisposableImplemetnClass disposable = new();
+            internal ExplicitDisposableImplemetnClass disposable { get; set; } = new();
         }
 
         [Fact]
-        public void フィールドがnull値となっている場合でもDisposeで例外は発生しない()
+        public void プロパティがnull値となっている場合でもDisposeで例外は発生しない()
         {
-            var testeeObject = new NullFieldClass();
+            var testeeObject = new NullPropertyClass();
             testeeObject.Dispose();
         }
 
@@ -217,13 +217,13 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [Fact]
-        public void readonlyフィールドに対する自動実装()
+        public void getonlyプロパティに対する自動実装()
         {
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
 
             disposableMock.Setup(v => v.Dispose());
 
-            var testeeObject = new ReadonlyFieldClass(disposableMock.Object);
+            var testeeObject = new GetonlyPropertyClass(disposableMock.Object);
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeの呼び出しが伝搬していない。");
@@ -233,13 +233,13 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [Fact]
-        public void ジェネリック型フィールドに対する自動実装()
+        public void ジェネリック型プロパティに対する自動実装()
         {
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
 
             disposableMock.Setup(v => v.Dispose());
 
-            var testeeObject = new GenericTypeFieldClass<IDisposable>(disposableMock.Object);
+            var testeeObject = new GenericTypePropertyClass<IDisposable>(disposableMock.Object);
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeの呼び出しが伝搬していない。");
@@ -249,13 +249,13 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [Fact]
-        public void IDisposable型のフィールドに対する自動実装()
+        public void IDisposable型のプロパティに対する自動実装()
         {
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
 
             disposableMock.Setup(v => v.Dispose());
 
-            var testeeObject = new InterfaceFieldClass(disposableMock.Object);
+            var testeeObject = new InterfacePropertyClass(disposableMock.Object);
 
             testeeObject.Dispose();
             disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeの呼び出しが伝搬していない。");
@@ -265,9 +265,9 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [Fact]
-        public void IDisposableを直接実装している型のフィールドに対する自動実装()
+        public void IDisposableを直接実装している型のプロパティに対する自動実装()
         {
-            var testeeObject = new ImplicitDisposableImplementClassFieldClass();
+            var testeeObject = new ImplicitDisposableImplementClassPropertyClass();
 
             testeeObject.Dispose();
             testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "最初のDisposeの呼び出しは伝搬されなければならない。");
@@ -277,9 +277,9 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         }
 
         [Fact]
-        public void IDisposableを直接明示的に実装している型のフィールドに対する自動実装()
+        public void IDisposableを直接明示的に実装している型のプロパティに対する自動実装()
         {
-            var testeeObject = new ExplicitDisposableImplemetnClassFieldClass();
+            var testeeObject = new ExplicitDisposableImplemetnClassPropertyClass();
 
             testeeObject.Dispose();
             testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "最初のDisposeの呼び出しは伝搬されなければならない。");

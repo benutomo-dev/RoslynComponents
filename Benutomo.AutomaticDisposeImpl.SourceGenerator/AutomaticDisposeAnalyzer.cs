@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
@@ -168,12 +167,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             isEnabledByDefault: true);
 
         /// <summary>
-        /// IDisposableを実装していないクラスのメソッドに対してManagedObjectDisposeMethod属性を付与することはできません。
+        /// IDisposableを実装していないクラスでManagedObjectDisposeMethod属性を使用することは出来ません。ManagedObjectDisposeMethod属性を付与したメソッドは、IDisposable.Dispose()の呼び出しと対応します。このメソッドはIAsyncDisposable.DisposeAsync()の自動実装コードからは呼び出されません。
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_SG0007 = new DiagnosticDescriptor(
             "SG0007",
-            "ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています",
-            "IDisposableを実装していないクラスのメソッドに対してManagedObjectDisposeMethod属性を付与することはできません。",
+            "ManagedObjectDisposeMethod属性がIDisposableインターフェースを実装していないクラスで使用されています。",
+            "IDisposableを実装していないクラスでManagedObjectDisposeMethod属性を使用することは出来ません。ManagedObjectDisposeMethod属性を付与したメソッドは、IDisposable.Dispose()の呼び出しと対応します。このメソッドはIAsyncDisposable.DisposeAsync()の自動実装コードからは呼び出されません。",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
@@ -212,12 +211,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             isEnabledByDefault: true);
 
         /// <summary>
-        /// IAsyncDisposableを実装していないクラスのメソッドに対してManagedObjectAsyncDisposeMethod属性を付与することはできません。
+        /// IAsyncDisposableを実装していないクラスでManagedObjectAsyncDisposeMethod属性を使用することは出来ません。ManagedObjectAsyncDisposeMethod属性を付与したメソッドは、IAsyncDisposable.DisposeAsync()の呼び出しと対応します。このメソッドはIDisposable.Dispose()の自動実装コードからは呼び出されません。
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_SG0011 = new DiagnosticDescriptor(
             "SG0011",
-            "ManagedObjectDisposeMethod属性はIDisposableインターフェースが実装されていないクラスのメソッドに付与されています",
-            "IAsyncDisposableを実装していないクラスのメソッドに対してManagedObjectAsyncDisposeMethod属性を付与することはできません。",
+            "ManagedObjectAsyncDisposeMethod属性がIAsyncDisposableインターフェースを実装していないクラスのメソッドに付与されています",
+            "IAsyncDisposableを実装していないクラスでManagedObjectAsyncDisposeMethod属性を使用することは出来ません。ManagedObjectAsyncDisposeMethod属性を付与したメソッドは、IAsyncDisposable.DisposeAsync()の呼び出しと対応します。このメソッドはIDisposable.Dispose()の自動実装コードからは呼び出されません。",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
@@ -227,7 +226,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_SG0012 = new DiagnosticDescriptor(
             "SG0012",
-            "ManagedObjectDisposeMethod属性がAutomaticDisposeImpl属性を付与されていないクラスのメソッドに付与されています",
+            "ManagedObjectAsyncDisposeMethod属性がAutomaticDisposeImpl属性を付与されていないクラスのメソッドに付与されています",
             "AutomaticDisposeImpl属性を付与していないクラスのメソッドに対してManagedObjectAsyncDisposeMethod属性を付与することはできません。",
             "Usage",
             DiagnosticSeverity.Error,
@@ -512,7 +511,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     }
                 }
 
-                if (isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
+                if (isAssignableToIAsyncDisposable && isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
                 {
                     if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
                     {
@@ -785,17 +784,42 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     }
                 }
 
-                if (!isAssignableToIDisposableMember)
+                if (isEnableAutomaticDisposeMember)
                 {
-                    // メンバの型はIDisposableを実装していない
+                    // 自動破棄の対象となるメンバ
 
-                    if (isAssignableToIAsyncDisposableMember)
+                    if (isAssignableToIDisposableMember)
                     {
-                        // メンバの型はIAsyncDisposableを実装している
+                        // メンバはIDisposableを実装している
 
-                        if (isEnableAutomaticDisposeMember)
+                        if (isAssignableToIAsyncDisposableMember)
                         {
-                            // 自動破棄の対象となるメンバ
+                            // メンバはIAsyncDisposableを実装している
+
+                            if (isAssignableToIDisposable)
+                            {
+                                // メンバを含むクラスはIDisposableを実装している
+
+                                if (!isAssignableToIAsyncDisposable)
+                                {
+                                    // メンバを含むクラスはIAsyncDisposableを実装していない
+
+                                    foreach (var location in member.Locations)
+                                    {
+                                        // このメンバはIAsyncDisposableのみを実装していてIDisposableは実装していないので、常に同期的破棄になることを注意
+                                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, member.Name, namedTypeSymbol.Name));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // メンバはIDisposableを実装していない
+
+                        if (isAssignableToIAsyncDisposableMember)
+                        {
+                            // メンバはIAsyncDisposableを実装している
 
                             if (isAssignableToIDisposable)
                             {
@@ -823,14 +847,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        // メンバの型はIAsyncDisposableを実装していない
-
-                        if (isEnableAutomaticDisposeMember)
+                        else
                         {
-                            // メンバを含むクラスはIAsyncDisposableを実装していない
+                            // メンバはIAsyncDisposableを実装していない
 
                             if (isEnableAutomaticDisposeAttributedMember)
                             {

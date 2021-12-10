@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Benutomo.AutomaticDisposeImpl.Test
+namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
 {
     public partial class IAsyncDisposable実装型のフィールドを含むIAsyncDisposable実装クラス
     {
