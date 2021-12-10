@@ -773,8 +773,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 {
                     if (isAssignableToIDisposableMember || isAssignableToIAsyncDisposableMember)
                     {
+                        // メンバは自動破棄の対象となりうる条件を満たしている
+
                         if (!isEnableAutomaticDisposeAttributedMember && !isDisableAutomaticDisposeAttributedMember)
                         {
+                            // メンバに自動破棄の有無を明示する属性が設定されていない
+
                             foreach (var location in member.Locations)
                             {
                                 // 自動実装のモードがExplicitなのに、EnableAutomaticDisposeとDisableAutomaticDisposeのどちらの属性も付けられていない
@@ -788,86 +792,57 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 {
                     // 自動破棄の対象となるメンバ
 
-                    if (isAssignableToIDisposableMember)
+                    if (isAssignableToIDisposableMember && isAssignableToIAsyncDisposableMember && isAssignableToIDisposable && !isAssignableToIAsyncDisposable)
                     {
-                        // メンバはIDisposableを実装している
+                        // メンバはDisposeでもDisposeAsyncでも破棄できるが、メンバを含むクラスはIAsyncDisposableを実装していない
 
-                        if (isAssignableToIAsyncDisposableMember)
+                        foreach (var location in member.Locations)
                         {
-                            // メンバはIAsyncDisposableを実装している
+                            // このメンバは非同期破棄をサポートしているが、自動破棄では常に同期的破棄になることを注意
+                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, member.Name, namedTypeSymbol.Name));
+                        }
+                    }
+                    
+                    if (!isAssignableToIDisposableMember && isAssignableToIAsyncDisposableMember)
+                    {
+                        // メンバはDisposeAsyncでのみ破棄できる
 
-                            if (isAssignableToIDisposable)
+                        if (isAssignableToIDisposable && !isAssignableToIAsyncDisposable)
+                        {
+                            // メンバを含むクラスはIDisposableだけを実装している
+
+                            foreach (var location in member.Locations)
                             {
-                                // メンバを含むクラスはIDisposableを実装している
-
-                                if (!isAssignableToIAsyncDisposable)
-                                {
-                                    // メンバを含むクラスはIAsyncDisposableを実装していない
-
-                                    foreach (var location in member.Locations)
-                                    {
-                                        // このメンバはIAsyncDisposableのみを実装していてIDisposableは実装していないので、常に同期的破棄になることを注意
-                                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, member.Name, namedTypeSymbol.Name));
-                                    }
-                                }
+                                // このメンバはDisposeAsyncでしか破棄できないのに、このメンバを含むクラスはIDisposableしか実装していないので、自動破棄できない
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0004, location, member.Name, namedTypeSymbol.Name));
                             }
                         }
                     }
-                    else
+                }
+
+                if (!isAssignableToIDisposableMember && !isAssignableToIAsyncDisposableMember)
+                {
+                    // IDisposableもIAsyncDisposableも実装していない
+
+                    if (isEnableAutomaticDisposeAttributedMember)
                     {
-                        // メンバはIDisposableを実装していない
+                        // EnableAutomaticDispose属性を付与している
 
-                        if (isAssignableToIAsyncDisposableMember)
+                        foreach (var location in member.Locations)
                         {
-                            // メンバはIAsyncDisposableを実装している
-
-                            if (isAssignableToIDisposable)
-                            {
-                                // メンバを含むクラスはIDisposableを実装している
-
-                                if (isAssignableToIAsyncDisposable)
-                                {
-                                    // メンバを含むクラスはIAsyncDisposableを実装している
-
-                                    foreach (var location in member.Locations)
-                                    {
-                                        // このメンバはIAsyncDisposableのみを実装していてIDisposableは実装していないので、常に同期的破棄になることを注意
-                                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, member.Name, namedTypeSymbol.Name));
-                                    }
-                                }
-                                else
-                                {
-                                    // メンバを含むクラスはIAsyncDisposableを実装していない
-
-                                    foreach (var location in member.Locations)
-                                    {
-                                        // このメンバはIAsyncDisposableのみを実装しているクラスのメンバであるのに、IAsyncDisposableのみを実装していてIDisposableは実装していないので、自動破棄できない
-                                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0004, location, member.Name, namedTypeSymbol.Name));
-                                    }
-                                }
-                            }
+                            // IDisposableとIAysncDisposableのどちらも実装してい型のメンバにEnableAutomaticDispose属性は付与できない
+                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0020, location, member.Name, namedTypeSymbol.Name));
                         }
-                        else
+                    }
+
+                    if (isDisableAutomaticDisposeAttributedMember)
+                    {
+                        // DisableAutomaticDispose属性を付与している
+
+                        foreach (var location in member.Locations)
                         {
-                            // メンバはIAsyncDisposableを実装していない
-
-                            if (isEnableAutomaticDisposeAttributedMember)
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    // IDisposableとIAysncDisposableのどちらも実装してい型のメンバにEnableAutomaticDispose属性は付与できない
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0020, location, member.Name, namedTypeSymbol.Name));
-                                }
-                            }
-
-                            if (isDisableAutomaticDisposeAttributedMember)
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    // IDisposableとIAysncDisposableのどちらも実装してい型のメンバにDisableAutomaticDispose属性は付与できない
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0021, location, member.Name, namedTypeSymbol.Name));
-                                }
-                            }
+                            // IDisposableとIAysncDisposableのどちらも実装してい型のメンバにDisableAutomaticDispose属性は付与できない
+                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0021, location, member.Name, namedTypeSymbol.Name));
                         }
                     }
                 }

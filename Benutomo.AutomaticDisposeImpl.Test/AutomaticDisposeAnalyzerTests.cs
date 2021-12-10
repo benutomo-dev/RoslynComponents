@@ -177,7 +177,7 @@ class Dummy : IAsyncDisposable
         }
 
         [Fact]
-        public async Task SG0005_AutomaticDisposeImpl属性を付与していないクラスのメンバに対してAutomaticDisposeImplMode属性を付与()
+        public async Task SG0005_AutomaticDisposeImpl属性を付与していないクラスのメンバに対してEnableAutomaticDispose属性を付与()
         {
             var source = @"
 using System;
@@ -210,7 +210,42 @@ partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where 
 
     [EnableAutomaticDispose]
     private TDummy Property4 { get; } = default!;
+}
 
+class Dummy : IDisposable, IAsyncDisposable
+{
+    public void Dispose() {}
+    public ValueTask DisposeAsync() => default;
+}
+";
+
+            var expected = new[]
+            {
+                DiagnosticResult.CompilerError("CS0535").WithLocation(6, 45), // ソース生成がされないパターンのテストなのでDispose()の実装漏れでCS0535も発生
+                DiagnosticResult.CompilerError("CS0535").WithLocation(6, 58), // ソース生成がされないパターンのテストなのでDisposeAsync()の実装漏れでCS0535も発生
+                Verify.Diagnostic("SG0005").WithLocation(10, 19),
+                Verify.Diagnostic("SG0005").WithLocation(13, 19),
+                Verify.Diagnostic("SG0005").WithLocation(16, 30),
+                Verify.Diagnostic("SG0005").WithLocation(19, 30),
+                Verify.Diagnostic("SG0005").WithLocation(22, 30),
+                Verify.Diagnostic("SG0005").WithLocation(25, 30),
+                Verify.Diagnostic("SG0005").WithLocation(28, 20),
+                Verify.Diagnostic("SG0005").WithLocation(31, 20),
+            };
+
+            await Verify.VerifyAnalyzerAsync(source, expected);
+        }
+
+        [Fact]
+        public async Task SG0017_AutomaticDisposeImpl属性を付与していないクラスのメンバに対してDisableAutomaticDispose属性を付与()
+        {
+            var source = @"
+using System;
+using System.Threading.Tasks;
+using Benutomo;
+
+partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where TAsyncDisposable : IAsyncDisposable where TDummy : Dummy
+{
 
     [DisableAutomaticDispose]
     private Dummy _field5 = new();
@@ -248,22 +283,296 @@ class Dummy : IDisposable, IAsyncDisposable
             {
                 DiagnosticResult.CompilerError("CS0535").WithLocation(6, 45), // ソース生成がされないパターンのテストなのでDispose()の実装漏れでCS0535も発生
                 DiagnosticResult.CompilerError("CS0535").WithLocation(6, 58), // ソース生成がされないパターンのテストなのでDisposeAsync()の実装漏れでCS0535も発生
-                Verify.Diagnostic("SG0005").WithLocation(10, 19),
-                Verify.Diagnostic("SG0005").WithLocation(13, 19),
-                Verify.Diagnostic("SG0005").WithLocation(16, 30),
-                Verify.Diagnostic("SG0005").WithLocation(19, 30),
-                Verify.Diagnostic("SG0005").WithLocation(22, 30),
-                Verify.Diagnostic("SG0005").WithLocation(25, 30),
-                Verify.Diagnostic("SG0005").WithLocation(28, 20),
-                Verify.Diagnostic("SG0005").WithLocation(31, 20),
-                Verify.Diagnostic("SG0017").WithLocation(35, 19),
-                Verify.Diagnostic("SG0017").WithLocation(38, 19),
-                Verify.Diagnostic("SG0017").WithLocation(41, 30),
-                Verify.Diagnostic("SG0017").WithLocation(44, 30),
-                Verify.Diagnostic("SG0017").WithLocation(47, 30),
-                Verify.Diagnostic("SG0017").WithLocation(50, 30),
-                Verify.Diagnostic("SG0017").WithLocation(53, 20),
-                Verify.Diagnostic("SG0017").WithLocation(56, 20),
+                Verify.Diagnostic("SG0017").WithLocation(10, 19),
+                Verify.Diagnostic("SG0017").WithLocation(13, 19),
+                Verify.Diagnostic("SG0017").WithLocation(16, 30),
+                Verify.Diagnostic("SG0017").WithLocation(19, 30),
+                Verify.Diagnostic("SG0017").WithLocation(22, 30),
+                Verify.Diagnostic("SG0017").WithLocation(25, 30),
+                Verify.Diagnostic("SG0017").WithLocation(28, 20),
+                Verify.Diagnostic("SG0017").WithLocation(31, 20),
+            };
+
+            await Verify.VerifyAnalyzerAsync(source, expected);
+        }
+
+        [Fact]
+        public async Task SG0018_EnableAutomaticDispose属性とDisableAutomaticDispose属性を同一メンバに同時に付与()
+        {
+            var source = @"
+using System;
+using System.Threading.Tasks;
+using Benutomo;
+
+[AutomaticDisposeImpl]
+partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where TAsyncDisposable : IAsyncDisposable where TDummy : Dummy
+{
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private Dummy _field = new();
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private Dummy Property { get; } = new();
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private IAsyncDisposable _field2 = new Dummy();
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private IAsyncDisposable Property2 { get; } = new Dummy();
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private TAsyncDisposable _field3 = default!;
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private TAsyncDisposable Property3 { get; } = default!;
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private TDummy _field4 = default!;
+
+    [EnableAutomaticDispose,DisableAutomaticDispose]
+    private TDummy Property4 { get; } = default!;
+}
+
+class Dummy : IDisposable, IAsyncDisposable
+{
+    public void Dispose() {}
+    public ValueTask DisposeAsync() => default;
+}
+";
+
+            var expected = new[]
+            {
+                Verify.Diagnostic("SG0018").WithLocation(10, 19),
+                Verify.Diagnostic("SG0018").WithLocation(13, 19),
+                Verify.Diagnostic("SG0018").WithLocation(16, 30),
+                Verify.Diagnostic("SG0018").WithLocation(19, 30),
+                Verify.Diagnostic("SG0018").WithLocation(22, 30),
+                Verify.Diagnostic("SG0018").WithLocation(25, 30),
+                Verify.Diagnostic("SG0018").WithLocation(28, 20),
+                Verify.Diagnostic("SG0018").WithLocation(31, 20),
+            };
+
+            await Verify.VerifyAnalyzerAsync(source, expected);
+        }
+
+        [Fact]
+        public async Task SG0019_自動実装がExplicitモードでEnableAutomaticDispose属性またはDisableAutomaticDispose属性が付与されていない()
+        {
+            {
+                var source = @"
+using System;
+using System.Threading.Tasks;
+using Benutomo;
+
+[AutomaticDisposeImpl]
+partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where TAsyncDisposable : IAsyncDisposable where TDummy : Dummy
+{
+
+    private Dummy _field = new();
+
+
+    private Dummy Property { get; } = new();
+
+
+    private IAsyncDisposable _field2 = new Dummy();
+
+
+    private IAsyncDisposable Property2 { get; } = new Dummy();
+
+
+    private TAsyncDisposable _field3 = default!;
+
+
+    private TAsyncDisposable Property3 { get; } = default!;
+
+
+    private TDummy _field4 = default!;
+
+
+    private TDummy Property4 { get; } = default!;
+}
+
+class Dummy : IDisposable, IAsyncDisposable
+{
+    public void Dispose() {}
+    public ValueTask DisposeAsync() => default;
+}
+";
+
+                var expected = new[]
+                {
+                    Verify.Diagnostic("SG0019").WithLocation(10, 19),
+                    Verify.Diagnostic("SG0019").WithLocation(13, 19),
+                    Verify.Diagnostic("SG0019").WithLocation(16, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(19, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(22, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(25, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(28, 20),
+                    Verify.Diagnostic("SG0019").WithLocation(31, 20),
+                };
+
+                await Verify.VerifyAnalyzerAsync(source, expected);
+            }
+
+            {
+                var source = @"
+using System;
+using System.Threading.Tasks;
+using Benutomo;
+
+[AutomaticDisposeImpl(Mode = AutomaticDisposeImplMode.Explicit)]
+partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where TAsyncDisposable : IAsyncDisposable where TDummy : Dummy
+{
+
+    private Dummy _field = new();
+
+
+    private Dummy Property { get; } = new();
+
+
+    private IAsyncDisposable _field2 = new Dummy();
+
+
+    private IAsyncDisposable Property2 { get; } = new Dummy();
+
+
+    private TAsyncDisposable _field3 = default!;
+
+
+    private TAsyncDisposable Property3 { get; } = default!;
+
+
+    private TDummy _field4 = default!;
+
+
+    private TDummy Property4 { get; } = default!;
+}
+
+class Dummy : IDisposable, IAsyncDisposable
+{
+    public void Dispose() {}
+    public ValueTask DisposeAsync() => default;
+}
+";
+
+                var expected = new[]
+                {
+                    Verify.Diagnostic("SG0019").WithLocation(10, 19),
+                    Verify.Diagnostic("SG0019").WithLocation(13, 19),
+                    Verify.Diagnostic("SG0019").WithLocation(16, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(19, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(22, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(25, 30),
+                    Verify.Diagnostic("SG0019").WithLocation(28, 20),
+                    Verify.Diagnostic("SG0019").WithLocation(31, 20),
+                };
+
+                await Verify.VerifyAnalyzerAsync(source, expected);
+            }
+        }
+
+        [Fact]
+        public async Task SG0020_IDisposableとIAysncDisposableの少なくともどちらも実装されていない型のメンバにEnableAutomaticDispose属性を付与()
+        {
+            var source = @"
+using System;
+using Benutomo;
+
+[AutomaticDisposeImpl]
+partial class A : IDisposable
+{
+    [EnableAutomaticDispose]
+    private object _field = new();
+
+    [EnableAutomaticDispose]
+    private object Property { get; } = new();
+}
+";
+
+            var expected = new[]
+            {
+                Verify.Diagnostic("SG0020").WithLocation(9, 20),
+                Verify.Diagnostic("SG0020").WithLocation(12, 20),
+            };
+
+            await Verify.VerifyAnalyzerAsync(source, expected);
+        }
+
+        [Fact]
+        public async Task SG0021_IDisposableとIAysncDisposableの少なくともどちらも実装されていない型のメンバにDisableAutomaticDispose属性を付与()
+        {
+            var source = @"
+using System;
+using Benutomo;
+
+[AutomaticDisposeImpl]
+partial class A : IDisposable
+{
+    [DisableAutomaticDispose]
+    private object _field = new();
+
+    [DisableAutomaticDispose]
+    private object Property { get; } = new();
+}
+";
+
+            var expected = new[]
+            {
+                Verify.Diagnostic("SG0021").WithLocation(9, 20),
+                Verify.Diagnostic("SG0021").WithLocation(12, 20),
+            };
+
+            await Verify.VerifyAnalyzerAsync(source, expected);
+        }
+
+        [Fact]
+        public async Task SG0022_staticメンバにEnableAutomaticDispose属性を付与()
+        {
+            var source = @"
+using System;
+using Benutomo;
+
+[AutomaticDisposeImpl]
+partial class A : IDisposable
+{
+    [EnableAutomaticDispose]
+    private static object _field = new();
+
+    [EnableAutomaticDispose]
+    private static object Property { get; } = new();
+}
+";
+
+            var expected = new[]
+            {
+                Verify.Diagnostic("SG0022").WithLocation(9, 27),
+                Verify.Diagnostic("SG0022").WithLocation(12, 27),
+            };
+
+            await Verify.VerifyAnalyzerAsync(source, expected);
+        }
+
+        [Fact]
+        public async Task SG0023_staticメンバにDisableAutomaticDispose属性を付与()
+        {
+            var source = @"
+using System;
+using Benutomo;
+
+[AutomaticDisposeImpl]
+partial class A : IDisposable
+{
+    [DisableAutomaticDispose]
+    private static object _field = new();
+
+    [DisableAutomaticDispose]
+    private static object Property { get; } = new();
+}
+";
+
+            var expected = new[]
+            {
+                Verify.Diagnostic("SG0023").WithLocation(9, 27),
+                Verify.Diagnostic("SG0023").WithLocation(12, 27),
             };
 
             await Verify.VerifyAnalyzerAsync(source, expected);
