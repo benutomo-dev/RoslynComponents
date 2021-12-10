@@ -17,12 +17,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class NullFieldClass : IDisposable
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            [EnableAutomaticDispose]
+            internal IAutomaticImplSupportedAsyncDisposable? disposable = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass baseDisposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             int baseImplReleaseUnmanagedResourceCallCount;
@@ -62,6 +64,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass selfDisposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             int selfImplReleaseUnmanagedResourceCallCount;
@@ -101,6 +104,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ReadonlyFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal readonly IAutomaticImplSupportedAsyncDisposable disposable; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             public ReadonlyFieldClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -112,6 +116,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GenericTypeFieldClass<T> : IDisposable where T : IDisposable, IAsyncDisposable
         {
+            [EnableAutomaticDispose]
             internal T disposable; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             public GenericTypeFieldClass(T disposable)
@@ -123,6 +128,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class InterfaceFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal IAutomaticImplSupportedAsyncDisposable disposable; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             public InterfaceFieldClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -134,12 +140,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ImplicitAsyncDisposableImplementClassFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass disposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [AutomaticDisposeImpl]
         partial class ExplicitAsyncDisposableImplemetnClassFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ExplicitAsyncDisposableImplemetnClass disposable = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 

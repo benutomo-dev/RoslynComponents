@@ -14,12 +14,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class NullFieldClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable = null; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
+            [EnableAutomaticDispose]
+            internal IAutomaticImplSupportedAsyncDisposable? disposable = null; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass baseDisposable = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             int baseImplReleaseUnmanagedResourceCallCount;
@@ -57,6 +59,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass selfDisposable = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             int selfImplReleaseUnmanagedResourceCallCount;
@@ -94,6 +97,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ReadonlyFieldClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal readonly IAutomaticImplSupportedAsyncDisposable disposable; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             public ReadonlyFieldClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -105,6 +109,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GenericTypeFieldClass<T> : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/ where T : IDisposable, IAsyncDisposable
         {
+            [EnableAutomaticDispose]
             internal T disposable; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             public GenericTypeFieldClass(T disposable)
@@ -116,6 +121,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class InterfaceFieldClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal IAutomaticImplSupportedAsyncDisposable disposable; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             public InterfaceFieldClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -127,12 +133,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ImplicitAsyncDisposableImplementClassFieldClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass disposable = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 
         [AutomaticDisposeImpl]
         partial class ExplicitAsyncDisposableImplemetnClassFieldClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal ExplicitAsyncDisposableImplemetnClass disposable = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 

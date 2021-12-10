@@ -452,7 +452,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                             {
                                 foreach (var fieldSymbol in _disposableFields)
                                 {
-                                    if (_automaticDisposeContextChecker.IsDisabledModeField(fieldSymbol))
+                                    if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
                                     {
                                         continue;
                                     }
@@ -477,7 +477,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                                 foreach (var propertySymbol in _disposableProperties)
                                 {
-                                    if (_automaticDisposeContextChecker.IsDisabledModeProperty(propertySymbol))
+                                    if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
                                     {
                                         continue;
                                     }
@@ -640,7 +640,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         {
                             foreach (var fieldSymbol in _asyncDisposableFields)
                             {
-                                if (_automaticDisposeContextChecker.IsDisabledModeField(fieldSymbol))
+                                if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
                                 {
                                     continue;
                                 }
@@ -676,7 +676,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                             foreach (var propertySymbol in _asyncDisposableProperties)
                             {
-                                if (_automaticDisposeContextChecker.IsDisabledModeProperty(propertySymbol))
+                                if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
                                 {
                                     continue;
                                 }
@@ -711,7 +711,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                             foreach (var fieldSymbol in _nonAsyncDisposableFields)
                             {
-                                if (_automaticDisposeContextChecker.IsDisabledModeField(fieldSymbol))
+                                if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
                                 {
                                     continue;
                                 }
@@ -736,7 +736,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                             foreach (var propertySymbol in _nonAsyncDisposableProperties)
                             {
-                                if (_automaticDisposeContextChecker.IsDisabledModeProperty(propertySymbol))
+                                if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
                                 {
                                     continue;
                                 }

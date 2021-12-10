@@ -14,12 +14,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class NullPropertyClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable { get; set; } = null; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
+            [EnableAutomaticDispose]
+            internal IAutomaticImplSupportedAsyncDisposable? disposable { get; set; } = null; // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass baseDisposable { get; set; } = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             int baseImplReleaseUnmanagedResourceCallCount;
@@ -57,6 +59,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass selfDisposable { get; set; } = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             int selfImplReleaseUnmanagedResourceCallCount;
@@ -94,6 +97,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GetonlyPropertyClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal IAutomaticImplSupportedAsyncDisposable disposable { get; } // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             public GetonlyPropertyClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -105,6 +109,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GenericTypePropertyClass<T> : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/ where T : IDisposable, IAsyncDisposable
         {
+            [EnableAutomaticDispose]
             internal T disposable { get; } // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             public GenericTypePropertyClass(T disposable)
@@ -116,6 +121,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class InterfacePropertyClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal IAutomaticImplSupportedAsyncDisposable disposable { get; set; } // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
 
             public InterfacePropertyClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -127,12 +133,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ImplicitAsyncDisposableImplementClassPropertyClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass disposable { get; set; } = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 
         [AutomaticDisposeImpl]
         partial class ExplicitAsyncDisposableImplemetnClassPropertyClass : IAsyncDisposable, IDisposable/*AutomaticDisposeImpl‚É‚æ‚éIAsyncDisposable‚Ì©“®À‘•‚Å‚ÍIDisposable‚à•K{*/
         {
+            [EnableAutomaticDispose]
             internal ExplicitAsyncDisposableImplemetnClass disposable { get; set; } = new(); // SG0003Œx‚ª”­¶‚µ‚È‚¢‚±‚Æ
         }
 

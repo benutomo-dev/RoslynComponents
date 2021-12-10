@@ -56,7 +56,11 @@ namespace SourceGeneratorDebug_StandardPatterns
     [AutomaticDisposeImpl]
     partial class GenericTypeMember<T1, T2> : BaseClass where T1 : IDisposable where T2 : SubInterface2
     {
-        T1 disposable = default;
-        T2 asyncDisposable = default;
+
+        [EnableAutomaticDispose]
+        T1? disposable = default;
+
+        [EnableAutomaticDispose]
+        T2? asyncDisposable = default;
     }
 }

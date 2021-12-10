@@ -16,15 +16,26 @@ namespace SourceGeneratorDebug_StandardPatterns
     [AutomaticDisposeImpl]
     public partial class AsyncDisposableOnlyComposition1 : IDisposable
     {
-        AsyncOnlyDisposable _asyncOnlyDisposableFieald;
-        readonly AsyncOnlyDisposable _asyncOnlyDisposableReadonlyFieald;
-        static AsyncOnlyDisposable s_asyncOnlyDisposableFieald = null;
-        static readonly AsyncOnlyDisposable s_asyncOnlyDisposableReadonlyFieald = null;
+        [EnableAutomaticDispose]
+        AsyncOnlyDisposable? _asyncOnlyDisposableFieald;
 
-        AsyncOnlyDisposable _asyncOnlyDisposableProperty { get; set; }
-        AsyncOnlyDisposable _asyncOnlyDisposableGetonlyProperty { get; }
-        static AsyncOnlyDisposable s_asyncOnlyDisposableProperty { get; set; }
-        static AsyncOnlyDisposable s_asyncOnlyDisposableGetonlyProperty { get; }
+        [EnableAutomaticDispose]
+        readonly AsyncOnlyDisposable? _asyncOnlyDisposableReadonlyFieald;
+
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald = null;
+
+        static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald = null;
+
+
+        [EnableAutomaticDispose]
+        AsyncOnlyDisposable? _asyncOnlyDisposableProperty { get; set; }
+
+        [EnableAutomaticDispose]
+        AsyncOnlyDisposable? _asyncOnlyDisposableGetonlyProperty { get; }
+
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableProperty { get; set; }
+
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableGetonlyProperty { get; }
 
         internal AsyncDisposableOnlyComposition1(AsyncOnlyDisposable asyncOnlyDisposableFieald, AsyncOnlyDisposable asyncOnlyDisposableReadonlyFieald, AsyncOnlyDisposable asyncOnlyDisposableProperty, AsyncOnlyDisposable asyncOnlyDisposableGetonlyProperty)
         {
@@ -41,15 +52,27 @@ namespace SourceGeneratorDebug_StandardPatterns.Nest
     [AutomaticDisposeImpl]
     public partial class AsyncDisposableOnlyComposition2 : IDisposable, IAsyncDisposable
     {
-        AsyncOnlyDisposable _asyncOnlyDisposableFieald;
-        readonly AsyncOnlyDisposable _asyncOnlyDisposableReadonlyFieald;
-        static AsyncOnlyDisposable s_asyncOnlyDisposableFieald = null;
-        static readonly AsyncOnlyDisposable s_asyncOnlyDisposableReadonlyFieald = null;
+        [EnableAutomaticDispose]
+        AsyncOnlyDisposable? _asyncOnlyDisposableFieald;
 
-        AsyncOnlyDisposable _asyncOnlyDisposableProperty { get; set; }
-        AsyncOnlyDisposable _asyncOnlyDisposableGetonlyProperty { get; }
-        static AsyncOnlyDisposable s_asyncOnlyDisposableProperty { get; set; }
-        static AsyncOnlyDisposable s_asyncOnlyDisposableGetonlyProperty { get; }
+        [EnableAutomaticDispose]
+        readonly AsyncOnlyDisposable? _asyncOnlyDisposableReadonlyFieald;
+
+
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald = null;
+
+        static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald = null;
+
+
+        [EnableAutomaticDispose]
+        AsyncOnlyDisposable? _asyncOnlyDisposableProperty { get; set; }
+
+        [EnableAutomaticDispose]
+        AsyncOnlyDisposable? _asyncOnlyDisposableGetonlyProperty { get; }
+
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableProperty { get; set; }
+
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableGetonlyProperty { get; }
 
         internal AsyncDisposableOnlyComposition2(AsyncOnlyDisposable asyncOnlyDisposableFieald, AsyncOnlyDisposable asyncOnlyDisposableReadonlyFieald, AsyncOnlyDisposable asyncOnlyDisposableProperty, AsyncOnlyDisposable asyncOnlyDisposableGetonlyProperty)
         {
@@ -68,15 +91,27 @@ namespace SourceGeneratorDebug_StandardPatterns
         [AutomaticDisposeImpl]
         public partial class AsyncDisposableOnlyComposition3 : IAsyncDisposable
         {
-            AsyncOnlyDisposable _asyncOnlyDisposableFieald;
-            readonly AsyncOnlyDisposable _asyncOnlyDisposableReadonlyFieald;
-            static AsyncOnlyDisposable s_asyncOnlyDisposableFieald = null;
-            static readonly AsyncOnlyDisposable s_asyncOnlyDisposableReadonlyFieald = null;
 
-            AsyncOnlyDisposable _asyncOnlyDisposableProperty { get; set; }
-            AsyncOnlyDisposable _asyncOnlyDisposableGetonlyProperty { get; }
-            static AsyncOnlyDisposable s_asyncOnlyDisposableProperty { get; set; }
-            static AsyncOnlyDisposable s_asyncOnlyDisposableGetonlyProperty { get; }
+            [EnableAutomaticDispose]
+            AsyncOnlyDisposable? _asyncOnlyDisposableFieald;
+
+            [EnableAutomaticDispose]
+            readonly AsyncOnlyDisposable? _asyncOnlyDisposableReadonlyFieald;
+
+            static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald = null;
+
+            static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald = null;
+
+
+            [EnableAutomaticDispose]
+            AsyncOnlyDisposable? _asyncOnlyDisposableProperty { get; set; }
+
+            [EnableAutomaticDispose]
+            AsyncOnlyDisposable? _asyncOnlyDisposableGetonlyProperty { get; }
+
+            static AsyncOnlyDisposable? s_asyncOnlyDisposableProperty { get; set; }
+
+            static AsyncOnlyDisposable? s_asyncOnlyDisposableGetonlyProperty { get; }
 
             internal AsyncDisposableOnlyComposition3(AsyncOnlyDisposable asyncOnlyDisposableFieald, AsyncOnlyDisposable asyncOnlyDisposableReadonlyFieald, AsyncOnlyDisposable asyncOnlyDisposableProperty, AsyncOnlyDisposable asyncOnlyDisposableGetonlyProperty)
             {

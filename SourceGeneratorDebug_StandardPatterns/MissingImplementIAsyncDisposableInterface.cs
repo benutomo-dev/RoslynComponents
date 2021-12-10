@@ -12,9 +12,13 @@ namespace SourceGeneratorDebug_StandardPatterns
         [AutomaticDisposeImpl]
         partial class MissingImplementIAsyncDisposableInterface : IDisposable
         {
-            Stream _streamFieald = null;
 
-            Stream StreamProperty { get; set; }
+            [EnableAutomaticDispose]
+            Stream? _streamFieald = null;
+
+
+            [EnableAutomaticDispose]
+            Stream? StreamProperty { get; set; }
         }
     }
 }

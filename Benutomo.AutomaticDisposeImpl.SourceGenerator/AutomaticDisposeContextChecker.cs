@@ -5,52 +5,56 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
     class AutomaticDisposeContextChecker
     {
-        AutomaticDisposeImplMode _defaultMode;
+        internal AutomaticDisposeImplMode Mode { get; }
 
         internal AutomaticDisposeContextChecker(AttributeData automaticDisposeImplAttributeData)
         {
-            var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == AutomaticDisposeGenerator.AutomaticDisposeImplAttribute_DefaultMode).Value.Value;
+            var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == AutomaticDisposeGenerator.AutomaticDisposeImplAttributeModeName).Value.Value;
 
-            var defaultMode = defaultModeValue is int defaultModeRawValue ? (AutomaticDisposeImplMode)defaultModeRawValue : AutomaticDisposeImplMode.Default;
-            _defaultMode = defaultMode switch
+            var defaultMode = defaultModeValue is int defaultModeRawValue ? (AutomaticDisposeImplMode)defaultModeRawValue : AutomaticDisposeImplMode.Explicit;
+
+            Mode = defaultMode switch
             {
-                AutomaticDisposeImplMode.Disable => AutomaticDisposeImplMode.Disable,
-                _ => AutomaticDisposeImplMode.Enable,
+                AutomaticDisposeImplMode.Implicit => AutomaticDisposeImplMode.Implicit,
+                AutomaticDisposeImplMode.Explicit => AutomaticDisposeImplMode.Explicit,
+                _ => AutomaticDisposeImplMode.Explicit,
             };
         }
 
-        public bool IsDisabledModeField(IFieldSymbol fieldSymbol)
+        public bool IsEnableField(IFieldSymbol fieldSymbol)
         {
-            var automaticDisposeModeAttributeData = fieldSymbol.GetAttributes().SingleOrDefault(attr => AutomaticDisposeGenerator.IsAutomaticDisposeImplModeAttribute(attr.AttributeClass));
-
-            var modeValue = automaticDisposeModeAttributeData?.ConstructorArguments.SingleOrDefault().Value;
-
-            var designationMode = modeValue is int modeRawValue ? (AutomaticDisposeImplMode)modeRawValue : AutomaticDisposeImplMode.Default;
-            var actualMode = designationMode switch
+            if (fieldSymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsDisableAutomaticDisposeAttribute(attr.AttributeClass)))
             {
-                AutomaticDisposeImplMode.Disable => AutomaticDisposeImplMode.Disable,
-                AutomaticDisposeImplMode.Enable => AutomaticDisposeImplMode.Enable,
-                _ => _defaultMode,
-            };
+                return false;
+            }
 
-            return actualMode == AutomaticDisposeImplMode.Disable;
+            if (Mode == AutomaticDisposeImplMode.Explicit)
+            {
+                if (!fieldSymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(attr.AttributeClass)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public bool IsDisabledModeProperty(IPropertySymbol propertySymbol)
+        public bool IsEnableProperty(IPropertySymbol propertySymbol)
         {
-            var automaticDisposeModeAttributeData = propertySymbol.GetAttributes().SingleOrDefault(attr => AutomaticDisposeGenerator.IsAutomaticDisposeImplModeAttribute(attr.AttributeClass));
-
-            var modeValue = automaticDisposeModeAttributeData?.ConstructorArguments.SingleOrDefault().Value;
-
-            var designationMode = modeValue is int modeRawValue ? (AutomaticDisposeImplMode)modeRawValue : AutomaticDisposeImplMode.Default;
-            var actualMode = designationMode switch
+            if (propertySymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsDisableAutomaticDisposeAttribute(attr.AttributeClass)))
             {
-                AutomaticDisposeImplMode.Disable => AutomaticDisposeImplMode.Disable,
-                AutomaticDisposeImplMode.Enable => AutomaticDisposeImplMode.Enable,
-                _ => _defaultMode,
-            };
+                return false;
+            }
 
-            return actualMode == AutomaticDisposeImplMode.Disable;
+            if (Mode == AutomaticDisposeImplMode.Explicit)
+            {
+                if (!propertySymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(attr.AttributeClass)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

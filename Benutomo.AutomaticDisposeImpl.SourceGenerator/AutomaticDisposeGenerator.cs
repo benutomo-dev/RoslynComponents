@@ -10,27 +10,10 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     {
         internal const string AttributeDefinedNameSpace = "Benutomo";
 
-        internal const string AutomaticDisposeImplAttributeCoreName = "AutomaticDisposeImpl";
-        internal const string AutomaticDisposeImplAttributeName = "AutomaticDisposeImplAttribute";
-        internal const string AutomaticDisposeImplAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplAttribute";
-        internal const string AutomaticDisposeImplAttribute_DefaultMode = "DefaultMode";
 
-        internal const string AutomaticDisposeImplModeAttributeName = "AutomaticDisposeImplModeAttribute";
-        internal const string AutomaticDisposeImplModeAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplModeAttribute";
 
-        internal const string UnmanagedResourceReleaseMethodAttributeName = "UnmanagedResourceReleaseMethodAttribute";
-        internal const string UnmanagedResourceReleaseMethodAttributeFullyQualifiedMetadataName = "Benutomo.UnmanagedResourceReleaseMethodAttribute";
 
-        internal const string ManagedObjectDisposeMethodAttributeName = "ManagedObjectDisposeMethodAttribute";
-        internal const string ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName = "Benutomo.ManagedObjectDisposeMethodAttribute";
-
-        internal const string ManagedObjectAsyncDisposeMethodAttributeName = "ManagedObjectAsyncDisposeMethodAttribute";
-        internal const string ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName = "Benutomo.ManagedObjectAsyncDisposeMethodAttribute";
-
-        /// <summary>
-        /// <see cref="AutomaticDisposeImplMode"/>定数内の定義と一致させること
-        /// </summary>
-        const string AutomaticDisposeImplModeSource = @"
+        private const string AutomaticDisposeImplModeSource = @"
 namespace Benutomo
 {
     /// <summary>
@@ -39,24 +22,23 @@ namespace Benutomo
     internal enum AutomaticDisposeImplMode
     {
         /// <summary>
-        /// デフォルト。メンバに指定した場合はクラス全体の設定と同じとする。クラス全体もデフォルトの場合は破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバは<see cref=""Enable"" />を設定した場合と同様に扱う。
+        /// <see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />を継承する型を持つメンバは暗黙的に自動Dispose呼び出しの対象となる。
         /// </summary>
-        Default,
+        Implicit,
 
         /// <summary>
-        /// 自動実装されるDisposeの対象とする。
+        /// <see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />を継承する型を持つメンバは自動Dispose呼び出しの対象となる。
         /// </summary>
-        Enable,
-
-        /// <summary>
-        /// 自動実装されるDisposeの対象外とする。Disableにした場合、あえて破棄をしてはならないような特殊ケースでない限り<see cref=""AutomaticDisposeImplAttribute"" />に<see cref=""AutomaticDisposeImplAttribute.SelfDisposeMethod"" />と必要に応じて<see cref=""AutomaticDisposeImplAttribute.SelfDisposeAsyncMethod"" />を指定し、そのメソッド内でこのメンバの破棄を実装すること。
-        /// </summary>
-        Disable,
+        Explicit,
     }
 }
 ";
 
-        const string AutomaticDisposeImplAttributeSource = @"
+        internal const string AutomaticDisposeImplAttributeCoreName = "AutomaticDisposeImpl";
+        internal const string AutomaticDisposeImplAttributeName = "AutomaticDisposeImplAttribute";
+        internal const string AutomaticDisposeImplAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplAttribute";
+        internal const string AutomaticDisposeImplAttributeModeName = "Mode";
+        private const string AutomaticDisposeImplAttributeSource = @"
 using System;
 
 #nullable enable
@@ -70,14 +52,55 @@ namespace Benutomo
     internal class AutomaticDisposeImplAttribute : Attribute
     {
         /// <summary>
-        /// メンバ毎の<see cref=""AutomaticDisposeImplMode"" />に<see cref=""AutomaticDisposeImplMode.Default"" />が指定されている場合の既定値を設定する。
+        /// 自動破棄実装の既定動作を設定する。
         /// </summary>
-        public AutomaticDisposeImplMode DefaultMode { get; set; }
+        public AutomaticDisposeImplMode Mode { get; set; }
     }
 }
 ";
 
-        const string AutomaticDisposeImplModeAttributeSource = @"
+        internal const string EnableAutomaticDisposeAttributeName = "EnableAutomaticDisposeAttribute";
+        internal const string EnableAutomaticDisposeAttributeFullyQualifiedMetadataName = "Benutomo.EnableAutomaticDisposeAttribute";
+        private const string EnableAutomaticDisposeAttributeSource = @"
+using System;
+
+#nullable enable
+
+namespace Benutomo
+{
+    /// <summary>
+    /// このオブジェクトの破棄と同時に自動的に<see cref=""System.IDisposable.Dispose"" />メソッドまたは<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッドを呼び出します。
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    internal class EnableAutomaticDisposeAttribute : Attribute
+    {
+    }
+}
+";
+
+        internal const string DisableAutomaticDisposeAttributeName = "DisableAutomaticDisposeAttribute";
+        internal const string DisableAutomaticDisposeAttributeFullyQualifiedMetadataName = "Benutomo.DisableAutomaticDisposeAttribute";
+        private const string DisableAutomaticDisposeAttributeSource = @"
+using System;
+
+#nullable enable
+
+namespace Benutomo
+{
+    /// <summary>
+    /// このメンバに対して、<see cref=""System.IDisposable.Dispose"" />メソッドまたは<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッドの自動呼出しは行いません。このオブジェクトで破棄するのが不適当であるかユーザ自身が<see cref=""System.IDisposable.Dispose"" />メソッドまたは<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッドの呼び出しを実装するメンバです。
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    internal class DisableAutomaticDisposeAttribute : Attribute
+    {
+    }
+}
+";
+
+#if false
+        internal const string AutomaticDisposeImplModeAttributeName = "AutomaticDisposeImplModeAttribute";
+        internal const string AutomaticDisposeImplModeAttributeFullyQualifiedMetadataName = "Benutomo.AutomaticDisposeImplModeAttribute";
+        private const string AutomaticDisposeImplModeAttributeSource = @"
 using System;
 
 #nullable enable
@@ -106,8 +129,11 @@ namespace Benutomo
     }
 }
 ";
+#endif
 
-        const string UnmanagedResourceReleaseMethodAttributeSource = @"
+        internal const string UnmanagedResourceReleaseMethodAttributeName = "UnmanagedResourceReleaseMethodAttribute";
+        internal const string UnmanagedResourceReleaseMethodAttributeFullyQualifiedMetadataName = "Benutomo.UnmanagedResourceReleaseMethodAttribute";
+        private const string UnmanagedResourceReleaseMethodAttributeSource = @"
 using System;
 
 #nullable enable
@@ -128,7 +154,9 @@ namespace Benutomo
 }
 ";
 
-        const string ManagedObjectDisposeMethodAttributeSource = @"
+        internal const string ManagedObjectDisposeMethodAttributeName = "ManagedObjectDisposeMethodAttribute";
+        internal const string ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName = "Benutomo.ManagedObjectDisposeMethodAttribute";
+        private const string ManagedObjectDisposeMethodAttributeSource = @"
 using System;
 
 #nullable enable
@@ -149,7 +177,9 @@ namespace Benutomo
 }
 ";
 
-        const string ManagedObjectAsyncDisposeMethodAttributeSource = @"
+        internal const string ManagedObjectAsyncDisposeMethodAttributeName = "ManagedObjectAsyncDisposeMethodAttribute";
+        internal const string ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName = "Benutomo.ManagedObjectAsyncDisposeMethodAttribute";
+        private const string ManagedObjectAsyncDisposeMethodAttributeSource = @"
 using System;
 
 #nullable enable
@@ -180,7 +210,8 @@ namespace Benutomo
         {
             context.AddSource("AutomaticDisposeImplAttribute.cs", AutomaticDisposeImplAttributeSource);
             context.AddSource("AutomaticDisposeImplMode.cs", AutomaticDisposeImplModeSource);
-            context.AddSource("AutomaticDisposeImplModeAttribute.cs", AutomaticDisposeImplModeAttributeSource);
+            context.AddSource("EnableAutomaticDisposeAttribute.cs", EnableAutomaticDisposeAttributeSource);
+            context.AddSource("DisableAutomaticDisposeAttribute.cs", DisableAutomaticDisposeAttributeSource);
             context.AddSource("UnmanagedResourceReleaseMethodAttribute.cs", UnmanagedResourceReleaseMethodAttributeSource);
             context.AddSource("ManagedObjectDisposeMethodAttribute.cs", ManagedObjectDisposeMethodAttributeSource);
             context.AddSource("ManagedObjectAsyncDisposeMethodAttribute.cs", ManagedObjectAsyncDisposeMethodAttributeSource);
@@ -272,6 +303,7 @@ namespace Benutomo
 
             return false;
         }
+
         private static bool IsXAttributedMemberImpl(ISymbol? symbol, Func<INamedTypeSymbol,bool> isXAttributeSymbol)
         {
             if (symbol is null) return false;
@@ -290,7 +322,9 @@ namespace Benutomo
 
         internal static bool IsAutomaticDisposeImplAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, AutomaticDisposeImplAttributeName);
 
-        internal static bool IsAutomaticDisposeImplModeAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, AutomaticDisposeImplModeAttributeName);
+        internal static bool IsEnableAutomaticDisposeAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, EnableAutomaticDisposeAttributeName);
+
+        internal static bool IsDisableAutomaticDisposeAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, DisableAutomaticDisposeAttributeName);
 
         internal static bool IsUnmanagedResourceReleaseMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, UnmanagedResourceReleaseMethodAttributeName);
 
@@ -306,7 +340,9 @@ namespace Benutomo
 
         internal static bool IsAssignableToIAsyncDisposable(ITypeSymbol? typeSymbol) => IsAssignableToIXImpl(typeSymbol, IsIAsyncDisposable, IsAssignableToIAsyncDisposable);
 
-        internal static bool IsAutomaticDisposeImplModeAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsAutomaticDisposeImplModeAttribute);
+        internal static bool IsEnableAutomaticDisposeAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsEnableAutomaticDisposeAttribute);
+
+        internal static bool IsDisableAutomaticDisposeAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsDisableAutomaticDisposeAttribute);
 
         internal static bool IsUnmanagedResourceReleaseMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsUnmanagedResourceReleaseMethodAttribute);
 

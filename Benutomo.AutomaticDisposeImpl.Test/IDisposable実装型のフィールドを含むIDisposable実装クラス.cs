@@ -13,12 +13,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class NullFieldClass : IDisposable
         {
-            internal IDisposable disposable = null;
+            [EnableAutomaticDispose]
+            internal IDisposable? disposable = null;
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitDisposableImplementClass baseDisposable = new();
 
             int baseImplReleaseUnmanagedResourceCallCount;
@@ -43,6 +45,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
+            [EnableAutomaticDispose]
             internal ImplicitDisposableImplementClass selfDisposable = new();
 
             int selfImplReleaseUnmanagedResourceCallCount;
@@ -67,6 +70,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ReadonlyFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal readonly IDisposable disposable;
 
             public ReadonlyFieldClass(IDisposable disposable)
@@ -78,6 +82,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GenericTypeFieldClass<T> : IDisposable where T : IDisposable
         {
+            [EnableAutomaticDispose]
             internal T disposable;
 
             public GenericTypeFieldClass(T disposable)
@@ -89,6 +94,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class InterfaceFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal IDisposable disposable;
 
             public InterfaceFieldClass(IDisposable disposable)
@@ -100,12 +106,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ImplicitDisposableImplementClassFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitDisposableImplementClass disposable = new();
         }
 
         [AutomaticDisposeImpl]
         partial class ExplicitDisposableImplemetnClassFieldClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ExplicitDisposableImplemetnClass disposable = new();
         }
 

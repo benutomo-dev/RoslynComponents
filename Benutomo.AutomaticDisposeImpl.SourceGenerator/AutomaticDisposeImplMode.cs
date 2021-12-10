@@ -5,8 +5,7 @@
     /// </summary>
     enum AutomaticDisposeImplMode
     {
-        Default,
-        Enable,
-        Disable,
+        Implicit,
+        Explicit,
     }
 }

@@ -6,10 +6,10 @@ namespace Benutomo.AutomaticDisposeImpl.Test.TestUtils
 {
     class ExplicitDisposableImplemetnClass : IDisposable
     {
-        public Action OnFinalize { get; set; }
+        public Action? OnFinalize { get; set; }
 
-        public Action OnDispose { get; set; }
-        public Action<bool> OnDisposeCore { get; set; }
+        public Action? OnDispose { get; set; }
+        public Action<bool>? OnDisposeCore { get; set; }
 
         private int _managedContextDisposeCount;
         private int _unmanagedContextDisposeCount;
@@ -47,10 +47,10 @@ namespace Benutomo.AutomaticDisposeImpl.Test.TestUtils
 
     class ImplicitDisposableImplementClass : IDisposable
     {
-        public Action OnFinalize { get; set; }
+        public Action? OnFinalize { get; set; }
 
-        public Action OnDispose { get; set; }
-        public Action<bool> OnDisposeCore { get; set; }
+        public Action? OnDispose { get; set; }
+        public Action<bool>? OnDisposeCore { get; set; }
 
         private int _managedContextDisposeCount;
         private int _unmanagedContextDisposeCount;
@@ -88,13 +88,13 @@ namespace Benutomo.AutomaticDisposeImpl.Test.TestUtils
 
     class ExplicitAsyncDisposableImplemetnClass : IDisposable, IAsyncDisposable
     {
-        public Action OnFinalize { get; set; }
+        public Action? OnFinalize { get; set; }
 
-        public Action OnDispose { get; set; }
-        public Action<bool> OnDisposeCore { get; set; }
+        public Action? OnDispose { get; set; }
+        public Action<bool>? OnDisposeCore { get; set; }
 
-        public Func<ValueTask> OnDisposeAsync { get; set; }
-        public Func<ValueTask> OnDisposeAsyncCore { get; set; }
+        public Func<ValueTask>? OnDisposeAsync { get; set; }
+        public Func<ValueTask>? OnDisposeAsyncCore { get; set; }
 
         private int _unmanagedContextDisposeCount;
 
@@ -161,13 +161,13 @@ namespace Benutomo.AutomaticDisposeImpl.Test.TestUtils
 
     class ImplicitAsyncDisposableImplementClass : IDisposable, IAsyncDisposable
     {
-        public Action OnFinalize { get; set; }
+        public Action? OnFinalize { get; set; }
 
-        public Action OnDispose { get; set; }
-        public Action<bool> OnDisposeCore { get; set; }
+        public Action? OnDispose { get; set; }
+        public Action<bool>? OnDisposeCore { get; set; }
 
-        public Func<ValueTask> OnDisposeAsync { get; set; }
-        public Func<ValueTask> OnDisposeAsyncCore { get; set; }
+        public Func<ValueTask>? OnDisposeAsync { get; set; }
+        public Func<ValueTask>? OnDisposeAsyncCore { get; set; }
 
         private int _unmanagedContextDisposeCount;
 

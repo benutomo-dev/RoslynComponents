@@ -17,12 +17,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class NullPropertyClass : IDisposable
         {
-            internal IAutomaticImplSupportedAsyncDisposable disposable { get; set; } = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
+            [EnableAutomaticDispose]
+            internal IAutomaticImplSupportedAsyncDisposable? disposable { get; set; } = null; // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass baseDisposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             int baseImplReleaseUnmanagedResourceCallCount;
@@ -62,6 +64,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass selfDisposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             int selfImplReleaseUnmanagedResourceCallCount;
@@ -101,6 +104,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GetonlyPropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal IAutomaticImplSupportedAsyncDisposable disposable { get; } // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             public GetonlyPropertyClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -112,6 +116,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GenericTypePropertyClass<T> : IDisposable where T : IDisposable, IAsyncDisposable
         {
+            [EnableAutomaticDispose]
             internal T disposable { get; } // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             public GenericTypePropertyClass(T disposable)
@@ -123,6 +128,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class InterfacePropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal IAutomaticImplSupportedAsyncDisposable disposable { get; set; } // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
 
             public InterfacePropertyClass(IAutomaticImplSupportedAsyncDisposable disposable)
@@ -134,12 +140,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ImplicitAsyncDisposableImplementClassPropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitAsyncDisposableImplementClass disposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 
         [AutomaticDisposeImpl]
         partial class ExplicitAsyncDisposableImplemetnClassPropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ExplicitAsyncDisposableImplemetnClass disposable { get; set; } = new(); // SG0003警告が発生すること(確認する場合はソース先頭のpragmaをコメントアウト)
         }
 

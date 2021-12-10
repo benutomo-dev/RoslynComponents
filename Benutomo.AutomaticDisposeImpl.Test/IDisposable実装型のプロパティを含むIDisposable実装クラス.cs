@@ -13,12 +13,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class NullPropertyClass : IDisposable
         {
-            internal IDisposable disposable { get; set; } = null;
+            [EnableAutomaticDispose]
+            internal IDisposable? disposable { get; set; } = null;
         }
 
         [AutomaticDisposeImpl]
         partial class ExclusivityTestBaseClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitDisposableImplementClass baseDisposable { get; set; } = new();
 
             int baseImplReleaseUnmanagedResourceCallCount;
@@ -43,6 +45,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ExclusivityTestClass : ExclusivityTestBaseClass
         {
+            [EnableAutomaticDispose]
             internal ImplicitDisposableImplementClass selfDisposable { get; set; } = new();
 
             int selfImplReleaseUnmanagedResourceCallCount;
@@ -67,6 +70,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GetonlyPropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal IDisposable disposable { get; }
 
             public GetonlyPropertyClass(IDisposable disposable)
@@ -78,6 +82,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class GenericTypePropertyClass<T> : IDisposable where T : IDisposable
         {
+            [EnableAutomaticDispose]
             internal T disposable { get; }
 
             public GenericTypePropertyClass(T disposable)
@@ -89,6 +94,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class InterfacePropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal IDisposable disposable { get; set; }
 
             public InterfacePropertyClass(IDisposable disposable)
@@ -100,12 +106,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test
         [AutomaticDisposeImpl]
         partial class ImplicitDisposableImplementClassPropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ImplicitDisposableImplementClass disposable { get; set; } = new();
         }
 
         [AutomaticDisposeImpl]
         partial class ExplicitDisposableImplemetnClassPropertyClass : IDisposable
         {
+            [EnableAutomaticDispose]
             internal ExplicitDisposableImplemetnClass disposable { get; set; } = new();
         }
 
