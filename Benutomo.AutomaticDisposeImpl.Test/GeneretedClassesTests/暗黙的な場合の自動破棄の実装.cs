@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Moq;
 using Xunit;
 
-namespace Benutomo.AutomaticDisposeImpl.Test
+namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
 {
     public partial class 暗黙的な場合の自動破棄の実装
     {
