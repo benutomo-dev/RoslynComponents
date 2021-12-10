@@ -1,0 +1,19 @@
+<Project>
+  <!-- <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" /> -->
+
+  <PropertyGroup>
+    <ProjectwiseSubDirectory>$(MSBuildProjectDirectoryNoRoot.Substring($(MSBuildThisFileDirectoryNoRoot.Length)))</ProjectwiseSubDirectory>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/$(ProjectwiseSubDirectory)/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)bin/$(ProjectwiseSubDirectory)/</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>10</LangVersion>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+</Project>
