@@ -4,7 +4,7 @@ C#で`IDisposable`と`IAsyncDisposable`の実装パターンに対応するメ�
 
 ## Introduction
 
-以下のサンプルで示すように、`IDisposable`と`IAsyncDisposable`インターフェイスの少なくとも一方を実装するクラスに`partial`キーワードと`AutomaticDisposeImpl`属性を付与すると、クラス内に含まれる`IDisposable`と`IAsyncDisposable`インターフェイスを実装してる型を持つメンバを破棄する`Dispose()`と`DisposeAsync()`が自動実装されます。
+以下のサンプルで示すように、`IDisposable`と`IAsyncDisposable`インターフェイスの少なくとも一方を実装するクラスに`partial`キーワードと`AutomaticDisposeImpl`属性を付与すると、クラス内に含まれる`IDisposable`と`IAsyncDisposable`インターフェイスを実装している型を持つメンバを破棄する`Dispose()`と`DisposeAsync()`が自動実装されるようになります。
 
 ### サンプルコード
 
@@ -20,11 +20,13 @@ namespace SampleCode
     public partial class DisposeableTest : IDisposable, IAsyncDisposable
     {
         // DisposeableTestのDipose()とDiposeAsync()は自動実装されるため、定義不要
-        
+
         // IDisposable.Dispose()による破棄が可能なフィールド
+        [EnableAutomaticDispose]
         ConsoleOutputDisposable consoleOutputDisposable = new ConsoleOutputDisposable();
 
         // IDisposable.Dispose()とIAsyncDisposable.DisposeAsync()のどちらでも破棄が可能なプロパティ
+        [EnableAutomaticDispose]
         ConsoleOutputAsyncDisposable consoleOutputAsyncDisposable { get; } = new ConsoleOutputAsyncDisposable();
 
         public DisposeableTest()
@@ -32,7 +34,7 @@ namespace SampleCode
             Console.WriteLine("Created new DisposeableTest");
         }
     }
-    
+
     // 以降は、出力例のためのコード
 
     class Program
@@ -54,7 +56,7 @@ namespace SampleCode
             Console.WriteLine();
         }
     }
-    
+
     class ConsoleOutputDisposable : IDisposable
     {
         public void Dispose()
@@ -107,7 +109,11 @@ Install-Package Benutomo.AutomaticDisposeImpl.SourceGenerator
 ```
 
 ### 基本
-以下のように、破棄の自動実装を使用したいクラスを含むC#のソースコードの先頭部に`using Benutomo;`を追加し、`IDisposable`を実装しているクラスに`partial`キーワードと`[AutomaticDisposeImpl]`属性を追加します。自動実装する意味がありませんが、メンバは空でも問題ありません。ただし、`IDisposable`と`IAsyncDisposable`は利用者側のコードで明記する必要があります。
+
+以下のように、破棄の自動実装を使用したいクラスを含むC#のソースコードの先頭部に`using Benutomo;`を追加し、`IDisposable`と`IAsyncDisposable`の少なくとも一方を実装しているクラスに`partial`キーワードと`[AutomaticDisposeImpl]`属性を追加します。
+`EnableDisposeImpl`属性を追加したフィールドまはたプロパティはメンバを含むクラスが破棄と同時に自動的に破棄されます。
+`DisnableDisposeImpl`属性を追加したフィールドまはたプロパティは自動的な破棄の対象外となります。
+自動実装する意味がありませんが、メンバは空でも問題ありません。
 
 ```cs
 using Benutomo;
@@ -117,6 +123,13 @@ using System;
 [AutomaticDisposeImpl]
 partial class Sample1 : IDisposable
 {
+    // 自動破棄するメンバにはEnableAutomaticDispose属性を付与
+    [EnableAutomaticDispose]
+    IDisposable _disposable;
+
+    // 自動破棄しないメンバにはDisableAutomaticDispose属性を付与
+    [DisableAutomaticDispose]
+    IDisposable Disposable => _disposable;
 }
 
 // 非同期的な破棄(IAsyncDisposable)を自動実装
@@ -140,35 +153,7 @@ partial class Sample4
 
 ℹ 自動実装コードからメンバの破棄が行われるのは呼び出し方に関わらず(自動実装クラスの`Dispose()`と`DisposeAysnc()`のどちらが先に何回呼び出されても)、最大１回です。標準の[Disposeパターン](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose#implement-the-dispose-pattern)と同様に重複する呼び出しは無視されます。
 
-ℹ 自動実装されたメンバの破棄で生じた例外は、リリースビルド時は無視され、デバッグビルド時はDebug.Fail()によってデバッガを停止させます。標準的な`Dispose()`等は例外を発生させることなく複数回の呼び出しが可能である必要があります([Disposeメソッドの実装](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose))。自動実装されるコードはそれが守られていることを期待しているため、破棄で例外を発生させるメンバが存在する場合は、後述する方法で破棄の自動実装対象から除外し、独自処理メソッドの中で破棄と例外のハンドリングを行って下さい。
-
-### 破棄の自動実装から除外したいメンバを指定する
-
-`[AutomaticDisposeImpl]`属性のオプション(`DefaultMode`)と`[AutomaticDisposeImplMode]`属性を使用すると、破棄の自動実装の対象をコントロールすることができます。
-
-`[AutomaticDisposeImpl]`属性の`DefaultMode`に`AutomaticDisposeImplMode.Disable`を指定すると、クラス全体の自動実装コードからの破棄の呼び出しのデフォルトが無効になります(`Dispose()`メソッドと`DisposeAsync()`メソッドは作られますがデフォルトではメンバの破棄をしなくなります)。
-
-また、メンバに対して`[AutomaticDisposeImplMode]`属性を付与することでメンバごとにクラスのデフォルトと異なる設定を適用することができます。設定できるモードは以下の３値です。
-
-| 設定値 | 振る舞い |
-|-|-|
-| AutomaticDisposeImplMode.Disable | メンバの自動破棄を無効にします。 |
-| AutomaticDisposeImplMode.Enable | メンバの自動破棄を有効にします。 |
-| AutomaticDisposeImplMode.Default | `[AutomaticDisposeImplMode]`で使用した場合は`[AutomaticDisposeImpl]`の設定を継承します。`[AutomaticDisposeImpl]`属性の`DefaultMode`に使用した場合は`AutomaticDisposeImplMode.Enable`と見なされます。 |
-
-```cs 
-[AutomaticDisposeImpl(DefaultMode = AutomaticDisposeImplMode.Disable)] // メンバの自動破棄の規定値を無効に変更
-partial class AutomaticDisposeImplMode : IDisposable, IAsyncDisposable
-{
-    IDisposable _ignoredDisposable1; // 規定値が無効であるため、このメンバのDispose()は自動実装コードからは呼び出されません。
-
-    [AutomaticDisposeImplMode(AutomaticDisposeImplMode.Disable)] // メンバの自動破棄を無効化
-    IDisposable _ignoredDisposable2; // 個別に無効化されているため、このメンバのDispose()は自動実装コードからは呼び出されません。
-
-    [AutomaticDisposeImplMode(AutomaticDisposeImplMode.Enable)] // メンバの自動破棄を有効化
-    IDisposable _automaticDisposedDisposable; // 個別に有効化されているため、このメンバのDispose()は自動実装コードからは呼び出されます。
-}
-```
+ℹ 自動実装されたメンバの破棄で生じた例外は、リリースビルド時は無視され、デバッグビルド時はDebug.Fail()によってデバッガを停止させます。標準的な`Dispose()`等は例外を発生させることなく複数回の呼び出しが可能である必要があります([Disposeメソッドの実装](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose))。自動実装されるコードはそれが守られていることを期待しているため、破棄で例外を発生させるメンバが存在する場合は、自動実装対象から除外し、独自処理メソッドの中で破棄と例外のハンドリングを行って下さい。
 
 ### Dispose()などが呼び出されるタイミングで自動実装されるメンバの破棄と同時に独自の処理も実行する
 
