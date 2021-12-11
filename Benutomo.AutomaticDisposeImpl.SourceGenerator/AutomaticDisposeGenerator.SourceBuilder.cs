@@ -9,7 +9,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     {
         class SourceBuilder
         {
-            public string HintName => $"gen.{string.Join(".", _names)}.AutomaticDisposeImpl.cs";
+            public string HintName => $"gen_{string.Join(".", _hintingTypeNames)}_{string.Join(".", _nameSpaceNames)}_AutomaticDisposeImpl.cs";
 
             public string SourceText => _sourceBuilder.ToString();
 
@@ -37,7 +37,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             readonly IMethodSymbol? _userDefinedManagedObjectAsyncDisposeMethod;
 
-            readonly List<string> _names = new List<string>();
+            readonly List<string> _hintingTypeNames = new List<string>();
+
+            readonly List<string> _nameSpaceNames = new List<string>();
 
             readonly StringBuilder _sourceBuilder = new StringBuilder(4000);
 
@@ -159,7 +161,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             public void Build()
             {
-                _names.Clear();
+                _hintingTypeNames.Clear();
+                _nameSpaceNames.Clear();
                 _sourceBuilder.Clear();
 
                 _sourceBuilder.AppendLine("#nullable enable");
@@ -234,35 +237,46 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     _sourceBuilder.Append("partial ");
                     _sourceBuilder.Append(namedTypeSymbol.IsValueType ? "struct " : "class ");
                     _sourceBuilder.Append(namedTypeSymbol.Name);
-                    if (namedTypeSymbol.IsGenericType)
+
+                    if (namedTypeSymbol.IsGenericType && namedTypeSymbol.TypeArguments.Length > 0)
                     {
                         _sourceBuilder.Append("<");
                         _sourceBuilder.Append(string.Join(", ", namedTypeSymbol.TypeArguments.Select(v => v.Name)));
                         _sourceBuilder.Append(">");
+
+                        var hintingTypeNameBuilder = new StringBuilder();
+
+                        hintingTypeNameBuilder.Append(namedTypeSymbol.Name);
+                        hintingTypeNameBuilder.Append("{");
+                        hintingTypeNameBuilder.Append(string.Join("_", namedTypeSymbol.TypeArguments.Select(v => v.Name)));
+                        hintingTypeNameBuilder.Append("}");
+                        _hintingTypeNames.Add(hintingTypeNameBuilder.ToString());
                     }
+                    else
+                    {
+                        _hintingTypeNames.Add(namedTypeSymbol.Name);
+                    }
+
                     if (isDesingationType)
                     {
                         // なくてもいいが生成されたコードだけを見ても実装対象となっているインターフェイスが分かるようにしておく
 
                         if (_isIDisposableIntafeceImplementer && _isIAsyncDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(" : global::System.IDisposable, global::System.IAsyncDisposable");
+                            _sourceBuilder.Append(" // This is implementation class for IDisposable and IAysncDisposables by AutomaticDisposeImpl.");
                         }
                         else if (_isIDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(" : global::System.IDisposable");
+                            _sourceBuilder.Append(" // This is implementation class for IDisposable by AutomaticDisposeImpl.");
                         }
                         else if (_isIAsyncDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(" : global::System.IAsyncDisposable");
+                            _sourceBuilder.Append(" // This is implementation class for IAysncDisposables by AutomaticDisposeImpl.");
                         }
                     }
                     _sourceBuilder.AppendLine("");
 
                     BeginBlock();
-
-
-                    _names.Add(namedTypeSymbol.Name);
                 }
 
                 void WriteContainingNameSpaceStart(INamespaceSymbol namespaceSymbol)
@@ -279,7 +293,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     BeginBlock();
 
 
-                    _names.Add(namespaceSymbol.Name);
+                    _nameSpaceNames.Add(namespaceSymbol.Name);
                 }
             }
 
