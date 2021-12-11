@@ -6,14 +6,14 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <Nullable>enable</Nullable>
     <OutputType>library</OutputType>
-    <Version>1.1.0.1</Version>
+    <Version>1.1.0.2</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <PackageId>Benutomo.AutomaticDisposeImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements the Dispose method of IDisposable and the DisposeAsync method of IAsyncDisposable.</Description>
-    <PackageVersion>0.0.0.8</PackageVersion>
+    <PackageVersion>0.0.0.9</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;idisposable;iasyncdisposable;disepose;disposeasync</PackageTags>
