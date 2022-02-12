@@ -208,17 +208,25 @@ namespace Benutomo
 
         void PostInitialization(GeneratorPostInitializationContext context)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("AutomaticDisposeImplAttribute.cs", AutomaticDisposeImplAttributeSource);
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("AutomaticDisposeImplMode.cs", AutomaticDisposeImplModeSource);
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("EnableAutomaticDisposeAttribute.cs", EnableAutomaticDisposeAttributeSource);
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("DisableAutomaticDisposeAttribute.cs", DisableAutomaticDisposeAttributeSource);
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("UnmanagedResourceReleaseMethodAttribute.cs", UnmanagedResourceReleaseMethodAttributeSource);
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("ManagedObjectDisposeMethodAttribute.cs", ManagedObjectDisposeMethodAttributeSource);
+            context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("ManagedObjectAsyncDisposeMethodAttribute.cs", ManagedObjectAsyncDisposeMethodAttributeSource);
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
             if (context.SyntaxContextReceiver is not SyntaxContextReceiver syntaxContextReciever)
             {
                 context.ReportDiagnostic(Diagnostic.Create(AutomaticDisposeAnalyzer.s_diagnosticDescriptor_SG9999, null));
@@ -229,6 +237,8 @@ namespace Benutomo
 
             foreach (var anotatedClassDeclaration in syntaxContextReciever.AnotatedClassDeclarations)
             {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     if (!anotatedClassDeclaration.syntaxNode.Modifiers.Any(modifier => modifier.ValueText == "partial"))
