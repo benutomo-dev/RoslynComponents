@@ -9,11 +9,13 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     {
         class SourceBuilder
         {
-            public string HintName => $"gen.{string.Join(".", _names)}.AutomaticDisposeImpl.cs";
+            public string HintName => $"gen_{string.Join(".", _hintingTypeNames)}_{string.Join(".", _nameSpaceNames)}_AutomaticDisposeImpl.cs";
 
             public string SourceText => _sourceBuilder.ToString();
 
             private bool IsEnabledFinalize => _userDefinedUnmanagedResourceReleaseMethod is not null;
+
+            readonly GeneratorExecutionContext _context;
 
             readonly INamedTypeSymbol _classDeclarationSymbol;
 
@@ -37,7 +39,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             readonly IMethodSymbol? _userDefinedManagedObjectAsyncDisposeMethod;
 
-            readonly List<string> _names = new List<string>();
+            readonly List<string> _hintingTypeNames = new List<string>();
+
+            readonly List<string> _nameSpaceNames = new List<string>();
 
             readonly StringBuilder _sourceBuilder = new StringBuilder(4000);
 
@@ -57,6 +61,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             public SourceBuilder(GeneratorExecutionContext context, INamedTypeSymbol classDeclarationSymbol, AttributeData automaticDisposeAttributeData)
             {
+                _context = context;
                 _classDeclarationSymbol = classDeclarationSymbol;
                 _automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeAttributeData);
 
@@ -81,6 +86,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 foreach (var member in classDeclarationSymbol.GetMembers())
                 {
+                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                     if (member.IsStatic) continue;
 
                     if (member is IMethodSymbol methodSymbol)
@@ -159,16 +166,22 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             public void Build()
             {
-                _names.Clear();
+                _context.CancellationToken.ThrowIfCancellationRequested();
+
+                _hintingTypeNames.Clear();
+                _nameSpaceNames.Clear();
                 _sourceBuilder.Clear();
 
                 _sourceBuilder.AppendLine("#nullable enable");
                 _sourceBuilder.AppendLine("#pragma warning disable CS0612,CS0618,CS0619");
 
+                _context.CancellationToken.ThrowIfCancellationRequested();
                 WriteTypeDeclarationStart();
 
+                _context.CancellationToken.ThrowIfCancellationRequested();
                 WriteBody();
 
+                _context.CancellationToken.ThrowIfCancellationRequested();
                 WriteTypeDeclarationEnd();
 
 #if DEBUG
@@ -230,39 +243,52 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         WriteContainingNameSpaceStart(namedTypeSymbol.ContainingNamespace);
                     }
 
+                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                     PutIndentSpace();
                     _sourceBuilder.Append("partial ");
                     _sourceBuilder.Append(namedTypeSymbol.IsValueType ? "struct " : "class ");
                     _sourceBuilder.Append(namedTypeSymbol.Name);
-                    if (namedTypeSymbol.IsGenericType)
+
+                    if (namedTypeSymbol.IsGenericType && namedTypeSymbol.TypeArguments.Length > 0)
                     {
                         _sourceBuilder.Append("<");
                         _sourceBuilder.Append(string.Join(", ", namedTypeSymbol.TypeArguments.Select(v => v.Name)));
                         _sourceBuilder.Append(">");
+
+                        var hintingTypeNameBuilder = new StringBuilder();
+
+                        hintingTypeNameBuilder.Append(namedTypeSymbol.Name);
+                        hintingTypeNameBuilder.Append("{");
+                        hintingTypeNameBuilder.Append(string.Join("_", namedTypeSymbol.TypeArguments.Select(v => v.Name)));
+                        hintingTypeNameBuilder.Append("}");
+                        _hintingTypeNames.Add(hintingTypeNameBuilder.ToString());
                     }
+                    else
+                    {
+                        _hintingTypeNames.Add(namedTypeSymbol.Name);
+                    }
+
                     if (isDesingationType)
                     {
                         // なくてもいいが生成されたコードだけを見ても実装対象となっているインターフェイスが分かるようにしておく
 
                         if (_isIDisposableIntafeceImplementer && _isIAsyncDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(" : global::System.IDisposable, global::System.IAsyncDisposable");
+                            _sourceBuilder.Append(" // This is implementation class for IDisposable and IAysncDisposables by AutomaticDisposeImpl.");
                         }
                         else if (_isIDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(" : global::System.IDisposable");
+                            _sourceBuilder.Append(" // This is implementation class for IDisposable by AutomaticDisposeImpl.");
                         }
                         else if (_isIAsyncDisposableIntafeceImplementer)
                         {
-                            _sourceBuilder.Append(" : global::System.IAsyncDisposable");
+                            _sourceBuilder.Append(" // This is implementation class for IAysncDisposables by AutomaticDisposeImpl.");
                         }
                     }
                     _sourceBuilder.AppendLine("");
 
                     BeginBlock();
-
-
-                    _names.Add(namedTypeSymbol.Name);
                 }
 
                 void WriteContainingNameSpaceStart(INamespaceSymbol namespaceSymbol)
@@ -270,6 +296,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     if (namespaceSymbol.IsGlobalNamespace) return;
 
                     WriteContainingNameSpaceStart(namespaceSymbol.ContainingNamespace);
+
+                    _context.CancellationToken.ThrowIfCancellationRequested();
 
                     PutIndentSpace();
                     _sourceBuilder.Append("namespace ");
@@ -279,7 +307,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     BeginBlock();
 
 
-                    _names.Add(namespaceSymbol.Name);
+                    _nameSpaceNames.Add(namespaceSymbol.Name);
                 }
             }
 
@@ -292,6 +320,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 void WriteContainingTypeEnd(INamedTypeSymbol namedTypeSymbol)
                 {
                     EndBlock();
+
+                    _context.CancellationToken.ThrowIfCancellationRequested();
 
                     if (namedTypeSymbol.ContainingType is not null)
                     {
@@ -309,6 +339,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                     WriteContainingNameSpaceEnd(namespaceSymbol.ContainingNamespace);
 
+                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                     EndBlock();
                 }
             }
@@ -317,6 +349,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             {
                 if (!_isDisposableSubClass)
                 {
+                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                     PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                     PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                     PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
@@ -354,6 +388,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 if (IsEnabledFinalize)
                 {
+                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                     _sourceBuilder.AppendLine();
                     PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                     PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
@@ -365,6 +401,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 if (_isIDisposableIntafeceImplementer || IsEnabledFinalize)
                 {
+                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                     WriteDisposeCoreMethod();
                 }
 
@@ -372,6 +410,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 {
                     if (!_isDisposableSubClass)
                     {
+                        _context.CancellationToken.ThrowIfCancellationRequested();
+
                         WriteIDisposableDisposeMethod();
                     }
 
@@ -381,8 +421,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 {
                     if (!_isAsyncDisposableSubClass)
                     {
+                        _context.CancellationToken.ThrowIfCancellationRequested();
+
                         WriteIAsyncDisposableDisposeAsyncMethod();
                     }
+
+                    _context.CancellationToken.ThrowIfCancellationRequested();
 
                     WriteDisposeAsyncCoreMethod();
                 }
@@ -478,6 +522,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                             {
                                 foreach (var fieldSymbol in _disposableFields)
                                 {
+                                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                                     if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
                                     {
                                         continue;
@@ -503,6 +549,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                                 foreach (var propertySymbol in _disposableProperties)
                                 {
+                                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                                     if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
                                     {
                                         continue;
@@ -529,6 +577,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                                 if (_userDefinedManagedObjectDisposeMethod is not null)
                                 {
+                                    _context.CancellationToken.ThrowIfCancellationRequested();
+
                                     BeginTryBlock();
                                     {
                                         _sourceBuilder.AppendLine("");
@@ -556,6 +606,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                         if (_userDefinedUnmanagedResourceReleaseMethod is not null)
                         {
+                            _context.CancellationToken.ThrowIfCancellationRequested();
+
                             PutIndentSpace(); _sourceBuilder.AppendLine("var unmanagedResourceReleaseState = global::System.Threading.Interlocked.Exchange(ref __generator_internal_unmanagedResourceReleaseState, 1);");
                             PutIndentSpace(); _sourceBuilder.AppendLine("if (unmanagedResourceReleaseState == 0)");
                             BeginBlock();
@@ -583,6 +635,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                         if (_isDisposableSubClass)
                         {
+                            _context.CancellationToken.ThrowIfCancellationRequested();
+
                             BeginTryBlock();
                             {
                                 PutIndentSpace(); _sourceBuilder.AppendLine("base.Dispose(disposing);");
@@ -666,6 +720,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         {
                             foreach (var fieldSymbol in _asyncDisposableFields)
                             {
+                                _context.CancellationToken.ThrowIfCancellationRequested();
+
                                 if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
                                 {
                                     continue;
@@ -702,6 +758,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                             foreach (var propertySymbol in _asyncDisposableProperties)
                             {
+                                _context.CancellationToken.ThrowIfCancellationRequested();
+
                                 if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
                                 {
                                     continue;
@@ -737,6 +795,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                             foreach (var fieldSymbol in _nonAsyncDisposableFields)
                             {
+                                _context.CancellationToken.ThrowIfCancellationRequested();
+
                                 if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
                                 {
                                     continue;
@@ -762,6 +822,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                             foreach (var propertySymbol in _nonAsyncDisposableProperties)
                             {
+                                _context.CancellationToken.ThrowIfCancellationRequested();
+
                                 if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
                                 {
                                     continue;
