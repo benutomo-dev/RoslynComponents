@@ -14,6 +14,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
 
         private const string AutomaticDisposeImplModeSource = @"
+#pragma warning disable CS0436
 namespace Benutomo
 {
     /// <summary>
@@ -41,6 +42,7 @@ namespace Benutomo
         private const string AutomaticDisposeImplAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
@@ -64,6 +66,7 @@ namespace Benutomo
         private const string EnableAutomaticDisposeAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
@@ -83,6 +86,7 @@ namespace Benutomo
         private const string DisableAutomaticDisposeAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
@@ -103,6 +107,7 @@ namespace Benutomo
         private const string AutomaticDisposeImplModeAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
@@ -136,6 +141,7 @@ namespace Benutomo
         private const string UnmanagedResourceReleaseMethodAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
@@ -159,6 +165,7 @@ namespace Benutomo
         private const string ManagedObjectDisposeMethodAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
@@ -182,6 +189,7 @@ namespace Benutomo
         private const string ManagedObjectAsyncDisposeMethodAttributeSource = @"
 using System;
 
+#pragma warning disable CS0436
 #nullable enable
 
 namespace Benutomo
