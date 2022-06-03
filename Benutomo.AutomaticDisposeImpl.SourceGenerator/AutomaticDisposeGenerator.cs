@@ -1,13 +1,44 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
     [Generator]
-    public partial class AutomaticDisposeGenerator : ISourceGenerator
+    public partial class AutomaticDisposeGenerator : IIncrementalGenerator
     {
+#if DEBUG
+        static StreamWriter _streamWriter;
+        static AutomaticDisposeGenerator()
+        {
+            Directory.CreateDirectory(@"c:\var\log\AutomaticDisposeGenerator");
+            var proc = Process.GetCurrentProcess();
+            _streamWriter = new StreamWriter($@"c:\var\log\AutomaticDisposeGenerator\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
+            _streamWriter.WriteLine(proc);
+        }
+
+        [Conditional("DEBUG")]
+        static void WriteLogLine(string line)
+        {
+            lock (_streamWriter)
+            {
+                _streamWriter.WriteLine(line);
+                _streamWriter.Flush();
+            }
+        }
+#else
+        [Conditional("DEBUG")]
+        static void WriteLogLine(string line)
+        {
+        }
+#endif
+
+
+
         internal const string AttributeDefinedNameSpace = "Benutomo";
 
 
@@ -208,13 +239,82 @@ namespace Benutomo
 }
 ";
 
-        public void Initialize(GeneratorInitializationContext context)
+        record struct UsingSymbols(
+            INamedTypeSymbol AutomaticDisposeImplAttributeSymbol,
+            INamedTypeSymbol EnableAutomaticDisposeAttributeSymbol,
+            INamedTypeSymbol DisableAutomaticDisposeAttributeSymbol,
+            INamedTypeSymbol UnmanagedResourceReleaseMethodAttributeSymbol,
+            INamedTypeSymbol ManagedObjectDisposeMethodAttributeSymbol,
+            INamedTypeSymbol ManagedObjectAsyncDisposeMethodAttributeSymbol,
+            INamedTypeSymbol DisposableSymbol,
+            INamedTypeSymbol AsyncDisposableSymbol
+            );
+
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(PostInitialization);
-            context.RegisterForSyntaxNotifications(() => new SyntaxContextReceiver());
+            WriteLogLine("Begin Initialize");
+
+            context.RegisterPostInitializationOutput(PostInitialization);
+
+            var usingSymbols = context.CompilationProvider
+                .Select((compilation, cancellationToken) =>
+                {
+                    WriteLogLine("Begin GetTypeByMetadataName");
+
+                    try
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        var automaticDisposeImplAttributeSymbol = compilation.GetTypeByMetadataName(AutomaticDisposeImplAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+                        var enableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(EnableAutomaticDisposeAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+                        var disableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(DisableAutomaticDisposeAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+                        var unmanagedResourceReleaseMethodAttributeSymbol = compilation.GetTypeByMetadataName(UnmanagedResourceReleaseMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+                        var managedObjectDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+                        var managedObjectAsyncDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+                        var disposableSymbol = compilation.GetTypeByMetadataName("System.IDisposable") ?? throw new InvalidOperationException();
+                        var asyncDisposableSymbol = compilation.GetTypeByMetadataName("System.IAsyncDisposable") ?? throw new InvalidOperationException();
+
+                        return new UsingSymbols(
+                            automaticDisposeImplAttributeSymbol,
+                            enableAutomaticDisposeAttributeSymbol,
+                            disableAutomaticDisposeAttributeSymbol,
+                            unmanagedResourceReleaseMethodAttributeSymbol,
+                            managedObjectDisposeMethodAttributeSymbol,
+                            managedObjectAsyncDisposeMethodAttributeSymbol,
+                            disposableSymbol,
+                            asyncDisposableSymbol
+                        );
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        WriteLogLine("Canceled GetTypeByMetadataName");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteLogLine("Exception GetTypeByMetadataName");
+                        WriteLogLine(ex.ToString());
+                        throw;
+                    }
+                });
+
+            // Where句を使用しない。
+            // https://github.com/dotnet/roslyn/issues/57991
+            // 今は、Where句を使用するとSource GeneratorがVSでインクリメンタルに実行されたときに
+            // 対象のコードの状態や編集内容などによって突然内部状態が壊れて機能しなくなる問題がおきる。
+
+            var anotatedClasses = context.SyntaxProvider
+                .CreateSyntaxProvider(Predicate, Transform)
+                //.Where(v => v is not null)
+                .Combine(usingSymbols)
+                .Select(PostTransform)
+                ;//.Where(v => v is not null);
+
+            context.RegisterSourceOutput(anotatedClasses, Generate);
+
+            WriteLogLine("End Initialize");
         }
 
-        void PostInitialization(GeneratorPostInitializationContext context)
+        void PostInitialization(IncrementalGeneratorPostInitializationContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             context.AddSource("AutomaticDisposeImplAttribute.cs", AutomaticDisposeImplAttributeSource);
@@ -232,53 +332,109 @@ namespace Benutomo
             context.AddSource("ManagedObjectAsyncDisposeMethodAttribute.cs", ManagedObjectAsyncDisposeMethodAttributeSource);
         }
 
-        public void Execute(GeneratorExecutionContext context)
+
+        bool Predicate(SyntaxNode node, CancellationToken cancellationToken)
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
-            if (context.SyntaxContextReceiver is not SyntaxContextReceiver syntaxContextReciever)
+            //WriteLogLine("Predicate");
+
+            return node is ClassDeclarationSyntax
             {
-                context.ReportDiagnostic(Diagnostic.Create(AutomaticDisposeAnalyzer.s_diagnosticDescriptor_SG9999, null));
-                return;
+                AttributeLists.Count: > 0
+            };
+        }
+
+        INamedTypeSymbol? Transform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+        {
+            WriteLogLine("Begin Transform");
+            try
+            {
+                var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
+
+                if (!classDeclarationSyntax.Modifiers.Any(modifier => modifier.ValueText == "partial"))
+                {
+                    return null;
+                }
+
+                var namedTypeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, cancellationToken) as INamedTypeSymbol;
+
+                WriteLogLine($"End Transform ({namedTypeSymbol?.ContainingType?.Name}.{namedTypeSymbol?.Name})");
+
+                return namedTypeSymbol;
             }
-
-            var automaticDisposeImplAttributeSymbol = context.Compilation.GetTypeByMetadataName(AutomaticDisposeImplAttributeFullyQualifiedMetadataName);
-
-            foreach (var anotatedClassDeclaration in syntaxContextReciever.AnotatedClassDeclarations)
+            catch (OperationCanceledException)
             {
-                context.CancellationToken.ThrowIfCancellationRequested();
+                WriteLogLine($"Canceled Transform");
+                throw;
+            }
+        }
 
-                try
+        SourceBuildInputs? PostTransform((INamedTypeSymbol? Left, UsingSymbols Right) v, CancellationToken ct)
+        {
+            var namedTypeSymbol = v.Left;
+            var usingSymbols = v.Right;
+
+            if (namedTypeSymbol is null) return null;
+
+            WriteLogLine($"Begin PostTransform ({namedTypeSymbol.Name})");
+
+            try
+            {
+                var automaticDisposeImplAttributeData = namedTypeSymbol.GetAttributes().FirstOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, usingSymbols.AutomaticDisposeImplAttributeSymbol));
+                if (automaticDisposeImplAttributeData is null)
                 {
-                    if (!anotatedClassDeclaration.syntaxNode.Modifiers.Any(modifier => modifier.ValueText == "partial"))
-                    {
-                        // AnalyzerでSG0001の報告を実装
-                        continue;
-                    }
-
-                    if (!IsAssignableToIDisposable(anotatedClassDeclaration.symbol) && !IsAssignableToIAsyncDisposable(anotatedClassDeclaration.symbol))
-                    {
-                        // AnalyzerでSG0002の報告を実装
-                        continue;
-                    }
-
-                    var automaticDisposeAttributeData = anotatedClassDeclaration.symbol.GetAttributes().SingleOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, automaticDisposeImplAttributeSymbol));
-                    if (automaticDisposeAttributeData is null)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(AutomaticDisposeAnalyzer.s_diagnosticDescriptor_SG9998, anotatedClassDeclaration.syntaxNode.Identifier.GetLocation(), anotatedClassDeclaration.symbol.Name));
-                        continue;
-                    }
-
-                    var sourceBuilder = new SourceBuilder(context, anotatedClassDeclaration.symbol, automaticDisposeAttributeData);
-
-                    sourceBuilder.Build();
-
-                    context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
+                    return null;
                 }
-                catch (Exception e) when (e is not OperationCanceledException)
+
+                if (!IsAssignableToIDisposable(namedTypeSymbol) && !IsAssignableToIAsyncDisposable(namedTypeSymbol))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(AutomaticDisposeAnalyzer.s_diagnosticDescriptor_SG9998, anotatedClassDeclaration.syntaxNode.Identifier.GetLocation(), anotatedClassDeclaration.symbol.Name));
-                    continue;
+                    return null;
                 }
+
+                var result = new SourceBuildInputs(namedTypeSymbol, usingSymbols, automaticDisposeImplAttributeData);
+
+                WriteLogLine($"End PostTransform ({namedTypeSymbol.Name})");
+
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                WriteLogLine($"Canceled PostTransform ({namedTypeSymbol.Name})");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                WriteLogLine($"Exception PostTransform ({namedTypeSymbol.Name})");
+                WriteLogLine(ex.ToString());
+                throw;
+            }
+        }
+
+        void Generate(SourceProductionContext context, SourceBuildInputs? sourceBuildInputs)
+        {
+            if (sourceBuildInputs is null) return;
+
+            WriteLogLine($"Begin Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
+
+            try
+            {
+                var sourceBuilder = new SourceBuilder(context, sourceBuildInputs);
+
+                sourceBuilder.Build();
+
+                context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
+
+                WriteLogLine($"End Generate ({sourceBuildInputs.TargetTypeInfo.Name}) => {sourceBuilder.HintName}");
+            }
+            catch (OperationCanceledException)
+            {
+                WriteLogLine($"Canceled Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                WriteLogLine($"Exception in Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
+                WriteLogLine(ex.ToString());
+                throw;
             }
         }
 

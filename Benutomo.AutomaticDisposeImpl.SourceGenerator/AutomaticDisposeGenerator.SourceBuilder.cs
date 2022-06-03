@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -7,106 +9,153 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
     public partial class AutomaticDisposeGenerator
     {
-        class SourceBuilder
+        interface ITypeContainer
         {
-            public string HintName => $"gen_{string.Join(".", _hintingTypeNames)}_{string.Join(".", _nameSpaceNames)}_AutomaticDisposeImpl.cs";
+            string Name { get; }
+        }
 
-            public string SourceText => _sourceBuilder.ToString();
+        class NameSpaceInfo : ITypeContainer, IEquatable<NameSpaceInfo?>
+        {
+            public string Name { get; }
 
-            private bool IsEnabledFinalize => _userDefinedUnmanagedResourceReleaseMethod is not null;
-
-            readonly GeneratorExecutionContext _context;
-
-            readonly INamedTypeSymbol _classDeclarationSymbol;
-
-            readonly AutomaticDisposeContextChecker _automaticDisposeContextChecker;
-
-            readonly List<IFieldSymbol> _disposableFields;
-
-            readonly List<IPropertySymbol> _disposableProperties;
-
-            readonly List<IFieldSymbol> _nonAsyncDisposableFields;
-
-            readonly List<IPropertySymbol> _nonAsyncDisposableProperties;
-
-            readonly List<IFieldSymbol> _asyncDisposableFields;
-
-            readonly List<IPropertySymbol> _asyncDisposableProperties;
-
-            readonly IMethodSymbol? _userDefinedUnmanagedResourceReleaseMethod;
-
-            readonly IMethodSymbol? _userDefinedManagedObjectDisposeMethod;
-
-            readonly IMethodSymbol? _userDefinedManagedObjectAsyncDisposeMethod;
-
-            readonly List<string> _hintingTypeNames = new List<string>();
-
-            readonly List<string> _nameSpaceNames = new List<string>();
-
-            readonly StringBuilder _sourceBuilder = new StringBuilder(4000);
-
-            readonly bool _isIDisposableIntafeceImplementer;
-
-            readonly bool _isIAsyncDisposableIntafeceImplementer;
-
-            readonly bool _isDisposableSubClass;
-
-            readonly bool _isAsyncDisposableSubClass;
-
-            readonly bool _isInheritalbeClass;
-
-            int _currentIndentCount = 0;
-
-            const string indentText = "    ";
-
-            public SourceBuilder(GeneratorExecutionContext context, INamedTypeSymbol classDeclarationSymbol, AttributeData automaticDisposeAttributeData)
+            public NameSpaceInfo(string name)
             {
-                _context = context;
-                _classDeclarationSymbol = classDeclarationSymbol;
-                _automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeAttributeData);
+                Name = name ?? throw new ArgumentNullException(nameof(name));
+            }
 
-                _isIDisposableIntafeceImplementer = IsAssignableToIDisposable(_classDeclarationSymbol);
+            public override bool Equals(object? obj)
+            {
+                return Equals(obj as NameSpaceInfo);
+            }
 
-                _isIAsyncDisposableIntafeceImplementer = IsAssignableToIAsyncDisposable(_classDeclarationSymbol);
+            public bool Equals(NameSpaceInfo? other)
+            {
+                return other is not null &&
+                       Name == other.Name;
+            }
 
-                _isDisposableSubClass = IsAssignableToIDisposable(_classDeclarationSymbol.BaseType);
+            public override int GetHashCode()
+            {
+                return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+            }
+        }
 
-                _isAsyncDisposableSubClass = IsAssignableToIAsyncDisposable(_classDeclarationSymbol.BaseType);
+        class TypeDefinitionInfo : ITypeContainer, IEquatable<TypeDefinitionInfo?>
+        {
+            public ITypeContainer Container { get; }
 
-                _isInheritalbeClass = !_classDeclarationSymbol.IsValueType && !_classDeclarationSymbol.IsSealed;
+            public string Name { get; }
 
-                _disposableFields = new();
-                _disposableProperties = new();
+            public bool IsValueType { get; }
 
-                _nonAsyncDisposableFields = new();
-                _nonAsyncDisposableProperties = new();
+            public bool IsNullableAnoteted { get; }
 
-                _asyncDisposableFields = new();
-                _asyncDisposableProperties = new();
+            public ImmutableArray<string> GenericTypeArgs { get; }
 
-                foreach (var member in classDeclarationSymbol.GetMembers())
+            public TypeDefinitionInfo(ITypeContainer container, string name, bool isValueType, bool isNullableAnoteted, ImmutableArray<string> genericTypeArgs)
+            {
+                Container = container ?? throw new ArgumentNullException(nameof(container));
+                Name = name ?? throw new ArgumentNullException(nameof(name));
+                IsValueType = isValueType;
+                IsNullableAnoteted = isNullableAnoteted;
+                GenericTypeArgs = genericTypeArgs;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return Equals(obj as TypeDefinitionInfo);
+            }
+
+            public bool Equals(TypeDefinitionInfo? other)
+            {
+                return other is not null &&
+                       EqualityComparer<ITypeContainer>.Default.Equals(Container, other.Container) &&
+                       Name == other.Name &&
+                       IsValueType == other.IsValueType &&
+                       IsNullableAnoteted == other.IsNullableAnoteted &&
+                       GenericTypeArgs.SequenceEqual(other.GenericTypeArgs);
+            }
+
+            public override int GetHashCode()
+            {
+                int hashCode = 319546947;
+                hashCode = hashCode * -1521134295 + EqualityComparer<ITypeContainer>.Default.GetHashCode(Container);
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+                hashCode = hashCode * -1521134295 + IsValueType.GetHashCode();
+                hashCode = hashCode * -1521134295 + IsNullableAnoteted.GetHashCode();
+                hashCode = hashCode * -1521134295 + GenericTypeArgs.Sum(v => v.GetHashCode());
+                return hashCode;
+            }
+        }
+
+        class SourceBuildInputs : IEquatable<SourceBuildInputs?>
+        {
+            public TypeDefinitionInfo TargetTypeInfo;
+
+            public List<string> SyncDisposeMembersInDisposeMethod;
+
+            public List<string> SyncDisposeMembersInAsyncDisposeMethod;
+
+            public List<string> AsyncDisposeMembersInAsyncDisposeMethod;
+
+            public string? _userDefinedUnmanagedResourceReleaseMethodName;
+
+            public string? _userDefinedManagedObjectDisposeMethodName;
+
+            public string? _userDefinedManagedObjectAsyncDisposeMethodName;
+
+            public bool _isIDisposableIntafeceImplementer;
+
+            public bool _isIAsyncDisposableIntafeceImplementer;
+
+            public bool _isDisposableSubClass;
+
+            public bool _isAsyncDisposableSubClass;
+
+            public bool _isInheritalbeClass;
+
+
+            public SourceBuildInputs(INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData automaticDisposeImplAttributeData)
+            {
+                TargetTypeInfo = BuildTypeDefinitionInfo(namedTypeSymbol);
+
+                var automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeImplAttributeData);
+
+                _isIDisposableIntafeceImplementer = IsAssignableToIDisposable(namedTypeSymbol);
+
+                _isIAsyncDisposableIntafeceImplementer = IsAssignableToIAsyncDisposable(namedTypeSymbol);
+
+                _isDisposableSubClass = IsAssignableToIDisposable(namedTypeSymbol.BaseType);
+
+                _isAsyncDisposableSubClass = IsAssignableToIAsyncDisposable(namedTypeSymbol.BaseType);
+
+                _isInheritalbeClass = !namedTypeSymbol.IsValueType && !namedTypeSymbol.IsSealed;
+
+                SyncDisposeMembersInDisposeMethod = new();
+                SyncDisposeMembersInAsyncDisposeMethod = new();
+                AsyncDisposeMembersInAsyncDisposeMethod = new();
+
+                foreach (var member in namedTypeSymbol.GetMembers())
                 {
-                    _context.CancellationToken.ThrowIfCancellationRequested();
-
                     if (member.IsStatic) continue;
 
                     if (member is IMethodSymbol methodSymbol)
                     {
                         foreach (var attribute in member.GetAttributes())
                         {
-                            if (_userDefinedUnmanagedResourceReleaseMethod is null && IsUnmanagedResourceReleaseMethodAttribute(attribute.AttributeClass))
+                            if (_userDefinedUnmanagedResourceReleaseMethodName is null && IsUnmanagedResourceReleaseMethodAttribute(attribute.AttributeClass))
                             {
-                                _userDefinedUnmanagedResourceReleaseMethod = methodSymbol;
+                                _userDefinedUnmanagedResourceReleaseMethodName = methodSymbol.Name;
                                 break;
                             }
-                            if (_userDefinedManagedObjectDisposeMethod is null && IsManagedObjectDisposeMethodAttribute(attribute.AttributeClass))
+                            if (_userDefinedManagedObjectDisposeMethodName is null && IsManagedObjectDisposeMethodAttribute(attribute.AttributeClass))
                             {
-                                _userDefinedManagedObjectDisposeMethod = methodSymbol;
+                                _userDefinedManagedObjectDisposeMethodName = methodSymbol.Name;
                                 break;
                             }
-                            if (_userDefinedManagedObjectAsyncDisposeMethod is null && IsManagedObjectAsyncDisposeMethodAttribute(attribute.AttributeClass))
+                            if (_userDefinedManagedObjectAsyncDisposeMethodName is null && IsManagedObjectAsyncDisposeMethodAttribute(attribute.AttributeClass))
                             {
-                                _userDefinedManagedObjectAsyncDisposeMethod = methodSymbol;
+                                _userDefinedManagedObjectAsyncDisposeMethodName = methodSymbol.Name;
                                 break;
                             }
                         }
@@ -115,30 +164,34 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     {
                         if (fieldSymbol.IsImplicitlyDeclared) continue;
 
+                        if (!automaticDisposeContextChecker.IsEnableField(fieldSymbol)) continue;
+
                         var isAssignableToIDisposable = IsAssignableToIDisposable(fieldSymbol.Type);
                         var isAssignableToIAsyncDisposable = IsAssignableToIAsyncDisposable(fieldSymbol.Type);
 
                         if (isAssignableToIDisposable)
                         {
                             // Dispose()が呼び出し可能
-                            _disposableFields.Add(fieldSymbol);
+                            SyncDisposeMembersInDisposeMethod.Add(fieldSymbol.Name);
 
                             if (!isAssignableToIAsyncDisposable)
                             {
                                 // Dispose()のみが呼び出し可能
-                                _nonAsyncDisposableFields.Add(fieldSymbol);
+                                SyncDisposeMembersInAsyncDisposeMethod.Add(fieldSymbol.Name);
                             }
                         }
 
                         if (isAssignableToIAsyncDisposable)
                         {
                             // DisposeAsync()が呼び出し可能
-                            _asyncDisposableFields.Add(fieldSymbol);
+                            AsyncDisposeMembersInAsyncDisposeMethod.Add(fieldSymbol.Name);
                         }
                     }
                     else if (member is IPropertySymbol propertySymbol)
                     {
                         if (propertySymbol.IsImplicitlyDeclared) continue;
+
+                        if (!automaticDisposeContextChecker.IsEnableProperty(propertySymbol)) continue;
 
                         var isAssignableToIDisposable = IsAssignableToIDisposable(propertySymbol.Type);
                         var isAssignableToIAsyncDisposable = IsAssignableToIAsyncDisposable(propertySymbol.Type);
@@ -146,22 +199,181 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         if (isAssignableToIDisposable)
                         {
                             // Dispose()が呼び出し可能
-                            _disposableProperties.Add(propertySymbol);
+                            SyncDisposeMembersInDisposeMethod.Add(propertySymbol.Name);
 
                             if (!isAssignableToIAsyncDisposable)
                             {
                                 // Dispose()のみが呼び出し可能
-                                _nonAsyncDisposableProperties.Add(propertySymbol);
+                                SyncDisposeMembersInAsyncDisposeMethod.Add(propertySymbol.Name);
                             }
                         }
 
                         if (isAssignableToIAsyncDisposable)
                         {
                             // DisposeAsync()が呼び出し可能
-                            _asyncDisposableProperties.Add(propertySymbol);
+                            AsyncDisposeMembersInAsyncDisposeMethod.Add(propertySymbol.Name);
                         }
                     }
                 }
+
+                return;
+
+
+
+                static TypeDefinitionInfo BuildTypeDefinitionInfo(ITypeSymbol typeSymbol)
+                {
+                    ITypeContainer container;
+
+                    if (typeSymbol.ContainingType is null)
+                    {
+                        var namespaceBuilder = new StringBuilder();
+                        AppendFullNamespace(namespaceBuilder, typeSymbol.ContainingNamespace);
+
+                        container = new NameSpaceInfo(namespaceBuilder.ToString());
+                    }
+                    else
+                    {
+                        container = BuildTypeDefinitionInfo(typeSymbol.ContainingType);
+                    }
+
+                    ImmutableArray<string> genericTypeArgs = ImmutableArray<string>.Empty;
+
+                    if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+                    {
+                        var builder = ImmutableArray.CreateBuilder<string>(namedTypeSymbol.TypeArguments.Length);
+
+                        for (int i = 0; i < namedTypeSymbol.TypeArguments.Length; i++)
+                        {
+                            builder.Add(namedTypeSymbol.TypeArguments[i].Name);
+                        }
+
+                        genericTypeArgs = builder.MoveToImmutable();
+                    }
+
+                    return new TypeDefinitionInfo(container, typeSymbol.Name, typeSymbol.IsValueType, typeSymbol.NullableAnnotation == NullableAnnotation.Annotated, genericTypeArgs);
+                }
+
+                static void AppendFullTypeName(StringBuilder typeNameBuilder, ITypeSymbol typeSymbol)
+                {
+                    if (typeSymbol.ContainingType is null)
+                    {
+                        typeNameBuilder.Append("global::");
+                        AppendFullNamespace(typeNameBuilder, typeSymbol.ContainingNamespace);
+                    }
+                    else
+                    {
+                        AppendFullTypeName(typeNameBuilder, typeSymbol.ContainingType);
+                    }
+                    typeNameBuilder.Append(".");
+
+                    typeNameBuilder.Append(typeSymbol.Name);
+
+                    if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+                    {
+                        var typeArguments = namedTypeSymbol.TypeArguments;
+
+                        typeNameBuilder.Append("<");
+
+                        for (int i = 0; i < typeArguments.Length - 1; i++)
+                        {
+                            AppendFullTypeName(typeNameBuilder, typeArguments[i]);
+                            typeNameBuilder.Append(", ");
+                        }
+                        AppendFullTypeName(typeNameBuilder, typeArguments[typeArguments.Length - 1]);
+
+                        typeNameBuilder.Append(">");
+                    }
+
+                    if (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation == NullableAnnotation.Annotated)
+                    {
+                        typeNameBuilder.Append("?");
+                    }
+                }
+
+                static void AppendFullNamespace(StringBuilder namespaceNameBuilder, INamespaceSymbol namespaceSymbol)
+                {
+                    if (namespaceSymbol.ContainingNamespace is not null && !namespaceSymbol.ContainingNamespace.IsGlobalNamespace)
+                    {
+                        AppendFullNamespace(namespaceNameBuilder, namespaceSymbol.ContainingNamespace);
+                        namespaceNameBuilder.Append(".");
+                    }
+
+                    namespaceNameBuilder.Append(namespaceSymbol.Name);
+                }
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return Equals(obj as SourceBuildInputs);
+            }
+
+            public bool Equals(SourceBuildInputs? other)
+            {
+                var result = other is not null &&
+                       EqualityComparer<TypeDefinitionInfo>.Default.Equals(TargetTypeInfo, other.TargetTypeInfo) &&
+                       SyncDisposeMembersInDisposeMethod.SequenceEqual(other.SyncDisposeMembersInDisposeMethod) &&
+                       SyncDisposeMembersInAsyncDisposeMethod.SequenceEqual(other.SyncDisposeMembersInAsyncDisposeMethod) &&
+                       AsyncDisposeMembersInAsyncDisposeMethod.SequenceEqual(other.AsyncDisposeMembersInAsyncDisposeMethod) &&
+                       _userDefinedUnmanagedResourceReleaseMethodName == other._userDefinedUnmanagedResourceReleaseMethodName &&
+                       _userDefinedManagedObjectDisposeMethodName == other._userDefinedManagedObjectDisposeMethodName &&
+                       _userDefinedManagedObjectAsyncDisposeMethodName == other._userDefinedManagedObjectAsyncDisposeMethodName &&
+                       _isIDisposableIntafeceImplementer == other._isIDisposableIntafeceImplementer &&
+                       _isIAsyncDisposableIntafeceImplementer == other._isIAsyncDisposableIntafeceImplementer &&
+                       _isDisposableSubClass == other._isDisposableSubClass &&
+                       _isAsyncDisposableSubClass == other._isAsyncDisposableSubClass &&
+                       _isInheritalbeClass == other._isInheritalbeClass;
+
+                WriteLogLine($"SourceBuildInputs.Equals({TargetTypeInfo.Name}, {other?.TargetTypeInfo.Name}) => {result}");
+
+                return result;
+            }
+
+            public override int GetHashCode()
+            {
+                int hashCode = -160234080;
+                hashCode = hashCode * -1521134295 + EqualityComparer<TypeDefinitionInfo>.Default.GetHashCode(TargetTypeInfo);
+                hashCode = hashCode * -1521134295 + SyncDisposeMembersInDisposeMethod.Sum(v => EqualityComparer<string>.Default.GetHashCode(v));
+                hashCode = hashCode * -1521134295 + SyncDisposeMembersInAsyncDisposeMethod.Sum(v => EqualityComparer<string>.Default.GetHashCode(v));
+                hashCode = hashCode * -1521134295 + AsyncDisposeMembersInAsyncDisposeMethod.Sum(v => EqualityComparer<string>.Default.GetHashCode(v));
+                hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_userDefinedUnmanagedResourceReleaseMethodName);
+                hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_userDefinedManagedObjectDisposeMethodName);
+                hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_userDefinedManagedObjectAsyncDisposeMethodName);
+                hashCode = hashCode * -1521134295 + _isIDisposableIntafeceImplementer.GetHashCode();
+                hashCode = hashCode * -1521134295 + _isIAsyncDisposableIntafeceImplementer.GetHashCode();
+                hashCode = hashCode * -1521134295 + _isDisposableSubClass.GetHashCode();
+                hashCode = hashCode * -1521134295 + _isAsyncDisposableSubClass.GetHashCode();
+                hashCode = hashCode * -1521134295 + _isInheritalbeClass.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        class SourceBuilder
+        {
+            public string HintName => $"gen_{string.Join(".", _hintingTypeNames)}_{_nameSpace}_AutomaticDisposeImpl.cs";
+
+            public string SourceText => _sourceBuilder.ToString();
+
+            private bool IsEnabledFinalize => _sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName is not null;
+
+            readonly SourceProductionContext _context;
+
+            readonly SourceBuildInputs _sourceBuildInputs;
+
+            public List<string> _hintingTypeNames = new List<string>();
+
+            public string _nameSpace;
+
+            public StringBuilder _sourceBuilder = new StringBuilder(4000);
+
+            int _currentIndentCount = 0;
+
+            const string indentText = "    ";
+
+            public SourceBuilder(SourceProductionContext context, SourceBuildInputs sourceBuildInputs)
+            {
+                _context = context;
+                _sourceBuildInputs = sourceBuildInputs;
+
             }
 
             public void Build()
@@ -169,7 +381,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 _context.CancellationToken.ThrowIfCancellationRequested();
 
                 _hintingTypeNames.Clear();
-                _nameSpaceNames.Clear();
+                _nameSpace = "";
                 _sourceBuilder.Clear();
 
                 _sourceBuilder.AppendLine("#nullable enable");
@@ -228,19 +440,19 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             void WriteTypeDeclarationStart()
             {
-                WriteContainingTypeStart(_classDeclarationSymbol, isDesingationType: true);
+                WriteContainingTypeStart(_sourceBuildInputs.TargetTypeInfo, isDesingationType: true);
 
                 return;
 
-                void WriteContainingTypeStart(INamedTypeSymbol namedTypeSymbol, bool isDesingationType)
+                void WriteContainingTypeStart(TypeDefinitionInfo namedTypeSymbol, bool isDesingationType)
                 {
-                    if (namedTypeSymbol.ContainingType is not null)
+                    if (namedTypeSymbol.Container is NameSpaceInfo nameSpace && !string.IsNullOrWhiteSpace(nameSpace.Name))
                     {
-                        WriteContainingTypeStart(namedTypeSymbol.ContainingType, false);
+                        WriteContainingNameSpaceStart(nameSpace);
                     }
-                    else if (namedTypeSymbol.ContainingNamespace is not null)
+                    else if (namedTypeSymbol.Container is TypeDefinitionInfo typeInfo)
                     {
-                        WriteContainingNameSpaceStart(namedTypeSymbol.ContainingNamespace);
+                        WriteContainingTypeStart(typeInfo, isDesingationType: false);
                     }
 
                     _context.CancellationToken.ThrowIfCancellationRequested();
@@ -250,17 +462,17 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     _sourceBuilder.Append(namedTypeSymbol.IsValueType ? "struct " : "class ");
                     _sourceBuilder.Append(namedTypeSymbol.Name);
 
-                    if (namedTypeSymbol.IsGenericType && namedTypeSymbol.TypeArguments.Length > 0)
+                    if (namedTypeSymbol.GenericTypeArgs.Length > 0)
                     {
                         _sourceBuilder.Append("<");
-                        _sourceBuilder.Append(string.Join(", ", namedTypeSymbol.TypeArguments.Select(v => v.Name)));
+                        _sourceBuilder.Append(string.Join(", ", namedTypeSymbol.GenericTypeArgs));
                         _sourceBuilder.Append(">");
 
                         var hintingTypeNameBuilder = new StringBuilder();
 
                         hintingTypeNameBuilder.Append(namedTypeSymbol.Name);
                         hintingTypeNameBuilder.Append("{");
-                        hintingTypeNameBuilder.Append(string.Join("_", namedTypeSymbol.TypeArguments.Select(v => v.Name)));
+                        hintingTypeNameBuilder.Append(string.Join("_", namedTypeSymbol.GenericTypeArgs));
                         hintingTypeNameBuilder.Append("}");
                         _hintingTypeNames.Add(hintingTypeNameBuilder.ToString());
                     }
@@ -273,15 +485,15 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     {
                         // なくてもいいが生成されたコードだけを見ても実装対象となっているインターフェイスが分かるようにしておく
 
-                        if (_isIDisposableIntafeceImplementer && _isIAsyncDisposableIntafeceImplementer)
+                        if (_sourceBuildInputs._isIDisposableIntafeceImplementer && _sourceBuildInputs._isIAsyncDisposableIntafeceImplementer)
                         {
                             _sourceBuilder.Append(" // This is implementation class for IDisposable and IAysncDisposables by AutomaticDisposeImpl.");
                         }
-                        else if (_isIDisposableIntafeceImplementer)
+                        else if (_sourceBuildInputs._isIDisposableIntafeceImplementer)
                         {
                             _sourceBuilder.Append(" // This is implementation class for IDisposable by AutomaticDisposeImpl.");
                         }
-                        else if (_isIAsyncDisposableIntafeceImplementer)
+                        else if (_sourceBuildInputs._isIAsyncDisposableIntafeceImplementer)
                         {
                             _sourceBuilder.Append(" // This is implementation class for IAysncDisposables by AutomaticDisposeImpl.");
                         }
@@ -291,63 +503,50 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     BeginBlock();
                 }
 
-                void WriteContainingNameSpaceStart(INamespaceSymbol namespaceSymbol)
+                void WriteContainingNameSpaceStart(NameSpaceInfo namespaceSymbol)
                 {
-                    if (namespaceSymbol.IsGlobalNamespace) return;
-
-                    WriteContainingNameSpaceStart(namespaceSymbol.ContainingNamespace);
-
-                    _context.CancellationToken.ThrowIfCancellationRequested();
-
                     PutIndentSpace();
                     _sourceBuilder.Append("namespace ");
                     _sourceBuilder.Append(namespaceSymbol.Name);
                     _sourceBuilder.AppendLine("");
 
+                    _nameSpace = namespaceSymbol.Name;
+
                     BeginBlock();
-
-
-                    _nameSpaceNames.Add(namespaceSymbol.Name);
                 }
             }
 
             void WriteTypeDeclarationEnd()
             {
-                WriteContainingTypeEnd(_classDeclarationSymbol);
+                WriteContainingTypeEnd(_sourceBuildInputs.TargetTypeInfo);
 
                 return;
 
-                void WriteContainingTypeEnd(INamedTypeSymbol namedTypeSymbol)
+                void WriteContainingTypeEnd(TypeDefinitionInfo namedTypeSymbol)
                 {
                     EndBlock();
 
                     _context.CancellationToken.ThrowIfCancellationRequested();
 
-                    if (namedTypeSymbol.ContainingType is not null)
+                    if (namedTypeSymbol.Container is NameSpaceInfo nameSpace && !string.IsNullOrWhiteSpace(nameSpace.Name))
                     {
-                        WriteContainingTypeEnd(namedTypeSymbol.ContainingType);
+                        WriteContainingNameSpaceEnd(nameSpace);
                     }
-                    else if (namedTypeSymbol.ContainingNamespace is not null)
+                    else if (namedTypeSymbol.Container is TypeDefinitionInfo typeInfo)
                     {
-                        WriteContainingNameSpaceEnd(namedTypeSymbol.ContainingNamespace);
+                        WriteContainingTypeEnd(typeInfo);
                     }
                 }
 
-                void WriteContainingNameSpaceEnd(INamespaceSymbol namespaceSymbol)
+                void WriteContainingNameSpaceEnd(NameSpaceInfo namespaceSymbol)
                 {
-                    if (namespaceSymbol.IsGlobalNamespace) return;
-
-                    WriteContainingNameSpaceEnd(namespaceSymbol.ContainingNamespace);
-
-                    _context.CancellationToken.ThrowIfCancellationRequested();
-
                     EndBlock();
                 }
             }
 
             void WriteBody()
             {
-                if (!_isDisposableSubClass)
+                if (!_sourceBuildInputs._isDisposableSubClass)
                 {
                     _context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -399,16 +598,16 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     WriteFinalizer();
                 }
 
-                if (_isIDisposableIntafeceImplementer || IsEnabledFinalize)
+                if (_sourceBuildInputs._isIDisposableIntafeceImplementer || IsEnabledFinalize)
                 {
                     _context.CancellationToken.ThrowIfCancellationRequested();
 
                     WriteDisposeCoreMethod();
                 }
 
-                if (_isIDisposableIntafeceImplementer)
+                if (_sourceBuildInputs._isIDisposableIntafeceImplementer)
                 {
-                    if (!_isDisposableSubClass)
+                    if (!_sourceBuildInputs._isDisposableSubClass)
                     {
                         _context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -417,9 +616,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 }
 
-                if (_isIAsyncDisposableIntafeceImplementer)
+                if (_sourceBuildInputs._isIAsyncDisposableIntafeceImplementer)
                 {
-                    if (!_isAsyncDisposableSubClass)
+                    if (!_sourceBuildInputs._isAsyncDisposableSubClass)
                     {
                         _context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -450,7 +649,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                     PutIndentSpace();
                     _sourceBuilder.Append("~");
-                    _sourceBuilder.Append(_classDeclarationSymbol.Name);
+                    _sourceBuilder.Append(_sourceBuildInputs.TargetTypeInfo.Name);
                     _sourceBuilder.AppendLine("()");
                     BeginBlock();
                     {
@@ -470,7 +669,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         PutIndentSpace(); _sourceBuilder.AppendLine("if (dispose_state == __generator_internal_BeNotInitiatedAnyDispose)");
                         BeginBlock();
                         {
-                            if (_isIDisposableIntafeceImplementer || IsEnabledFinalize)
+                            if (_sourceBuildInputs._isIDisposableIntafeceImplementer || IsEnabledFinalize)
                             {
                                 _sourceBuilder.AppendLine();
                                 PutIndentSpace(); _sourceBuilder.AppendLine("// Dispose managed members and release unmaneged resources.");
@@ -495,9 +694,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 {
                     _sourceBuilder.AppendLine();
 
-                    if (_isInheritalbeClass)
+                    if (_sourceBuildInputs._isInheritalbeClass)
                     {
-                        if (_isDisposableSubClass)
+                        if (_sourceBuildInputs._isDisposableSubClass)
                         {
                             PutIndentSpace(); _sourceBuilder.AppendLine("protected override void Dispose(bool disposing)");
                         }
@@ -520,20 +719,15 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                             PutIndentSpace(); _sourceBuilder.AppendLine("if (managedObjectDisposeState == 0)");
                             BeginBlock();
                             {
-                                foreach (var fieldSymbol in _disposableFields)
+                                foreach (var memberName in _sourceBuildInputs.SyncDisposeMembersInDisposeMethod)
                                 {
                                     _context.CancellationToken.ThrowIfCancellationRequested();
-
-                                    if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
-                                    {
-                                        continue;
-                                    }
 
                                     BeginTryBlock();
                                     {
                                         PutIndentSpace();
                                         _sourceBuilder.Append("(this.");
-                                        _sourceBuilder.Append(fieldSymbol.Name);
+                                        _sourceBuilder.Append(memberName);
                                         _sourceBuilder.AppendLine(" as global::System.IDisposable)?.Dispose();");
                                     }
                                     EndBlock();
@@ -541,41 +735,14 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                     {
                                         PutIndentSpace();
                                         _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the ");
-                                        _sourceBuilder.Append(fieldSymbol.Name);
-                                        _sourceBuilder.AppendLine(@".Dispose() calling. Message=\""{ex.Message}\"""");");
-                                    }
-                                    EndBlock();
-                                }
-
-                                foreach (var propertySymbol in _disposableProperties)
-                                {
-                                    _context.CancellationToken.ThrowIfCancellationRequested();
-
-                                    if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
-                                    {
-                                        continue;
-                                    }
-
-                                    BeginTryBlock();
-                                    {
-                                        PutIndentSpace();
-                                        _sourceBuilder.Append("(this.");
-                                        _sourceBuilder.Append(propertySymbol.Name);
-                                        _sourceBuilder.AppendLine(" as global::System.IDisposable)?.Dispose();");
-                                    }
-                                    EndBlock();
-                                    BeginBlock("catch (global::System.Exception ex)");
-                                    {
-                                        PutIndentSpace();
-                                        _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the ");
-                                        _sourceBuilder.Append(propertySymbol.Name);
+                                        _sourceBuilder.Append(memberName);
                                         _sourceBuilder.AppendLine(@".Dispose() calling. Message=\""{ex.Message}\"""");");
                                     }
                                     EndBlock();
                                 }
 
 
-                                if (_userDefinedManagedObjectDisposeMethod is not null)
+                                if (_sourceBuildInputs._userDefinedManagedObjectDisposeMethodName is not null)
                                 {
                                     _context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -586,7 +753,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                         PutIndentSpace(); _sourceBuilder.AppendLine("// Invoke user implemented disposer.");
                                         PutIndentSpace();
                                         _sourceBuilder.Append("this.");
-                                        _sourceBuilder.Append(_userDefinedManagedObjectDisposeMethod.Name);
+                                        _sourceBuilder.Append(_sourceBuildInputs._userDefinedManagedObjectDisposeMethodName);
                                         _sourceBuilder.AppendLine("();");
                                     }
                                     EndBlock();
@@ -594,7 +761,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                     {
                                         PutIndentSpace();
                                         _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the this.");
-                                        _sourceBuilder.Append(_userDefinedManagedObjectDisposeMethod.Name);
+                                        _sourceBuilder.Append(_sourceBuildInputs._userDefinedManagedObjectDisposeMethodName);
                                         _sourceBuilder.AppendLine(@"() calling. Message=\""{ex.Message}\"""");");
                                     }
                                     EndBlock();
@@ -604,7 +771,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         }
                         EndBlock();
 
-                        if (_userDefinedUnmanagedResourceReleaseMethod is not null)
+                        if (_sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName is not null)
                         {
                             _context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -617,7 +784,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                     PutIndentSpace(); _sourceBuilder.AppendLine("// Invoke user implemented finalizer.");
                                     PutIndentSpace();
                                     _sourceBuilder.Append("this.");
-                                    _sourceBuilder.Append(_userDefinedUnmanagedResourceReleaseMethod.Name);
+                                    _sourceBuilder.Append(_sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName);
                                     _sourceBuilder.AppendLine("();");
                                 }
                                 EndBlock();
@@ -625,7 +792,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the this.");
-                                    _sourceBuilder.Append(_userDefinedUnmanagedResourceReleaseMethod.Name);
+                                    _sourceBuilder.Append(_sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName);
                                     _sourceBuilder.AppendLine(@"() calling. Message=\""{ex.Message}\"""");");
                                 }
                                 EndBlock();
@@ -633,7 +800,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                             EndBlock();
                         }
 
-                        if (_isDisposableSubClass)
+                        if (_sourceBuildInputs._isDisposableSubClass)
                         {
                             _context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -667,7 +834,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         {
                             PutIndentSpace(); _sourceBuilder.AppendLine("await DisposeAsyncCore().ConfigureAwait(false);");
 
-                            if (_isIDisposableIntafeceImplementer || IsEnabledFinalize)
+                            if (_sourceBuildInputs._isIDisposableIntafeceImplementer || IsEnabledFinalize)
                             {
                                 _sourceBuilder.AppendLine();
                                 PutIndentSpace(); _sourceBuilder.AppendLine("// Release unmaneged resources.");
@@ -697,9 +864,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                     _sourceBuilder.AppendLine("#pragma warning disable CS1998");
                     PutIndentSpace();
-                    if (_isInheritalbeClass)
+                    if (_sourceBuildInputs._isInheritalbeClass)
                     {
-                        if (_isAsyncDisposableSubClass)
+                        if (_sourceBuildInputs._isAsyncDisposableSubClass)
                         {
                             _sourceBuilder.AppendLine("protected override async global::System.Threading.Tasks.ValueTask DisposeAsyncCore()");
                         }
@@ -718,28 +885,23 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         PutIndentSpace(); _sourceBuilder.AppendLine("if (managedObjectDisposeState == 0)");
                         BeginBlock();
                         {
-                            foreach (var fieldSymbol in _asyncDisposableFields)
+                            foreach (var memberName in _sourceBuildInputs.AsyncDisposeMembersInAsyncDisposeMethod)
                             {
                                 _context.CancellationToken.ThrowIfCancellationRequested();
-
-                                if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
-                                {
-                                    continue;
-                                }
 
                                 BeginTryBlock();
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append("if (this.");
-                                    _sourceBuilder.Append(fieldSymbol.Name);
+                                    _sourceBuilder.Append(memberName);
                                     _sourceBuilder.Append(" is global::System.IAsyncDisposable asyncDisposable_");
-                                    _sourceBuilder.Append(fieldSymbol.Name);
+                                    _sourceBuilder.Append(memberName);
                                     _sourceBuilder.AppendLine(")");
                                     BeginBlock();
                                     {
                                         PutIndentSpace();
                                         _sourceBuilder.Append("await asyncDisposable_");
-                                        _sourceBuilder.Append(fieldSymbol.Name);
+                                        _sourceBuilder.Append(memberName);
                                         _sourceBuilder.AppendLine(".DisposeAsync().ConfigureAwait(false);");
                                     }
                                     EndBlock();
@@ -749,64 +911,21 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the ");
-                                    _sourceBuilder.Append(fieldSymbol.Name);
+                                    _sourceBuilder.Append(memberName);
                                     _sourceBuilder.AppendLine(@".Dispose() calling. Message=\""{ex.Message}\"""");");
                                 }
                                 EndBlock();
                             }
 
-
-                            foreach (var propertySymbol in _asyncDisposableProperties)
+                            foreach (var memberName in _sourceBuildInputs.SyncDisposeMembersInAsyncDisposeMethod)
                             {
                                 _context.CancellationToken.ThrowIfCancellationRequested();
-
-                                if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
-                                {
-                                    continue;
-                                }
-
-                                BeginTryBlock();
-                                {
-                                    PutIndentSpace();
-                                    _sourceBuilder.Append("if (this.");
-                                    _sourceBuilder.Append(propertySymbol.Name);
-                                    _sourceBuilder.Append(" is global::System.IAsyncDisposable asyncDisposable_");
-                                    _sourceBuilder.Append(propertySymbol.Name);
-                                    _sourceBuilder.AppendLine(")");
-                                    BeginBlock();
-                                    {
-                                        PutIndentSpace();
-                                        _sourceBuilder.Append("await asyncDisposable_");
-                                        _sourceBuilder.Append(propertySymbol.Name);
-                                        _sourceBuilder.AppendLine(".DisposeAsync().ConfigureAwait(false);");
-                                    }
-                                    EndBlock();
-                                }
-                                EndBlock();
-                                BeginBlock("catch (global::System.Exception ex)");
-                                {
-                                    PutIndentSpace();
-                                    _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the ");
-                                    _sourceBuilder.Append(propertySymbol.Name);
-                                    _sourceBuilder.AppendLine(@".Dispose() calling. Message=\""{ex.Message}\"""");");
-                                }
-                                EndBlock();
-                            }
-
-                            foreach (var fieldSymbol in _nonAsyncDisposableFields)
-                            {
-                                _context.CancellationToken.ThrowIfCancellationRequested();
-
-                                if (!_automaticDisposeContextChecker.IsEnableField(fieldSymbol))
-                                {
-                                    continue;
-                                }
 
                                 BeginTryBlock();
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append("(this.");
-                                    _sourceBuilder.Append(fieldSymbol.Name);
+                                    _sourceBuilder.Append(memberName);
                                     _sourceBuilder.AppendLine(" as global::System.IDisposable)?.Dispose();");
                                 }
                                 EndBlock();
@@ -814,40 +933,13 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the ");
-                                    _sourceBuilder.Append(fieldSymbol.Name);
+                                    _sourceBuilder.Append(memberName);
                                     _sourceBuilder.AppendLine(@".Dispose() calling. Message=\""{ex.Message}\"""");");
                                 }
                                 EndBlock();
                             }
 
-                            foreach (var propertySymbol in _nonAsyncDisposableProperties)
-                            {
-                                _context.CancellationToken.ThrowIfCancellationRequested();
-
-                                if (!_automaticDisposeContextChecker.IsEnableProperty(propertySymbol))
-                                {
-                                    continue;
-                                }
-
-                                BeginTryBlock();
-                                {
-                                    PutIndentSpace();
-                                    _sourceBuilder.Append("(this.");
-                                    _sourceBuilder.Append(propertySymbol.Name);
-                                    _sourceBuilder.AppendLine(" as global::System.IDisposable)?.Dispose();");
-                                }
-                                EndBlock();
-                                BeginBlock("catch (global::System.Exception ex)");
-                                {
-                                    PutIndentSpace();
-                                    _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the ");
-                                    _sourceBuilder.Append(propertySymbol.Name);
-                                    _sourceBuilder.AppendLine(@".Dispose() calling. Message=\""{ex.Message}\"""");");
-                                }
-                                EndBlock();
-                            }
-
-                            if (_userDefinedManagedObjectAsyncDisposeMethod is not null)
+                            if (_sourceBuildInputs._userDefinedManagedObjectAsyncDisposeMethodName is not null)
                             {
                                 BeginTryBlock();
                                 {
@@ -856,7 +948,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                     PutIndentSpace(); _sourceBuilder.AppendLine("// Invoke user implemented disposer.");
                                     PutIndentSpace();
                                     _sourceBuilder.Append("await this.");
-                                    _sourceBuilder.Append(_userDefinedManagedObjectAsyncDisposeMethod.Name);
+                                    _sourceBuilder.Append(_sourceBuildInputs._userDefinedManagedObjectAsyncDisposeMethodName);
                                     _sourceBuilder.AppendLine("().ConfigureAwait(false);");
                                 }
                                 EndBlock();
@@ -864,12 +956,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the this.");
-                                    _sourceBuilder.Append(_userDefinedManagedObjectAsyncDisposeMethod.Name);
+                                    _sourceBuilder.Append(_sourceBuildInputs._userDefinedManagedObjectAsyncDisposeMethodName);
                                     _sourceBuilder.AppendLine(@"() calling. Message=\""{ex.Message}\"""");");
                                 }
                                 EndBlock();
                             }
-                            else if (_userDefinedManagedObjectDisposeMethod is not null)
+                            else if (_sourceBuildInputs._userDefinedManagedObjectDisposeMethodName is not null)
                             {
                                 BeginTryBlock();
                                 {
@@ -878,7 +970,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                     PutIndentSpace(); _sourceBuilder.AppendLine("// Invoke user implemented disposer.");
                                     PutIndentSpace();
                                     _sourceBuilder.Append("this.");
-                                    _sourceBuilder.Append(_userDefinedManagedObjectDisposeMethod.Name);
+                                    _sourceBuilder.Append(_sourceBuildInputs._userDefinedManagedObjectDisposeMethodName);
                                     _sourceBuilder.AppendLine("();");
                                 }
                                 EndBlock();
@@ -886,7 +978,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                                 {
                                     PutIndentSpace();
                                     _sourceBuilder.Append(@"global::System.Diagnostics.Debug.Fail($""Caught an exception in the this.");
-                                    _sourceBuilder.Append(_userDefinedManagedObjectDisposeMethod.Name);
+                                    _sourceBuilder.Append(_sourceBuildInputs._userDefinedManagedObjectDisposeMethodName);
                                     _sourceBuilder.AppendLine(@"() calling. Message=\""{ex.Message}\"""");");
                                 }
                                 EndBlock();
@@ -896,7 +988,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                         _sourceBuilder.AppendLine();
 
-                        if (_isAsyncDisposableSubClass)
+                        if (_sourceBuildInputs._isAsyncDisposableSubClass)
                         {
                             BeginTryBlock();
                             {
