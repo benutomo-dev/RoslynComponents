@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -441,6 +442,24 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 List<ISymbol> managedObjectDisposeMethodAttributeedMembers = new();
                 List<ISymbol> managedObjectAsyncDisposeMethodAttributeedMembers = new();
 
+
+                HashSet<string> dependencyMemberRegisteredSet = new HashSet<string>();
+
+                foreach (var member in namedTypeSymbol.GetMembers())
+                {
+                    var dependencyMembers = member.GetAttributes()
+                        .Where(v => AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(v.AttributeClass))
+                        .Where(v => v.ConstructorArguments.Length == 1 && v.ConstructorArguments[0].Kind == TypedConstantKind.Array)
+                        .SelectMany(v => v.ConstructorArguments[0].Values.Select(v => v.Value as string))
+                        .Where(v => v is not null)
+                        .Select(v => v!);
+
+                    foreach (var dependencyMember in dependencyMembers)
+                    {
+                        dependencyMemberRegisteredSet.Add(dependencyMember);
+                    }
+                }
+
                 foreach (var member in namedTypeSymbol.GetMembers())
                 {
                     context.CancellationToken.ThrowIfCancellationRequested();
@@ -452,6 +471,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     reporter.namedTypeSymbol = namedTypeSymbol;
                     reporter.automaticDisposeContextChecker = automaticDisposeContextChecker;
                     reporter.member = member;
+                    reporter.dependencyMemberRegisteredSet = dependencyMemberRegisteredSet;
                     reporter.isAssignableToIDisposable = isAssignableToIDisposable;
                     reporter.isAssignableToIAsyncDisposable = isAssignableToIAsyncDisposable;
                     reporter.isEnableAutomaticDisposeAttributedMember = AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttributedMember(member);
@@ -604,6 +624,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             public INamedTypeSymbol namedTypeSymbol;
             public AutomaticDisposeContextChecker automaticDisposeContextChecker;
             public ISymbol member;
+            public HashSet<string> dependencyMemberRegisteredSet;
             public bool isAssignableToIDisposable;
             public bool isAssignableToIAsyncDisposable;
             public bool isEnableAutomaticDisposeAttributedMember;
@@ -703,7 +724,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     var isAssignableToIAsyncDisposableMember = AutomaticDisposeGenerator.IsAssignableToIAsyncDisposable(fieldSymbol.Type);
                     var isEnableAutomaticDisposeMember = automaticDisposeContextChecker.IsEnableField(fieldSymbol);
 
-                    DoReportForFieldOrProptertyMember(isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
+                    DoReportForFieldOrProptertyMember(member.Name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
                 }
 
                 if (member is IPropertySymbol propertySymbol)
@@ -712,11 +733,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     var isAssignableToIAsyncDisposableMember = AutomaticDisposeGenerator.IsAssignableToIAsyncDisposable(propertySymbol.Type);
                     var isEnableAutomaticDisposeMember = automaticDisposeContextChecker.IsEnableProperty(propertySymbol);
 
-                    DoReportForFieldOrProptertyMember(isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
+                    DoReportForFieldOrProptertyMember(member.Name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
                 }
             }
 
             private void DoReportForFieldOrProptertyMember(
+                        string name,
                         bool isAssignableToIDisposableMember,
                         bool isAssignableToIAsyncDisposableMember,
                         bool isEnableAutomaticDisposeMember
@@ -733,7 +755,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 }
                 else
                 {
-                    DoReportForFieldOrProptertyInstanceMember(isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
+                    DoReportForFieldOrProptertyInstanceMember(name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
                 }
             }
 
@@ -764,6 +786,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             
             void DoReportForFieldOrProptertyInstanceMember(
+                        string name,
                         bool isAssignableToIDisposableMember,
                         bool isAssignableToIAsyncDisposableMember,
                         bool isEnableAutomaticDisposeMember
@@ -779,10 +802,15 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         {
                             // メンバに自動破棄の有無を明示する属性が設定されていない
 
-                            foreach (var location in member.Locations)
+                            if (!dependencyMemberRegisteredSet.Contains(name))
                             {
-                                // 自動実装のモードがExplicitなのに、EnableAutomaticDisposeとDisableAutomaticDisposeのどちらの属性も付けられていない
-                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0019, location, member.Name, namedTypeSymbol.Name));
+                                // 他のメンバの依存関係として設定されていない
+
+                                foreach (var location in member.Locations)
+                                {
+                                    // 自動実装のモードがExplicitなのに、EnableAutomaticDisposeとDisableAutomaticDisposeのどちらの属性も付けられていない
+                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0019, location, member.Name, namedTypeSymbol.Name));
+                                }
                             }
                         }
                     }

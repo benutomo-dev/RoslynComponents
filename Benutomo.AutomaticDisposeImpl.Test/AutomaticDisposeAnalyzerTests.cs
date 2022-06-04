@@ -389,6 +389,22 @@ partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where 
 
 
     private TDummy Property4 { get; } = default!;
+
+    [EnableAutomaticDispose(nameof(_enabledFieldDependencyField), nameof(_enabledFieldDependencyProperty))]
+    private IDisposable _enabledField;
+
+    [EnableAutomaticDispose(nameof(_enabledPropertyDependencyField), nameof(_enabledPropertyDependencyProperty))]
+    private IDisposable _enabledProperty;
+}
+
+partial class A<TAsyncDisposable, TDummy>
+{
+    // 以下のメンバは依存メンバとして指定されているため警告の対象とはならないこと
+
+    private IDisposable _enabledFieldDependencyField;
+    private IDisposable _enabledFieldDependencyProperty;
+    private IDisposable _enabledPropertyDependencyField;
+    private IDisposable _enabledPropertyDependencyProperty;
 }
 
 class Dummy : IDisposable, IAsyncDisposable
@@ -445,6 +461,22 @@ partial class A<TAsyncDisposable, TDummy> : IDisposable, IAsyncDisposable where 
 
 
     private TDummy Property4 { get; } = default!;
+
+    [EnableAutomaticDispose(nameof(_enabledFieldDependencyField), nameof(_enabledFieldDependencyProperty))]
+    private IDisposable _enabledField;
+
+    [EnableAutomaticDispose(nameof(_enabledPropertyDependencyField), nameof(_enabledPropertyDependencyProperty))]
+    private IDisposable _enabledProperty;
+}
+
+partial class A<TAsyncDisposable, TDummy>
+{
+    // 以下のメンバは依存メンバとして指定されているため警告の対象とはならないこと
+
+    private IDisposable _enabledFieldDependencyField;
+    private IDisposable _enabledFieldDependencyProperty;
+    private IDisposable _enabledPropertyDependencyField;
+    private IDisposable _enabledPropertyDependencyProperty;
 }
 
 class Dummy : IDisposable, IAsyncDisposable
