@@ -479,7 +479,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         PutIndentSpace();
                         Append("if (object.ReferenceEquals(global::System.Threading.Volatile.Read(ref ");
                         Append(_sourceBuildInputs.FieldName);
-                        Append("!), value)) ");
+                        AppendLine("!), value))");
                         BeginBlock();
                         {
                             PutIndentSpace(); AppendLine("prevValue = default;");
@@ -497,7 +497,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         PutIndentSpace();
                         Append("if (global::System.Threading.Volatile.Read(ref ");
                         Append(_sourceBuildInputs.FieldName);
-                        Append(") == value) ");
+                        AppendLine(") == value)");
                         BeginBlock();
                         {
                             PutIndentSpace(); AppendLine("prevValue = default;");
@@ -576,7 +576,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             RenderSetterMethodDeclarationCommonPrefixPart();
             Append(", global::System.Collections.Generic.IEqualityComparer<");
             Append(_sourceBuildInputs.PropertyType);
-            AppendLine("> equalityComparer) ");
+            AppendLine("> equalityComparer)");
             BeginBlock();
             {
                 AppendLine("#pragma warning disable CS8604,CS8618,CS8774");
