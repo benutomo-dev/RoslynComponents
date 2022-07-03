@@ -534,7 +534,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 if (_sourceBuildInputs.PropertyTypeIsReferenceType)
                 {
                     PutIndentSpace();
-                    Append("if (object.ReferenceEquals(prevValue, value)) ");
+                    AppendLine("if (object.ReferenceEquals(prevValue, value))");
                     BeginBlock();
                     {
                         PutIndentSpace(); AppendLine("prevValue = default;");
@@ -545,10 +545,9 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 else
                 {
                     PutIndentSpace();
-                    Append("if (prevValue == value) ");
+                    AppendLine("if (prevValue == value)");
                     BeginBlock();
                     {
-                        RenderChangedNotificationSection(changedEventBaseName);
                         PutIndentSpace(); AppendLine("prevValue = default;");
                         PutIndentSpace(); AppendLine("return false;");
                     }
