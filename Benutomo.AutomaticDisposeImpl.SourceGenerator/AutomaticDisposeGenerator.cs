@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
-    [Generator]
+    [Generator(LanguageNames.CSharp)]
     public partial class AutomaticDisposeGenerator : IIncrementalGenerator
     {
 #if DEBUG
@@ -256,26 +256,7 @@ namespace Benutomo
 
                     try
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        var automaticDisposeImplAttributeSymbol = compilation.GetTypeByMetadataName(AutomaticDisposeImplAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var enableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(EnableAutomaticDisposeAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var disableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(DisableAutomaticDisposeAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var unmanagedResourceReleaseMethodAttributeSymbol = compilation.GetTypeByMetadataName(UnmanagedResourceReleaseMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var managedObjectDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var managedObjectAsyncDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var disposableSymbol = compilation.GetTypeByMetadataName("System.IDisposable") ?? throw new InvalidOperationException();
-                        var asyncDisposableSymbol = compilation.GetTypeByMetadataName("System.IAsyncDisposable") ?? throw new InvalidOperationException();
-
-                        return new UsingSymbols(
-                            automaticDisposeImplAttributeSymbol,
-                            enableAutomaticDisposeAttributeSymbol,
-                            disableAutomaticDisposeAttributeSymbol,
-                            unmanagedResourceReleaseMethodAttributeSymbol,
-                            managedObjectDisposeMethodAttributeSymbol,
-                            managedObjectAsyncDisposeMethodAttributeSymbol,
-                            disposableSymbol,
-                            asyncDisposableSymbol
-                        );
+                        return UsingSymbols.CreateFrom(compilation);
                     }
                     catch (OperationCanceledException)
                     {
@@ -361,7 +342,7 @@ namespace Benutomo
             }
         }
 
-        SourceBuildInputs? PostTransform((INamedTypeSymbol? Left, UsingSymbols Right) v, CancellationToken ct)
+        MethodSourceBuilderInputs? PostTransform((INamedTypeSymbol? Left, UsingSymbols Right) v, CancellationToken ct)
         {
             var namedTypeSymbol = v.Left;
             var usingSymbols = v.Right;
@@ -372,18 +353,18 @@ namespace Benutomo
 
             try
             {
-                var automaticDisposeImplAttributeData = namedTypeSymbol.GetAttributes().FirstOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, usingSymbols.AutomaticDisposeImplAttributeSymbol));
+                var automaticDisposeImplAttributeData = namedTypeSymbol.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.IsSameSymbolTo(usingSymbols.AutomaticDisposeImplAttribute));
                 if (automaticDisposeImplAttributeData is null)
                 {
                     return null;
                 }
 
-                if (!IsAssignableToIDisposable(namedTypeSymbol) && !IsAssignableToIAsyncDisposable(namedTypeSymbol))
+                if (!namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable) && !namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable))
                 {
                     return null;
                 }
 
-                var result = new SourceBuildInputs(namedTypeSymbol, usingSymbols, automaticDisposeImplAttributeData);
+                var result = new MethodSourceBuilderInputs(namedTypeSymbol, usingSymbols, automaticDisposeImplAttributeData);
 
                 WriteLogLine($"End PostTransform ({namedTypeSymbol.Name})");
 
@@ -402,7 +383,7 @@ namespace Benutomo
             }
         }
 
-        void Generate(SourceProductionContext context, SourceBuildInputs? sourceBuildInputs)
+        void Generate(SourceProductionContext context, MethodSourceBuilderInputs? sourceBuildInputs)
         {
             if (sourceBuildInputs is null) return;
 
@@ -430,134 +411,6 @@ namespace Benutomo
                 WriteLogLine($"Exception in Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
                 WriteLogLine(ex.ToString());
                 throw;
-            }
-        }
-
-        private static bool IsXSymbolImpl(ITypeSymbol? typeSymbol, string ns1, string typeName)
-        {
-            Debug.Assert(!ns1.Contains("."));
-            Debug.Assert(!typeName.Contains("."));
-
-            if (typeSymbol is null) return false;
-
-            if (typeSymbol.Name != typeName) return false;
-
-            var containingNamespaceSymbol = typeSymbol.ContainingNamespace;
-
-            if (containingNamespaceSymbol is null) return false;
-
-            if (containingNamespaceSymbol.Name != ns1) return false;
-
-            if (containingNamespaceSymbol.ContainingNamespace is null) return false;
-
-            if (!containingNamespaceSymbol.ContainingNamespace.IsGlobalNamespace) return false;
-
-            return true;
-        }
-
-
-        private static bool IsAssignableToIXImpl(ITypeSymbol? typeSymbol, Func<ITypeSymbol, bool> isXTypeFunc, Func<ITypeSymbol, bool> isAssignableToXFunc)
-        {
-            if (typeSymbol is null) return false;
-
-            if (isXTypeFunc(typeSymbol)) return true;
-
-            if (typeSymbol.AllInterfaces.Any((Func<INamedTypeSymbol, bool>)isXTypeFunc)) return true;
-
-            // ジェネリック型の型パラメータの場合は型パラメータの制約を再帰的に確認
-            if (typeSymbol is ITypeParameterSymbol typeParameterSymbol && typeParameterSymbol.ConstraintTypes.Any(isAssignableToXFunc))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsXAttributedMemberImpl(ISymbol? symbol, Func<INamedTypeSymbol,bool> isXAttributeSymbol)
-        {
-            if (symbol is null) return false;
-
-            foreach (var attributeData in symbol.GetAttributes())
-            {
-                if (attributeData.AttributeClass is not null && isXAttributeSymbol(attributeData.AttributeClass))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-
-        internal static bool IsAutomaticDisposeImplAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, AutomaticDisposeImplAttributeName);
-
-        internal static bool IsEnableAutomaticDisposeAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, EnableAutomaticDisposeAttributeName);
-
-        internal static bool IsDisableAutomaticDisposeAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, DisableAutomaticDisposeAttributeName);
-
-        internal static bool IsUnmanagedResourceReleaseMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, UnmanagedResourceReleaseMethodAttributeName);
-
-        internal static bool IsManagedObjectDisposeMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, ManagedObjectDisposeMethodAttributeName);
-
-        internal static bool IsManagedObjectAsyncDisposeMethodAttribute(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, AttributeDefinedNameSpace, ManagedObjectAsyncDisposeMethodAttributeName);
-
-        internal static bool IsIDisposable(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, "System", "IDisposable");
-
-        internal static bool IsIAsyncDisposable(ITypeSymbol? typeSymbol) => IsXSymbolImpl(typeSymbol, "System", "IAsyncDisposable");
-
-        internal static bool IsAssignableToIDisposable(ITypeSymbol? typeSymbol) => IsAssignableToIXImpl(typeSymbol, IsIDisposable, IsAssignableToIDisposable);
-
-        internal static bool IsAssignableToIAsyncDisposable(ITypeSymbol? typeSymbol) => IsAssignableToIXImpl(typeSymbol, IsIAsyncDisposable, IsAssignableToIAsyncDisposable);
-
-        internal static bool IsEnableAutomaticDisposeAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsEnableAutomaticDisposeAttribute);
-
-        internal static bool IsDisableAutomaticDisposeAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsDisableAutomaticDisposeAttribute);
-
-        internal static bool IsUnmanagedResourceReleaseMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsUnmanagedResourceReleaseMethodAttribute);
-
-        internal static bool IsManagedObjectDisposeMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsManagedObjectDisposeMethodAttribute);
-
-        internal static bool IsManagedObjectAsyncDisposeMethodAttributedMember(ISymbol symbol) => IsXAttributedMemberImpl(symbol, IsManagedObjectAsyncDisposeMethodAttribute);
-
-        internal static bool IsAutomaticDisposeImplSubClass(INamedTypeSymbol? namedTypeSymbol)
-        {
-            if (namedTypeSymbol is null)
-            {
-                return false;
-            }
-
-            var isAutomaticDisposeImplAnnotationed = namedTypeSymbol.GetAttributes().Select(attrData => attrData.AttributeClass).Any(IsAutomaticDisposeImplAttribute);
-
-            if (isAutomaticDisposeImplAnnotationed)
-            {
-                return true;
-            }
-
-            if (namedTypeSymbol.BaseType is null || namedTypeSymbol.BaseType.SpecialType == SpecialType.System_Object)
-            {
-                return false;
-            }
-
-            return IsAutomaticDisposeImplSubClass(namedTypeSymbol.BaseType);
-        }
-
-        internal static bool TryGetBaseClassOwnedIsDisposableSymbol(INamedTypeSymbol? namedTypeSymbol, out ISymbol symbol)
-        {
-            if (namedTypeSymbol is null || namedTypeSymbol.SpecialType == SpecialType.System_Object)
-            {
-                symbol = null!;
-                return false;
-            }
-
-            symbol = namedTypeSymbol.GetMembers().FirstOrDefault(member => member.Name == "IsDisposed" && !member.IsStatic)!;
-
-            if (symbol is null)
-            {
-                return TryGetBaseClassOwnedIsDisposableSymbol(namedTypeSymbol.BaseType, out symbol);
-            }
-            else
-            {
-                return true;
             }
         }
     }

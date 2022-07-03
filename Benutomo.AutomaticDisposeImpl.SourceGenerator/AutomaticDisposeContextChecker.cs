@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Linq;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
@@ -7,7 +6,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     {
         internal AutomaticDisposeImplMode Mode { get; }
 
-        internal AutomaticDisposeContextChecker(AttributeData automaticDisposeImplAttributeData)
+        UsingSymbols _usingSymbols { get; }
+
+        internal AutomaticDisposeContextChecker(AttributeData automaticDisposeImplAttributeData, UsingSymbols usingSymbols)
         {
             var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == AutomaticDisposeGenerator.AutomaticDisposeImplAttributeModeName).Value.Value;
 
@@ -19,18 +20,20 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 AutomaticDisposeImplMode.Explicit => AutomaticDisposeImplMode.Explicit,
                 _ => AutomaticDisposeImplMode.Explicit,
             };
+
+            _usingSymbols = usingSymbols;
         }
 
         public bool IsEnableField(IFieldSymbol fieldSymbol)
         {
-            if (fieldSymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsDisableAutomaticDisposeAttribute(attr.AttributeClass)))
+            if (fieldSymbol.IsAttributedBy(_usingSymbols.DisableAutomaticDisposeAttribute))
             {
                 return false;
             }
 
             if (Mode == AutomaticDisposeImplMode.Explicit)
             {
-                if (!fieldSymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(attr.AttributeClass)))
+                if (!fieldSymbol.IsAttributedBy(_usingSymbols.EnableAutomaticDisposeAttribute))
                 {
                     return false;
                 }
@@ -41,14 +44,14 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         public bool IsEnableProperty(IPropertySymbol propertySymbol)
         {
-            if (propertySymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsDisableAutomaticDisposeAttribute(attr.AttributeClass)))
+            if (propertySymbol.IsAttributedBy(_usingSymbols.DisableAutomaticDisposeAttribute))
             {
                 return false;
             }
 
             if (Mode == AutomaticDisposeImplMode.Explicit)
             {
-                if (!propertySymbol.GetAttributes().Any(attr => AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(attr.AttributeClass)))
+                if (!propertySymbol.IsAttributedBy(_usingSymbols.EnableAutomaticDisposeAttribute))
                 {
                     return false;
                 }

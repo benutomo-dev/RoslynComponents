@@ -10,9 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ClassSourceBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IsExternalInit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITypeContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NameSpaceInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SourceBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SymbolHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeDefinitionInfo.cs" />
   </ItemGroup>
 </Project>

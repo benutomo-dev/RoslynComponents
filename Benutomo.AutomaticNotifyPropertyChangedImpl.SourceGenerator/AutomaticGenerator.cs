@@ -7,7 +7,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
     record struct GenerateEventArgInputs(TypeDefinitionInfo ContainingTypeInfo, ImmutableArray<(string Name, PropertyEventArgClass EventArgClass)> Properties);
 
-    [Generator]
+    [Generator(LanguageNames.CSharp)]
     public partial class AutomaticGenerator : IIncrementalGenerator
     {
 #if DEBUG
@@ -325,32 +325,7 @@ namespace Benutomo
                     
                     try
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        var enableNotificationSupportAttributeSymbol = compilation.GetTypeByMetadataName(EnableNotificationSupportAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var changedEventAttributeSymbol = compilation.GetTypeByMetadataName(ChangedEventAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var changingEventAttributeSymbol = compilation.GetTypeByMetadataName(ChangingEventAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var changedObservableAttributeSymbol = compilation.GetTypeByMetadataName(ChangedObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var changingObservableAttributeSymbol = compilation.GetTypeByMetadataName(ChangingObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var notifyPropertyChangedSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanged") ?? throw new InvalidOperationException();
-                        var notifyPropertyChangingSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanging") ?? throw new InvalidOperationException();
-                        var notificationAccessibilitySymbol = compilation.GetTypeByMetadataName(NotificationAccessibilityFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var explicitInterfaceImplementationSymbol = compilation.GetTypeByMetadataName(ExplicitInterfaceImplementationFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-                        var actionSymbol = compilation.GetTypeByMetadataName("System.Action") ?? throw new InvalidOperationException();
-                        var eventHandlerSymbol = compilation.GetTypeByMetadataName("System.EventHandler") ?? throw new InvalidOperationException();
-
-                        return new UsingSymbols(
-                            enableNotificationSupportAttributeSymbol,
-                            changedEventAttributeSymbol,
-                            changingEventAttributeSymbol,
-                            changedObservableAttributeSymbol,
-                            changingObservableAttributeSymbol,
-                            notifyPropertyChangedSymbol,
-                            notifyPropertyChangingSymbol,
-                            notificationAccessibilitySymbol,
-                            explicitInterfaceImplementationSymbol,
-                            actionSymbol,
-                            eventHandlerSymbol
-                        );
+                        return UsingSymbols.CreateFrom(compilation);
                     }
                     catch (OperationCanceledException)
                     {

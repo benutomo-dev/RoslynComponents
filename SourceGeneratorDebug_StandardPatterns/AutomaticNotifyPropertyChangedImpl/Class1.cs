@@ -1,16 +1,16 @@
 ﻿using Benutomo;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using static Benutomo.NotificationAccessibility;
-//using static Benutomo.ExplicitInterfaceImplementation;
+using static Benutomo.ExplicitInterfaceImplementation;
 
-using CAttribute = Benutomo.EnableNotificationSupportAttribute;
-
-namespace SourceGeneratorDebug
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedImpl
 {
     interface IInterface1
     {
-        //event EventHandler NumberChanged;
-        //event EventHandler NumberChanging;
+        event EventHandler NumberChanged;
+        event EventHandler NumberChanging;
 
         int Number { get; set; }
     }
@@ -27,16 +27,16 @@ namespace SourceGeneratorDebug
         {
         }
 
-        //        [EnableNotificationSupport(EventArgsOnly = false)]
-        //        [ChangedEvent(Public)]
-        //        [ChangingEvent(Public)]
-        //        [ChangedObservable(Public)]
-        //        [ChangingObservable(Private)]
-        //        public bool? IsEnabled
-        //        {
-        //            get => _IsEnabled();
-        //            set => _IsEnabled(value, EqualityComparer<bool?>.Default);
-        //        }
+        [EnableNotificationSupport(EventArgsOnly = false)]
+        [ChangedEvent(Public)]
+        [ChangingEvent(Public)]
+        [ChangedObservable(Public)]
+        [ChangingObservable(Private)]
+        public bool? IsEnabled
+        {
+            get => _IsEnabled();
+            set => _IsEnabled(value, EqualityComparer<bool?>.Default);
+        }
 
 #nullable enable
         [EnableNotificationSupport]
@@ -68,19 +68,19 @@ namespace SourceGeneratorDebug
             set => _Number(value);
         }
 
-        //[EnableNotificationSupport]
-        //public List<Dictionary<(int, string?), long>> X
-        //{
-        //    get => _X();
-        //    set => _X(value);
-        //}
+        [EnableNotificationSupport]
+        public List<Dictionary<(int, string?), long>> X
+        {
+            get => _X();
+            set => _X(value);
+        }
 
-        //[EnableNotificationSupport]
-        //Class2 Inner
-        //{
-        //    get => _Inner();
-        //    set => _Inner(value);
-        //}
+        [EnableNotificationSupport]
+        Class2 Inner
+        {
+            get => _Inner();
+            set => _Inner(value);
+        }
     }
 }
 

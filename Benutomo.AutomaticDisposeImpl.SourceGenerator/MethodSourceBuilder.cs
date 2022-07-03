@@ -8,11 +8,11 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         private bool IsEnabledFinalize => _sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName is not null;
 
-        SourceBuildInputs _sourceBuildInputs;
+        MethodSourceBuilderInputs _sourceBuildInputs;
 
         ClassSourceBuilder _sourceBuilder;
 
-        public MethodSourceBuilder(SourceProductionContext context, SourceBuildInputs sourceBuildInputs, Span<char> initialBuffer)
+        public MethodSourceBuilder(SourceProductionContext context, MethodSourceBuilderInputs sourceBuildInputs, Span<char> initialBuffer)
         {
             _sourceBuildInputs = sourceBuildInputs;
             _sourceBuilder = new ClassSourceBuilder(context, sourceBuildInputs.TargetTypeInfo, initialBuffer);

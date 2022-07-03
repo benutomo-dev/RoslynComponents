@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     internal partial class OuterClass
     {

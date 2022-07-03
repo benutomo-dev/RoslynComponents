@@ -10,7 +10,7 @@ class AsyncOnlyDisposable : IAsyncDisposable
     }
 }
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     [AutomaticDisposeImpl]
     public partial class AsyncDisposableOnlyComposition1 : IDisposable
@@ -46,7 +46,7 @@ namespace SourceGeneratorDebug_StandardPatterns
     }
 }
  
-namespace SourceGeneratorDebug_StandardPatterns.Nest
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl.Nest
 {
     [AutomaticDisposeImpl]
     public partial class AsyncDisposableOnlyComposition2 : IDisposable, IAsyncDisposable
@@ -83,7 +83,7 @@ namespace SourceGeneratorDebug_StandardPatterns.Nest
     }
 }
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     namespace Nest
     {

@@ -41,6 +41,6 @@
     <Using Include="Benutomo.SourceGeneratorCommons" />
   </ItemGroup>
 
-  <Import Project="..\SourceBuilder\SourceBuilder.projitems" Label="Shared" />
+  <Import Project="..\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems" Label="Shared" />
 
 </Project>

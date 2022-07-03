@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     [AutomaticDisposeImpl]
     public partial class DisposableOnlyComposition1 : IDisposable
@@ -39,7 +39,7 @@ namespace SourceGeneratorDebug_StandardPatterns
     }
 }
  
-namespace SourceGeneratorDebug_StandardPatterns.Nest
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl.Nest
 {
     [AutomaticDisposeImpl]
     public partial class DisposableOnlyComposition2 : IDisposable, IAsyncDisposable
@@ -76,7 +76,7 @@ namespace SourceGeneratorDebug_StandardPatterns.Nest
     }
 }
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     namespace Nest
     {

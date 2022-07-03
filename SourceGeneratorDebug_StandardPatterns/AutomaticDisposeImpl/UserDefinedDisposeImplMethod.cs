@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     [AutomaticDisposeImpl]
     partial class UserDefinedDisposeImplMethod : IDisposable, IAsyncDisposable

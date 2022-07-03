@@ -87,8 +87,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             IsEventArgsOnly = enableNotificationSupportAttributeData.NamedArguments.Where(v => v.Key == "EventArgsOnly").Select(v => (bool)(v.Value.Value ?? false)).FirstOrDefault();
 
-            EnabledNotifyPropertyChanging = propertySymbol.ContainingType.AllInterfaces.Any(v => SymbolEqualityComparer.Default.Equals(v, usingSymbols.NotifyPropertyChanging));
-            EnabledNotifyPropertyChanged = propertySymbol.ContainingType.AllInterfaces.Any(v => SymbolEqualityComparer.Default.Equals(v, usingSymbols.NotifyPropertyChanged));
+            EnabledNotifyPropertyChanging = propertySymbol.ContainingType.AllInterfaces.Any(v => SymbolEqualityComparer.Default.Equals(v, usingSymbols.INotifyPropertyChanging));
+            EnabledNotifyPropertyChanged = propertySymbol.ContainingType.AllInterfaces.Any(v => SymbolEqualityComparer.Default.Equals(v, usingSymbols.INotifyPropertyChanged));
 
             var defaultEnableExplicitInterfaceImplementations = propertySymbol.ExplicitInterfaceImplementations.Length > 0;
 
@@ -113,7 +113,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     _ => GenerateMemberAccessibility.Private,
                 };
 
-                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedEvent))
+                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedEventAttribute))
                 {
                     (ChangedEventAccessibility, var enabledxplicitInterfaceImplementations) = ResolveGenerateMemberAccessibility(
                         usingSymbols,
@@ -133,7 +133,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                             );
                     }
                 }
-                else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangingEvent))
+                else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangingEventAttribute))
                 {
                     (ChangingEventAccessibility, var enabledxplicitInterfaceImplementations) = ResolveGenerateMemberAccessibility(
                         usingSymbols,
@@ -153,7 +153,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                             );
                     }
                 }
-                else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedObservable))
+                else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedObservableAttribute))
                 {
                     (ChangedObservableAccesibility, _) = ResolveGenerateMemberAccessibility(
                         usingSymbols,
@@ -162,7 +162,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         false
                         );
                 }
-                else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChantingObservable))
+                else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChantingObservableAttribute))
                 {
                     (ChangingObservableAccesibility, _) = ResolveGenerateMemberAccessibility(
                         usingSymbols,

@@ -334,245 +334,233 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 return;
             }
 
-            var automaticDisposeImplAttributeSymbol = context.Compilation.GetTypeByMetadataName(AutomaticDisposeGenerator.AutomaticDisposeImplAttributeFullyQualifiedMetadataName);
-            if (automaticDisposeImplAttributeSymbol is null)
-            {
-                return;
-            }
+            var usingSymbols = UsingSymbols.CreateFrom(context.Compilation);
 
-            var systemTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-
-            var systemValueTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask");
-
-            var attributeData = namedTypeSymbol.GetAttributes().SingleOrDefault(v => AutomaticDisposeGenerator.IsAutomaticDisposeImplAttribute(v.AttributeClass));
+            var attributeData = namedTypeSymbol.GetAttributes().SingleOrDefault(v => v.AttributeClass.IsSameSymbolTo(usingSymbols.AutomaticDisposeImplAttribute));
             if (attributeData is null)
             {
-                AnalyzeNonAutomaticDisposeImplClass();
+                AnalyzeNonAutomaticDisposeImplClass(ref context, namedTypeSymbol, usingSymbols);
             }
             else
             {
-                AnalyzeAutomaticDisposeImplClass();
+                AnalyzeAutomaticDisposeImplClass(ref context, namedTypeSymbol, usingSymbols, attributeData);
+            }
+        }
+
+        private static void AnalyzeNonAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols)
+        {
+            foreach (var member in namedTypeSymbol.GetMembers())
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                if (member is IPropertySymbol || member is IFieldSymbol)
+                {
+                    foreach (var attribute in member.GetAttributes())
+                    {
+                        context.CancellationToken.ThrowIfCancellationRequested();
+
+                        if (attribute.AttributeClass.IsSameSymbolTo(usingSymbols.EnableAutomaticDisposeAttribute))
+                        {
+                            foreach (var location in member.Locations)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0005, location));
+                            }
+                        }
+
+                        if (attribute.AttributeClass.IsSameSymbolTo(usingSymbols.DisableAutomaticDisposeAttribute))
+                        {
+                            foreach (var location in member.Locations)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0017, location));
+                            }
+                        }
+                    }
+                }
+                else if (member is IMethodSymbol)
+                {
+                    foreach (var attribute in member.GetAttributes())
+                    {
+                        context.CancellationToken.ThrowIfCancellationRequested();
+
+                        if (attribute.AttributeClass.IsSameSymbolTo(usingSymbols.UnmanagedResourceReleaseMethodAttribute))
+                        {
+                            foreach (var location in member.Locations)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0006, location));
+                            }
+                        }
+                        else if (attribute.AttributeClass.IsSameSymbolTo(usingSymbols.ManagedObjectDisposeMethodAttribute))
+                        {
+                            foreach (var location in member.Locations)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0008, location));
+                            }
+                        }
+                        else if (attribute.AttributeClass.IsSameSymbolTo(usingSymbols.ManagedObjectAsyncDisposeMethodAttribute))
+                        {
+                            foreach (var location in member.Locations)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0012, location));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void AnalyzeAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData? attributeData)
+        {
+            var classDeclarationSyntaxes = EnumerateAllDeclarationSyntaxes(namedTypeSymbol, context.CancellationToken).ToArray();
+
+            foreach (var nonParcialDeclaration in classDeclarationSyntaxes.Where(IsNotParcialDeclaration))
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0001, nonParcialDeclaration.Identifier.GetLocation()));
             }
 
+            AutomaticDisposeContextChecker automaticDisposeContextChecker = new AutomaticDisposeContextChecker(attributeData, usingSymbols);
+
+            var isAssignableToIDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable);
+            var isAssignableToIAsyncDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+
+            List<ISymbol> unmanagedResourceReleaseMethodAttributeedMembers = new();
+            List<ISymbol> managedObjectDisposeMethodAttributeedMembers = new();
+            List<ISymbol> managedObjectAsyncDisposeMethodAttributeedMembers = new();
+
+
+            HashSet<string> dependencyMemberRegisteredSet = new HashSet<string>();
+
+            foreach (var member in namedTypeSymbol.GetMembers())
+            {
+                var dependencyMembers = member.GetAttributes()
+                    .Where(v => v.AttributeClass.IsSameSymbolTo(usingSymbols.EnableAutomaticDisposeAttribute))
+                    .Where(v => v.ConstructorArguments.Length == 1 && v.ConstructorArguments[0].Kind == TypedConstantKind.Array)
+                    .SelectMany(v => v.ConstructorArguments[0].Values.Select(v => v.Value as string))
+                    .Where(v => v is not null)
+                    .Select(v => v!);
+
+                foreach (var dependencyMember in dependencyMembers)
+                {
+                    dependencyMemberRegisteredSet.Add(dependencyMember);
+                }
+            }
+
+            foreach (var member in namedTypeSymbol.GetMembers())
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                AutomaticDisposeImplClassMemberReporter reporter;
+                reporter.context = context;
+                reporter.usingSymbols = usingSymbols;
+                reporter.namedTypeSymbol = namedTypeSymbol;
+                reporter.automaticDisposeContextChecker = automaticDisposeContextChecker;
+                reporter.member = member;
+                reporter.dependencyMemberRegisteredSet = dependencyMemberRegisteredSet;
+                reporter.isAssignableToIDisposable = isAssignableToIDisposable;
+                reporter.isAssignableToIAsyncDisposable = isAssignableToIAsyncDisposable;
+                reporter.isEnableAutomaticDisposeAttributedMember           = member.IsAttributedBy(usingSymbols.EnableAutomaticDisposeAttribute);
+                reporter.isDisableAutomaticDisposeAttributedMember          = member.IsAttributedBy(usingSymbols.DisableAutomaticDisposeAttribute);
+                reporter.isUnmanagedResourceReleaseMethodAttributeedMember  = member.IsAttributedBy(usingSymbols.UnmanagedResourceReleaseMethodAttribute);
+                reporter.isManagedObjectDisposeMethodAttributeedMember      = member.IsAttributedBy(usingSymbols.ManagedObjectDisposeMethodAttribute);
+                reporter.isManagedObjectAsyncDisposeMethodAttributeedMember = member.IsAttributedBy(usingSymbols.ManagedObjectAsyncDisposeMethodAttribute);
+
+                if (reporter.isUnmanagedResourceReleaseMethodAttributeedMember)
+                {
+                    unmanagedResourceReleaseMethodAttributeedMembers.Add(member);
+                }
+
+                if (reporter.isManagedObjectDisposeMethodAttributeedMember)
+                {
+                    managedObjectDisposeMethodAttributeedMembers.Add(member);
+                }
+
+                if (reporter.isManagedObjectAsyncDisposeMethodAttributeedMember)
+                {
+                    managedObjectAsyncDisposeMethodAttributeedMembers.Add(member);
+                }
+
+                reporter.DoReport();
+            }
+
+            if (unmanagedResourceReleaseMethodAttributeedMembers.Count > 1)
+            {
+                foreach (var member in unmanagedResourceReleaseMethodAttributeedMembers)
+                {
+                    foreach (var location in member.Locations)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0016, location));
+                    }
+                }
+            }
+
+            if (managedObjectDisposeMethodAttributeedMembers.Count > 1)
+            {
+                foreach (var member in managedObjectDisposeMethodAttributeedMembers)
+                {
+                    foreach (var location in member.Locations)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0009, location));
+                    }
+                }
+            }
+
+            if (managedObjectAsyncDisposeMethodAttributeedMembers.Count > 1)
+            {
+                foreach (var member in managedObjectAsyncDisposeMethodAttributeedMembers)
+                {
+                    foreach (var location in member.Locations)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0013, location));
+                    }
+                }
+            }
+
+            if (isAssignableToIAsyncDisposable && isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
+            {
+                if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, classDeclarationSyntax.Identifier.GetLocation(), managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
+                }
+                else
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, namedTypeSymbol.Locations[0], managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
+                }
+            }
+
+            if (!isAssignableToIAsyncDisposable && !isAssignableToIDisposable)
+            {
+                // 自動実装対象として指定されたクラスがIDisposableもIAsyncDisposableも実装していない
+
+                if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0002, classDeclarationSyntax.Identifier.GetLocation()));
+                }
+                else
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0002, namedTypeSymbol.Locations[0]));
+                }
+            }
 
             return;
 
-            void AnalyzeNonAutomaticDisposeImplClass()
+            static IEnumerable<ClassDeclarationSyntax> EnumerateAllDeclarationSyntaxes(INamedTypeSymbol namedTypeSymbol, CancellationToken cancellationToken)
             {
-                foreach (var member in namedTypeSymbol.GetMembers())
+                foreach (var location in namedTypeSymbol.Locations)
                 {
-                    context.CancellationToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    if (member is IPropertySymbol || member is IFieldSymbol)
+                    if (location.SourceTree is not { } syntaxTree || !syntaxTree.TryGetRoot(out var root))
                     {
-                        foreach (var attribute in member.GetAttributes())
-                        {
-                            context.CancellationToken.ThrowIfCancellationRequested();
-
-                            if (AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(attribute.AttributeClass))
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0005, location));
-                                }
-                            }
-
-                            if (AutomaticDisposeGenerator.IsDisableAutomaticDisposeAttribute(attribute.AttributeClass))
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0017, location));
-                                }
-                            }
-                        }
-                    }
-                    else if (member is IMethodSymbol)
-                    {
-                        foreach (var attribute in member.GetAttributes())
-                        {
-                            context.CancellationToken.ThrowIfCancellationRequested();
-
-                            if (AutomaticDisposeGenerator.IsUnmanagedResourceReleaseMethodAttribute(attribute.AttributeClass))
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0006, location));
-                                }
-                            }
-                            else if (AutomaticDisposeGenerator.IsManagedObjectDisposeMethodAttribute(attribute.AttributeClass))
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0008, location));
-                                }
-                            }
-                            else if (AutomaticDisposeGenerator.IsManagedObjectAsyncDisposeMethodAttribute(attribute.AttributeClass))
-                            {
-                                foreach (var location in member.Locations)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0012, location));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            void AnalyzeAutomaticDisposeImplClass()
-            {
-                var classDeclarationSyntaxes = EnumerateAllDeclarationSyntaxes(namedTypeSymbol, context.CancellationToken).ToArray();
-
-                foreach (var nonParcialDeclaration in classDeclarationSyntaxes.Where(IsNotParcialDeclaration))
-                {
-                    context.CancellationToken.ThrowIfCancellationRequested();
-
-                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0001, nonParcialDeclaration.Identifier.GetLocation()));
-                }
-
-                AutomaticDisposeContextChecker automaticDisposeContextChecker = new AutomaticDisposeContextChecker(attributeData);
-
-                var isAssignableToIDisposable = AutomaticDisposeGenerator.IsAssignableToIDisposable(namedTypeSymbol);
-                var isAssignableToIAsyncDisposable = AutomaticDisposeGenerator.IsAssignableToIAsyncDisposable(namedTypeSymbol);
-
-                List<ISymbol> unmanagedResourceReleaseMethodAttributeedMembers = new();
-                List<ISymbol> managedObjectDisposeMethodAttributeedMembers = new();
-                List<ISymbol> managedObjectAsyncDisposeMethodAttributeedMembers = new();
-
-
-                HashSet<string> dependencyMemberRegisteredSet = new HashSet<string>();
-
-                foreach (var member in namedTypeSymbol.GetMembers())
-                {
-                    var dependencyMembers = member.GetAttributes()
-                        .Where(v => AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttribute(v.AttributeClass))
-                        .Where(v => v.ConstructorArguments.Length == 1 && v.ConstructorArguments[0].Kind == TypedConstantKind.Array)
-                        .SelectMany(v => v.ConstructorArguments[0].Values.Select(v => v.Value as string))
-                        .Where(v => v is not null)
-                        .Select(v => v!);
-
-                    foreach (var dependencyMember in dependencyMembers)
-                    {
-                        dependencyMemberRegisteredSet.Add(dependencyMember);
-                    }
-                }
-
-                foreach (var member in namedTypeSymbol.GetMembers())
-                {
-                    context.CancellationToken.ThrowIfCancellationRequested();
-
-                    AutomaticDisposeImplClassMemberReporter reporter;
-                    reporter.context = context;
-                    reporter.systemTaskSymbol = systemTaskSymbol;
-                    reporter.systemValueTaskSymbol = systemValueTaskSymbol;
-                    reporter.namedTypeSymbol = namedTypeSymbol;
-                    reporter.automaticDisposeContextChecker = automaticDisposeContextChecker;
-                    reporter.member = member;
-                    reporter.dependencyMemberRegisteredSet = dependencyMemberRegisteredSet;
-                    reporter.isAssignableToIDisposable = isAssignableToIDisposable;
-                    reporter.isAssignableToIAsyncDisposable = isAssignableToIAsyncDisposable;
-                    reporter.isEnableAutomaticDisposeAttributedMember = AutomaticDisposeGenerator.IsEnableAutomaticDisposeAttributedMember(member);
-                    reporter.isDisableAutomaticDisposeAttributedMember = AutomaticDisposeGenerator.IsDisableAutomaticDisposeAttributedMember(member);
-                    reporter.isUnmanagedResourceReleaseMethodAttributeedMember = AutomaticDisposeGenerator.IsUnmanagedResourceReleaseMethodAttributedMember(member);
-                    reporter.isManagedObjectDisposeMethodAttributeedMember = AutomaticDisposeGenerator.IsManagedObjectDisposeMethodAttributedMember(member);
-                    reporter.isManagedObjectAsyncDisposeMethodAttributeedMember = AutomaticDisposeGenerator.IsManagedObjectAsyncDisposeMethodAttributedMember(member);
-
-                    if (reporter.isUnmanagedResourceReleaseMethodAttributeedMember)
-                    {
-                        unmanagedResourceReleaseMethodAttributeedMembers.Add(member);
+                        continue;
                     }
 
-                    if (reporter.isManagedObjectDisposeMethodAttributeedMember)
+                    if (root.FindNode(location.SourceSpan) is not ClassDeclarationSyntax classDeclarationSyntax)
                     {
-                        managedObjectDisposeMethodAttributeedMembers.Add(member);
+                        continue;
                     }
 
-                    if (reporter.isManagedObjectAsyncDisposeMethodAttributeedMember)
-                    {
-                        managedObjectAsyncDisposeMethodAttributeedMembers.Add(member);
-                    }
-
-                    reporter.DoReport();
-                }
-
-                if (unmanagedResourceReleaseMethodAttributeedMembers.Count > 1)
-                {
-                    foreach (var member in unmanagedResourceReleaseMethodAttributeedMembers)
-                    {
-                        foreach (var location in member.Locations)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0016, location));
-                        }
-                    }
-                }
-
-                if (managedObjectDisposeMethodAttributeedMembers.Count > 1)
-                {
-                    foreach (var member in managedObjectDisposeMethodAttributeedMembers)
-                    {
-                        foreach (var location in member.Locations)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0009, location));
-                        }
-                    }
-                }
-
-                if (managedObjectAsyncDisposeMethodAttributeedMembers.Count > 1)
-                {
-                    foreach (var member in managedObjectAsyncDisposeMethodAttributeedMembers)
-                    {
-                        foreach (var location in member.Locations)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0013, location));
-                        }
-                    }
-                }
-
-                if (isAssignableToIAsyncDisposable && isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
-                {
-                    if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, classDeclarationSyntax.Identifier.GetLocation(), managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
-                    }
-                    else
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, namedTypeSymbol.Locations[0], managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
-                    }
-                }
-
-                if (!isAssignableToIAsyncDisposable && !isAssignableToIDisposable)
-                {
-                    // 自動実装対象として指定されたクラスがIDisposableもIAsyncDisposableも実装していない
-
-                    if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0002, classDeclarationSyntax.Identifier.GetLocation()));
-                    }
-                    else
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0002, namedTypeSymbol.Locations[0]));
-                    }
-                }
-
-                return;
-
-                static IEnumerable<ClassDeclarationSyntax> EnumerateAllDeclarationSyntaxes(INamedTypeSymbol namedTypeSymbol, CancellationToken cancellationToken)
-                {
-                    foreach (var location in namedTypeSymbol.Locations)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        if (location.SourceTree is not { } syntaxTree || !syntaxTree.TryGetRoot(out var root))
-                        {
-                            continue;
-                        }
-
-                        if (root.FindNode(location.SourceSpan) is not ClassDeclarationSyntax classDeclarationSyntax)
-                        {
-                            continue;
-                        }
-
-                        yield return classDeclarationSyntax;
-                    }
+                    yield return classDeclarationSyntax;
                 }
             }
         }
@@ -604,273 +592,6 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             if (name.EndsWith(AutomaticDisposeGenerator.AutomaticDisposeImplAttributeName)) return true;
 
             return false;
-        }
-
-        ref struct AutomaticDisposeImplClassReporter
-        {
-
-
-        }
-
-        ref struct AutomaticDisposeImplClassMemberReporter
-        {
-            public SymbolAnalysisContext context;
-            public INamedTypeSymbol? systemTaskSymbol;
-            public INamedTypeSymbol? systemValueTaskSymbol;
-            public INamedTypeSymbol namedTypeSymbol;
-            public AutomaticDisposeContextChecker automaticDisposeContextChecker;
-            public ISymbol member;
-            public HashSet<string> dependencyMemberRegisteredSet;
-            public bool isAssignableToIDisposable;
-            public bool isAssignableToIAsyncDisposable;
-            public bool isEnableAutomaticDisposeAttributedMember;
-            public bool isDisableAutomaticDisposeAttributedMember;
-            public bool isUnmanagedResourceReleaseMethodAttributeedMember;
-            public bool isManagedObjectDisposeMethodAttributeedMember;
-            public bool isManagedObjectAsyncDisposeMethodAttributeedMember;
-
-            public void DoReport()
-            {
-                if (isManagedObjectDisposeMethodAttributeedMember)
-                {
-                    if (isAssignableToIDisposable)
-                    {
-                        if (!IsValidMethodForManagedObjectDisposeMethodAttribute(member))
-                        {
-                            foreach (var location in member.Locations)
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0010, location));
-                            }
-                        }
-
-                        static bool IsValidMethodForManagedObjectDisposeMethodAttribute(ISymbol? member)
-                        {
-                            if (member is not IMethodSymbol methodSymbol) return false;
-
-                            if (methodSymbol.ReturnType.SpecialType != SpecialType.System_Void) return false;
-
-                            if (methodSymbol.IsGenericMethod) return false;
-
-                            if (!methodSymbol.Parameters.IsEmpty) return false;
-
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var location in member.Locations)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0007, location));
-                        }
-                    }
-                }
-                 
-                if (isManagedObjectAsyncDisposeMethodAttributeedMember)
-                {
-                    if (isAssignableToIAsyncDisposable)
-                    {
-                        if (!IsValidMethodForManagedObjectAsyncDisposeMethodAttribute(member, systemTaskSymbol, systemValueTaskSymbol))
-                        {
-                            foreach (var location in member.Locations)
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0014, location));
-                            }
-                        }
-
-                        static bool IsValidMethodForManagedObjectAsyncDisposeMethodAttribute(ISymbol? member, INamedTypeSymbol? systemTaskSymbol, INamedTypeSymbol? systemValueTaskSymbol)
-                        {
-                            if (member is not IMethodSymbol methodSymbol) return false;
-
-                            if (true
-                                && !SymbolEqualityComparer.Default.Equals(methodSymbol.ReturnType, systemTaskSymbol)
-                                && !SymbolEqualityComparer.Default.Equals(methodSymbol.ReturnType, systemValueTaskSymbol)
-                                )
-                            {
-                                return false;
-                            }
-
-                            if (methodSymbol.IsGenericMethod) return false;
-
-                            if (!methodSymbol.Parameters.IsEmpty) return false;
-
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var location in member.Locations)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0011, location));
-                        }
-                    }
-                }
-
-                if (isEnableAutomaticDisposeAttributedMember && isDisableAutomaticDisposeAttributedMember)
-                {
-                    foreach (var location in member.Locations)
-                    {
-                        // EnableAutomaticDispose属性とDisableAutomaticDispose属性は同時付与できない
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0018, location));
-                    }
-                }
-
-                if (member is IFieldSymbol fieldSymbol)
-                {
-                    var isAssignableToIDisposableMember = AutomaticDisposeGenerator.IsAssignableToIDisposable(fieldSymbol.Type);
-                    var isAssignableToIAsyncDisposableMember = AutomaticDisposeGenerator.IsAssignableToIAsyncDisposable(fieldSymbol.Type);
-                    var isEnableAutomaticDisposeMember = automaticDisposeContextChecker.IsEnableField(fieldSymbol);
-
-                    DoReportForFieldOrProptertyMember(member.Name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
-                }
-
-                if (member is IPropertySymbol propertySymbol)
-                {
-                    var isAssignableToIDisposableMember = AutomaticDisposeGenerator.IsAssignableToIDisposable(propertySymbol.Type);
-                    var isAssignableToIAsyncDisposableMember = AutomaticDisposeGenerator.IsAssignableToIAsyncDisposable(propertySymbol.Type);
-                    var isEnableAutomaticDisposeMember = automaticDisposeContextChecker.IsEnableProperty(propertySymbol);
-
-                    DoReportForFieldOrProptertyMember(member.Name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
-                }
-            }
-
-            private void DoReportForFieldOrProptertyMember(
-                        string name,
-                        bool isAssignableToIDisposableMember,
-                        bool isAssignableToIAsyncDisposableMember,
-                        bool isEnableAutomaticDisposeMember
-                        )
-            {
-                if (member.IsImplicitlyDeclared)
-                {
-                    return;
-                }
-
-                if (member.IsStatic)
-                {
-                    DoReportForFieldOrProptertyStaticMember(isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
-                }
-                else
-                {
-                    DoReportForFieldOrProptertyInstanceMember(name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
-                }
-            }
-
-            void DoReportForFieldOrProptertyStaticMember(
-                        bool isAssignableToIDisposableMember,
-                        bool isAssignableToIAsyncDisposableMember,
-                        bool isEnableAutomaticDisposeMember
-                        )
-            {
-                if (isEnableAutomaticDisposeAttributedMember)
-                {
-                    foreach (var location in member.Locations)
-                    {
-                        // staticメンバにEnableAutomaticDispose属性は付与できない
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0022, location, member.Name, namedTypeSymbol.Name));
-                    }
-                }
-
-                if (isDisableAutomaticDisposeAttributedMember)
-                {
-                    foreach (var location in member.Locations)
-                    {
-                        // staticメンバにDisableAutomaticDispose属性は付与できない
-                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0023, location, member.Name, namedTypeSymbol.Name));
-                    }
-                }
-            }
-
-            
-            void DoReportForFieldOrProptertyInstanceMember(
-                        string name,
-                        bool isAssignableToIDisposableMember,
-                        bool isAssignableToIAsyncDisposableMember,
-                        bool isEnableAutomaticDisposeMember
-                        )
-            {
-                if (automaticDisposeContextChecker.Mode == AutomaticDisposeImplMode.Explicit)
-                {
-                    if (isAssignableToIDisposableMember || isAssignableToIAsyncDisposableMember)
-                    {
-                        // メンバは自動破棄の対象となりうる条件を満たしている
-
-                        if (!isEnableAutomaticDisposeAttributedMember && !isDisableAutomaticDisposeAttributedMember)
-                        {
-                            // メンバに自動破棄の有無を明示する属性が設定されていない
-
-                            if (!dependencyMemberRegisteredSet.Contains(name))
-                            {
-                                // 他のメンバの依存関係として設定されていない
-
-                                foreach (var location in member.Locations)
-                                {
-                                    // 自動実装のモードがExplicitなのに、EnableAutomaticDisposeとDisableAutomaticDisposeのどちらの属性も付けられていない
-                                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0019, location, member.Name, namedTypeSymbol.Name));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (isEnableAutomaticDisposeMember)
-                {
-                    // 自動破棄の対象となるメンバ
-
-                    if (isAssignableToIDisposableMember && isAssignableToIAsyncDisposableMember && isAssignableToIDisposable && !isAssignableToIAsyncDisposable)
-                    {
-                        // メンバはDisposeでもDisposeAsyncでも破棄できるが、メンバを含むクラスはIAsyncDisposableを実装していない
-
-                        foreach (var location in member.Locations)
-                        {
-                            // このメンバは非同期破棄をサポートしているが、自動破棄では常に同期的破棄になることを注意
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0003, location, member.Name, namedTypeSymbol.Name));
-                        }
-                    }
-                    
-                    if (!isAssignableToIDisposableMember && isAssignableToIAsyncDisposableMember)
-                    {
-                        // メンバはDisposeAsyncでのみ破棄できる
-
-                        if (isAssignableToIDisposable && !isAssignableToIAsyncDisposable)
-                        {
-                            // メンバを含むクラスはIDisposableだけを実装している
-
-                            foreach (var location in member.Locations)
-                            {
-                                // このメンバはDisposeAsyncでしか破棄できないのに、このメンバを含むクラスはIDisposableしか実装していないので、自動破棄できない
-                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0004, location, member.Name, namedTypeSymbol.Name));
-                            }
-                        }
-                    }
-                }
-
-                if (!isAssignableToIDisposableMember && !isAssignableToIAsyncDisposableMember)
-                {
-                    // IDisposableもIAsyncDisposableも実装していない
-
-                    if (isEnableAutomaticDisposeAttributedMember)
-                    {
-                        // EnableAutomaticDispose属性を付与している
-
-                        foreach (var location in member.Locations)
-                        {
-                            // IDisposableとIAysncDisposableのどちらも実装してい型のメンバにEnableAutomaticDispose属性は付与できない
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0020, location, member.Name, namedTypeSymbol.Name));
-                        }
-                    }
-
-                    if (isDisableAutomaticDisposeAttributedMember)
-                    {
-                        // DisableAutomaticDispose属性を付与している
-
-                        foreach (var location in member.Locations)
-                        {
-                            // IDisposableとIAysncDisposableのどちらも実装してい型のメンバにDisableAutomaticDispose属性は付与できない
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0021, location, member.Name, namedTypeSymbol.Name));
-                        }
-                    }
-                }
-            }
         }
     }
 }

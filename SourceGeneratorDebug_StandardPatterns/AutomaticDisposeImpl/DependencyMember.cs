@@ -2,7 +2,7 @@
 using System;
 
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
     [AutomaticDisposeImpl(Mode = AutomaticDisposeImplMode.Explicit)]
     partial class DependencyMember : IDisposable, IAsyncDisposable
