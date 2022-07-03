@@ -359,7 +359,7 @@ namespace Benutomo
 
             WriteLogLine("End Initialize");
 
-            IEnumerable<(TypeDefinitionInfo, ImmutableArray<(string, PropertyEventArgClass)>)> ToPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
+            IEnumerable<EventArgSourceBuilderInputs> ToPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
             {
                 foreach (var propertiesInClass in sourceBuildInputs.Where(v => !cancellationToken.IsCancellationRequested && v is not null).ToLookup(v => v!.ContainingTypeInfo))
                 {
@@ -379,7 +379,7 @@ namespace Benutomo
                         .Distinct()
                         .ToImmutableArray();
 
-                    yield return (propertiesInClass.Key, properties);
+                    yield return new (propertiesInClass.Key, properties);
                 }
             }
         }
@@ -516,67 +516,30 @@ namespace Benutomo
             }
         }
 
-        void GenerateEventArg(SourceProductionContext context, (TypeDefinitionInfo containingTypeInfo, ImmutableArray<(string name, PropertyEventArgClass eventArgClass)> properties) args)
+        void GenerateEventArg(SourceProductionContext context, EventArgSourceBuilderInputs args)
         {
-            WriteLogLine($"Begin Generate {args.containingTypeInfo.Name} EventArgs");
+            WriteLogLine($"Begin Generate {args.ContainingTypeInfo.Name} EventArgs");
 
             try
             {
                 Span<char> initialBuffer = stackalloc char[80000];
 
-                using var sourceBuilder = new ClassSourceBuilder(context, args.containingTypeInfo, initialBuffer);
+                using var sourceBuilder = new EventArgSourceBuilder(context, args, initialBuffer);
 
-                sourceBuilder.AppendLine("#nullable enable");
-                sourceBuilder.AppendLine("#pragma warning disable CS0612,CS0618,CS0619");
+                sourceBuilder.Build();
 
-                sourceBuilder.WriteTypeDeclarationStart("This is implementation class by AutomaticNotifyPropertyChangedImpl.");
+                context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
 
-                foreach (var property in args.properties)
-                {
-                    if (property.eventArgClass == PropertyEventArgClass.Changed)
-                    {
-                        var changedEventArgFieldName = $"__PropertyChangedEventArgs_{property.name}";
-
-                        sourceBuilder.PutIndentSpace();
-                        sourceBuilder.Append("private static global::System.ComponentModel.PropertyChangedEventArgs ");
-                        sourceBuilder.Append(changedEventArgFieldName);
-                        sourceBuilder.Append(" = new global::System.ComponentModel.PropertyChangedEventArgs(\"");
-                        sourceBuilder.Append(property.name);
-                        sourceBuilder.AppendLine("\");");
-                    }
-                    else if (property.eventArgClass == PropertyEventArgClass.Changing)
-                    {
-                        var changingEventArgFieldName = $"__PropertyChangingEventArgs_{property.name}";
-
-                        sourceBuilder.PutIndentSpace();
-                        sourceBuilder.Append("private static global::System.ComponentModel.PropertyChangingEventArgs ");
-                        sourceBuilder.Append(changingEventArgFieldName);
-                        sourceBuilder.Append(" = new global::System.ComponentModel.PropertyChangingEventArgs(\"");
-                        sourceBuilder.Append(property.name);
-                        sourceBuilder.AppendLine("\");");
-                    }
-                    else
-                    {
-                        Debug.Fail("invalid PropertyEventArgClass");
-                    }
-                }
-
-                sourceBuilder.WriteTypeDeclarationEnd();
-
-                var hintName = $"gen_{string.Join(".", sourceBuilder.HintingTypeNames)}.EventArgDeclarations_{sourceBuilder.NameSpace}.cs";
-
-                context.AddSource(hintName, sourceBuilder.SourceText);
-
-                WriteLogLine($"End Generate {args.containingTypeInfo.Name} EventArgs => {hintName}");
+                WriteLogLine($"End Generate {args.ContainingTypeInfo.Name} EventArgs => {sourceBuilder.HintName}");
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled Generate {args.containingTypeInfo.Name} EventArgs");
+                WriteLogLine($"Canceled Generate {args.ContainingTypeInfo.Name} EventArgs");
                 throw;
             }
             catch (Exception ex)
             {
-                WriteLogLine($"Exception in Generate {args.containingTypeInfo.Name} EventArgs");
+                WriteLogLine($"Exception in Generate {args.ContainingTypeInfo.Name} EventArgs");
                 WriteLogLine(ex.ToString());
                 throw;
             }

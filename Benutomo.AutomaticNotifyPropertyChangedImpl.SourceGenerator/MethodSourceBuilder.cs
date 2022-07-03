@@ -252,6 +252,12 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         void RenderInternalField()
         {
+            PutIndentSpace(); AppendLine("/// <summary>");
+            PutIndentSpace();
+            Append("/// <see cref=\"");
+            Append(_sourceBuildInputs.MethodName);
+            AppendLine("\" />メソッドが読み書きする内部フィールドです。コンストラクタで初期値を設定する場合を除いて、実装者が直接このフィールドを読み書きしてはいけません。");
+            PutIndentSpace(); AppendLine("/// </summary>");
             PutIndentSpace();
             Append("private ");
             Append(_sourceBuildInputs.PropertyType);
@@ -268,6 +274,12 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         void RenderGetterMethod()
         {
+            PutIndentSpace(); AppendLine("/// <summary>");
+            PutIndentSpace();
+            Append("/// ");
+            Append(_sourceBuildInputs.DefaultNotificationPropertyName);
+            AppendLine("プロパティの自動実装ゲッタメソッドです。");
+            PutIndentSpace(); AppendLine("/// </summary>");
             RenderAggressiveInliningAttribute();
             PutIndentSpace();
             Append("private ");
@@ -382,6 +394,14 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         void RenderDefaultSetterMethod(string changedEventBaseName, string changingEventBaseName)
         {
+            PutIndentSpace(); AppendLine("/// <summary>");
+            PutIndentSpace();
+            Append("/// ");
+            Append(_sourceBuildInputs.DefaultNotificationPropertyName);
+            AppendLine("プロパティの標準的な自動実装セッタメソッドです。現在の内部フィールドの値と引数で渡される値が異なる場合に内部フィールドの値を更新し、イベントを発生させ、戻り値としてtrueを返却します。現在の内部フィールドの値と引数で渡される値が同一である場合にイベントは発生せず、戻り値としてfalseを返却します。");
+            PutIndentSpace(); AppendLine("/// </summary>");
+            PutIndentSpace(); AppendLine("/// <param name=\"value\">プロパティの新しい設定値</param>");
+            PutIndentSpace(); AppendLine("/// <return>内部フィールドの値が更新された場合はtrue</return>");
             RenderSetterMethodDeclarationCommonPrefixPart();
             AppendLine(")");
             BeginBlock();
@@ -409,6 +429,15 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 || _sourceBuildInputs.EnabledNotifyPropertyChanging
                 ;
 
+            PutIndentSpace(); AppendLine("/// <summary>");
+            PutIndentSpace();
+            Append("/// ");
+            Append(_sourceBuildInputs.DefaultNotificationPropertyName);
+            AppendLine("プロパティの内部フィールドを<see cref=\"global::System.Threading.Interloced.Exchange\">によって更新する自動実装セッタメソッドです。ユーザ実装で変更前後の値に対して何だかの処理を付加的に行う必要がある場合などに使用します。現在の内部フィールドの値と引数で渡される値が異なる場合に内部フィールドの値を更新し、イベントを発生させ、outパラメータに変更の値を設定し、戻り値としてtrueを返却します。現在の内部フィールドの値と引数で渡される値が同一である場合にイベントは発生せず、戻り値としてfalseを返却します。");
+            PutIndentSpace(); AppendLine("/// </summary>");
+            PutIndentSpace(); AppendLine("/// <param name=\"value\">プロパティの新しい設定値</param>");
+            PutIndentSpace(); AppendLine("/// <param name=\"prevValue\">プロパティの変更前の設定値</param>");
+            PutIndentSpace(); AppendLine("/// <return>内部フィールドの値が更新された場合はtrue</return>");
             RenderSetterMethodDeclarationCommonPrefixPart();
             Append(", ");
             if (_sourceBuildInputs.PropertyTypeIsReferenceType && _sourceBuildInputs.PropertyTypeNullableAnnotation == NullableAnnotation.NotAnnotated)
@@ -536,6 +565,15 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         void RenderCustomEqualsSetterMethod(string changedEventBaseName, string changingEventBaseName)
         {
+            PutIndentSpace(); AppendLine("/// <summary>");
+            PutIndentSpace();
+            Append("/// ");
+            Append(_sourceBuildInputs.DefaultNotificationPropertyName);
+            AppendLine("プロパティの内部フィールドを指定したEqualityComparerを用いて更新する自動実装セッタメソッドです。現在の内部フィールドの値と引数で渡される値が異なる場合に内部フィールドの値を更新し、イベントを発生させ、戻り値としてtrueを返却します。現在の内部フィールドの値と引数で渡される値が同一である場合にイベントは発生せず、戻り値としてfalseを返却します。");
+            PutIndentSpace(); AppendLine("/// </summary>");
+            PutIndentSpace(); AppendLine("/// <param name=\"value\">プロパティの新しい設定値</param>");
+            PutIndentSpace(); AppendLine("/// <param name=\"equalityComparer\">フィールドの更新要否の判定に用いるIEqualityComparerジェネリックインターフェイスを実装したオブジェクト</param>");
+            PutIndentSpace(); AppendLine("/// <return>内部フィールドの値が更新された場合はtrue</return>");
             RenderSetterMethodDeclarationCommonPrefixPart();
             Append(", global::System.Collections.Generic.IEqualityComparer<");
             Append(_sourceBuildInputs.PropertyType);

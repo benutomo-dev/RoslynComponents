@@ -66,9 +66,17 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 if (property.EventArgClass == PropertyEventArgClass.Changed)
                 {
                     var changedEventArgFieldName = $"__PropertyChangedEventArgs_{property.Name}";
+                    
+                    AppendLine();
 
+                    PutIndentSpace(); AppendLine("/// <summary>");
                     PutIndentSpace();
-                    Append("private static global::System.ComponentModel.PropertyChangedEventArgs ");
+                    Append("/// プロパティ名として<value>\"");
+                    Append(property.Name);
+                    AppendLine("\"</value>を設定した<see cref=\"global::System.ComponentModel.PropertyChangedEventArgs\" />クラスのインスタンスが設定された読取専用フィールドです。ユーザが実装するコード内からPropertyChangedイベントを発生させる場合などに利用することが出来ます。");
+                    PutIndentSpace(); AppendLine("/// </summary>");
+                    PutIndentSpace();
+                    Append("private static readonly global::System.ComponentModel.PropertyChangedEventArgs ");
                     Append(changedEventArgFieldName);
                     Append(" = new global::System.ComponentModel.PropertyChangedEventArgs(\"");
                     Append(property.Name);
@@ -78,8 +86,16 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 {
                     var changingEventArgFieldName = $"__PropertyChangingEventArgs_{property.Name}";
 
+                    AppendLine();
+
+                    PutIndentSpace(); AppendLine("/// <summary>");
                     PutIndentSpace();
-                    Append("private static global::System.ComponentModel.PropertyChangingEventArgs ");
+                    Append("/// プロパティ名として<value>\"");
+                    Append(property.Name);
+                    AppendLine("\"</value>を設定した<see cref=\"global::System.ComponentModel.PropertyChangingEventArgs\"クラスのインスタンスが設定された読取専用フィールドです。ユーザが実装するコード内からPropertyChangingイベントを発生させる場合などに利用することが出来ます。");
+                    PutIndentSpace(); AppendLine("/// </summary>");
+                    PutIndentSpace();
+                    Append("private static readonly global::System.ComponentModel.PropertyChangingEventArgs ");
                     Append(changingEventArgFieldName);
                     Append(" = new global::System.ComponentModel.PropertyChangingEventArgs(\"");
                     Append(property.Name);
