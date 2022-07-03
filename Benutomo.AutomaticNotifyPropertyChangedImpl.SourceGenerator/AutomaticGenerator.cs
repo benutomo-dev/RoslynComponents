@@ -5,8 +5,6 @@ using System.Diagnostics;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
-    record struct GenerateEventArgInputs(TypeDefinitionInfo ContainingTypeInfo, ImmutableArray<(string Name, PropertyEventArgClass EventArgClass)> Properties);
-
     [Generator(LanguageNames.CSharp)]
     public partial class AutomaticGenerator : IIncrementalGenerator
     {

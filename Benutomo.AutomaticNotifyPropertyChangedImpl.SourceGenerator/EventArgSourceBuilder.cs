@@ -9,10 +9,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         ClassSourceBuilder _sourceBuilder;
 
-        readonly GenerateEventArgInputs _sourceBuildInputs;
+        readonly EventArgSourceBuilderInputs _sourceBuildInputs;
 
 
-        public EventArgSourceBuilder(SourceProductionContext context, GenerateEventArgInputs sourceBuildInputs, Span<char> initialBuffer)
+        public EventArgSourceBuilder(SourceProductionContext context, EventArgSourceBuilderInputs sourceBuildInputs, Span<char> initialBuffer)
         {
             _sourceBuildInputs = sourceBuildInputs;
             _sourceBuilder = new ClassSourceBuilder(context, sourceBuildInputs.ContainingTypeInfo, initialBuffer);
