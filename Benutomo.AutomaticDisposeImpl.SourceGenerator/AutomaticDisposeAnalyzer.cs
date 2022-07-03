@@ -408,7 +408,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             }
         }
 
-        private static void AnalyzeAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData? attributeData)
+        private static void AnalyzeAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData attributeData)
         {
             var classDeclarationSyntaxes = EnumerateAllDeclarationSyntaxes(namedTypeSymbol, context.CancellationToken).ToArray();
 
