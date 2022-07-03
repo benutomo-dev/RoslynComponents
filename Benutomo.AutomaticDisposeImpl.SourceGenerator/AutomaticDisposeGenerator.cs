@@ -1,10 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
@@ -246,16 +242,6 @@ namespace Benutomo
 }
 ";
 
-        record struct UsingSymbols(
-            INamedTypeSymbol AutomaticDisposeImplAttributeSymbol,
-            INamedTypeSymbol EnableAutomaticDisposeAttributeSymbol,
-            INamedTypeSymbol DisableAutomaticDisposeAttributeSymbol,
-            INamedTypeSymbol UnmanagedResourceReleaseMethodAttributeSymbol,
-            INamedTypeSymbol ManagedObjectDisposeMethodAttributeSymbol,
-            INamedTypeSymbol ManagedObjectAsyncDisposeMethodAttributeSymbol,
-            INamedTypeSymbol DisposableSymbol,
-            INamedTypeSymbol AsyncDisposableSymbol
-            );
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
@@ -424,7 +410,9 @@ namespace Benutomo
 
             try
             {
-                var sourceBuilder = new SourceBuilder(context, sourceBuildInputs);
+                Span<char> initialBuffer = stackalloc char[80000];
+
+                using var sourceBuilder = new MethodSourceBuilder(context, sourceBuildInputs, initialBuffer);
 
                 sourceBuilder.Build();
 

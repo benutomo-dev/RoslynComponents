@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net47;net6.0</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="NotificationUsingClasses.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NotificationUsingClasses.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+  </ItemGroup>
+
+  <!--<ItemGroup>
+    <PackageReference Include="Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator" Version="0.0.0.27" PrivateAssets="all" />
+  </ItemGroup>-->
+  
+  <!--<ItemGroup>
+    <PackageReference Include="Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator" Version="0.0.0.23" PrivateAssets="all" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <None Update="NotificationUsingClasses.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>NotificationUsingClasses.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="NotificationUsingClasses.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NotificationUsingClasses.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+
+</Project>
