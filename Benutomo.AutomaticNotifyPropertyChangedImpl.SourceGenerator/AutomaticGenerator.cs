@@ -531,7 +531,7 @@ namespace Benutomo
                 sourceBuilder.AppendLine("#nullable enable");
                 sourceBuilder.AppendLine("#pragma warning disable CS0612,CS0618,CS0619");
 
-                sourceBuilder.WriteTypeDeclarationStart();
+                sourceBuilder.WriteTypeDeclarationStart("This is implementation class by AutomaticNotifyPropertyChangedImpl.");
 
                 foreach (var property in args.properties)
                 {

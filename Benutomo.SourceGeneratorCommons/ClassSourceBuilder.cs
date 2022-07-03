@@ -47,15 +47,15 @@ namespace Benutomo.SourceGeneratorCommons
         public void EndBlock() => _sourceBuilder.EndBlock();
         #endregion
 
-        public void WriteTypeDeclarationStart()
+        public void WriteTypeDeclarationStart(string? classDecralationLineComment)
         {
             _nameSpace = "global";
             _hintingTypeNames.Clear();
 
-            WriteContainingTypeStart(ContainingTypeInfo, isDesingationType: true);
+            WriteContainingTypeStart(ContainingTypeInfo, isDesingationType: true, classDecralationLineComment);
         }
 
-        void WriteContainingTypeStart(TypeDefinitionInfo namedTypeSymbol, bool isDesingationType)
+        void WriteContainingTypeStart(TypeDefinitionInfo namedTypeSymbol, bool isDesingationType, string? classDecralationLineComment)
         {
             if (namedTypeSymbol.Container is NameSpaceInfo nameSpace && !string.IsNullOrWhiteSpace(nameSpace.Name))
             {
@@ -63,7 +63,7 @@ namespace Benutomo.SourceGeneratorCommons
             }
             else if (namedTypeSymbol.Container is TypeDefinitionInfo typeInfo)
             {
-                WriteContainingTypeStart(typeInfo, isDesingationType: false);
+                WriteContainingTypeStart(typeInfo, isDesingationType: false, null);
             }
 
             Context.CancellationToken.ThrowIfCancellationRequested();
@@ -105,11 +105,12 @@ namespace Benutomo.SourceGeneratorCommons
                 _hintingTypeNames.Add(namedTypeSymbol.Name);
             }
 
-            if (isDesingationType)
+            if (isDesingationType && classDecralationLineComment is not null)
             {
                 // なくてもいいが生成されたコードだけを見ても実装対象となっているインターフェイスが分かるようにしておく
 
-                Append(" // This is implementation class by AutomaticNotifyPropertyChangedImpl.");
+                Append(" // ");
+                Append(classDecralationLineComment);
             }
             AppendLine("");
 

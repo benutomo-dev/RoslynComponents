@@ -39,7 +39,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public void BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
         public void BeginBlock() => _sourceBuilder.BeginBlock();
         public void EndBlock() => _sourceBuilder.EndBlock();
-        public void WriteTypeDeclarationStart() => _sourceBuilder.WriteTypeDeclarationStart();
+        public void WriteTypeDeclarationStart(string? classDecralationLineComment) => _sourceBuilder.WriteTypeDeclarationStart(classDecralationLineComment);
         public void WriteTypeDeclarationEnd() => _sourceBuilder.WriteTypeDeclarationEnd();
         #endregion
 
@@ -52,7 +52,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             AppendLine("#pragma warning disable CS0618 // Obsolete属性でマークされたメソッドの呼び出しに対する警告を抑止");
             AppendLine("#pragma warning disable CS0619 // Obsolete属性でマークされたメソッドの呼び出しに対するエラーを抑止");
 
-            WriteTypeDeclarationStart();
+            WriteTypeDeclarationStart("This is implementation class by AutomaticNotifyPropertyChangedImpl.");
 
             WriteBody();
 

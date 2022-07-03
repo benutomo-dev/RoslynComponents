@@ -39,7 +39,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         public void BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
         public void BeginBlock() => _sourceBuilder.BeginBlock();
         public void EndBlock() => _sourceBuilder.EndBlock();
-        public void WriteTypeDeclarationStart() => _sourceBuilder.WriteTypeDeclarationStart();
+        public void WriteTypeDeclarationStart(string? classDecralationLineComment) => _sourceBuilder.WriteTypeDeclarationStart(classDecralationLineComment);
         public void WriteTypeDeclarationEnd() => _sourceBuilder.WriteTypeDeclarationEnd();
         #endregion
 
@@ -51,7 +51,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             _sourceBuilder.AppendLine("#nullable enable");
             _sourceBuilder.AppendLine("#pragma warning disable CS0612,CS0618,CS0619");
 
-            WriteTypeDeclarationStart();
+            WriteTypeDeclarationStart("This is implementation class by AutomaticDisposeImpl.");
 
             WriteBody();
 
