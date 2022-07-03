@@ -1,12 +1,23 @@
-# AutomaticDisposeImpl
+# RoslynComponents
+
+C#のRoslynコンパイラ用のソースジェネレータです。
+
+## 一覧
+
+- AutomaticDisposeImpl<br>
+  C#で`IDisposable`と`IAsyncDisposable`の実装パターンに対応するメソッドを自動実装するソースジェネレータ
+- AutomaticNotifyPropertyChangedImpl<br>
+  C#で`INotifyPropertyChanged`などの変更通知付きプロパティの実装を補助するソースジェネレータ
+
+## AutomaticDisposeImpl
 
 C#で`IDisposable`と`IAsyncDisposable`の実装パターンに対応するメソッドを自動実装するソースジェネレータです。
 
-## Introduction
+### Introduction
 
 以下のサンプルで示すように、`IDisposable`と`IAsyncDisposable`インターフェイスの少なくとも一方を実装するクラスに`partial`キーワードと`AutomaticDisposeImpl`属性を付与すると、クラス内に含まれる`IDisposable`と`IAsyncDisposable`インターフェイスを実装している型を持つメンバを破棄する`Dispose()`と`DisposeAsync()`が自動実装されるようになります。
 
-### サンプルコード
+#### サンプルコード
 
 ```cs
 using System;
@@ -81,7 +92,7 @@ namespace SampleCode
 }
 ```
 
-### サンプルコードを実行した際の出力例
+#### サンプルコードを実行した際の出力例
 以下のようにクラス内に含まれる`IDisposable`または`IAsyncDisposable`を実装したメンバの`Dispose()`と`DisposeAsync()`は、自動実装されたコードから呼び出されます。
 自動実装クラスの`DisposeAsync()`は基本的にメンバの破棄にも`DisposeAsync()`を呼び出しますが、メンバが`IDisposable`しか実装していない場合は`Dispose()`を使用して破棄します。
 ```
@@ -99,16 +110,16 @@ End disposeTestInstance.DisposeAsync()
 
 ```
 
-## 使用方法
+### 使用方法
 
-### インストール
+#### インストール
 [Nuget](https://www.nuget.org/packages/Benutomo.AutomaticDisposeImpl.SourceGenerator/)などを利用してプロジェクトのアナライザにBenutomo.AutomaticDisposeImpl.SourceGenerator.dllを追加します。
 
 ```
 Install-Package Benutomo.AutomaticDisposeImpl.SourceGenerator
 ```
 
-### 基本
+#### 基本
 
 以下のように、破棄の自動実装を使用したいクラスを含むC#のソースコードの先頭部に`using Benutomo;`を追加し、`IDisposable`と`IAsyncDisposable`の少なくとも一方を実装しているクラスに`partial`キーワードと`[AutomaticDisposeImpl]`属性を追加します。
 `EnableDisposeImpl`属性を追加したフィールドまはたプロパティはメンバを含むクラスが破棄と同時に自動的に破棄されます。
@@ -155,7 +166,7 @@ partial class Sample4
 
 ℹ 自動実装されたメンバの破棄で生じた例外は、リリースビルド時は無視され、デバッグビルド時はDebug.Fail()によってデバッガを停止させます。標準的な`Dispose()`等は例外を発生させることなく複数回の呼び出しが可能である必要があります([Disposeメソッドの実装](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose))。自動実装されるコードはそれが守られていることを期待しているため、破棄で例外を発生させるメンバが存在する場合は、自動実装対象から除外し、独自処理メソッドの中で破棄と例外のハンドリングを行って下さい。
 
-### Dispose()などが呼び出されるタイミングで自動実装されるメンバの破棄と同時に独自の処理も実行する
+#### Dispose()などが呼び出されるタイミングで自動実装されるメンバの破棄と同時に独自の処理も実行する
 
 `[ManagedObjectDisposeMethod]`属性と`[ManagedObjectAsyncDisposeMethod]`属性を使用すると、自動実装される`Dispose()`および、`DisposeAsync()`の中からユーザ側のコードで実装されるメソッドを呼び出させることができます。
 
@@ -194,7 +205,7 @@ sample.Dipose();
 
 ⚠ **自動実装のメンバ破棄と独自の処理の実行順は不確定です**。将来のバージョンでは順番が入れ替わる可能性がありますので、現在の自動実装の順番に依存しないように注意して下さい。
 
-### アンマネージドリソースの破棄
+#### アンマネージドリソースの破棄
 
 `IDisposable.Dipose()`などで自動破棄できるメンバのほかに、`System.IntPtr`等を利用してアンマネージドリソースのハンドルなどを保持している場合は`[UnmanagedResourceReleaseMethod]`属性を利用することで、アンマネージドリソースの破棄を行うメソッドを自動実装されるコードから呼び出させることができます。
 
@@ -210,3 +221,7 @@ partial class UserDefinedFinalizeImplSample : IDisposable, IAsyncDisposable
 ℹ `[UnmanagedResourceReleaseMethod]`属性を使用したクラスはファイナライザも自動実装されます。そのため、明示的に`Dispose()`または`DisposeAsync()`の呼び出しがされずにオブジェクトがガーベジコレクトされた場合もガーベジコレクタのファイナライズのタイミングで自動実装されたファイナライザを経由して`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドが呼び出されます。
 
 ℹ `[ManagedObjectDisposeMethod]`属性で破棄を自動実装したクラスは`IDisposable`と`IAsyncDisposable`を直接実装している`seald`クラスであるか、継承関係にある親クラス・子クラスが[同期](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-dispose#implement-the-dispose-pattern)および[非同期](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/implementing-disposeasync#implement-the-async-dispose-pattern)の破棄パターンを正しく実装している限り、`[UnmanagedResourceReleaseMethod]`属性を付与したメソッドはオブジェクトが生成されてから消滅するまでに、その間の明示的な破棄の有無や回数に関わらず、自動実装側からの呼び出し回数が必ず１回なることが保証されます。
+
+## AutomaticNotifyPropertyChangedImpl
+
+TODO
