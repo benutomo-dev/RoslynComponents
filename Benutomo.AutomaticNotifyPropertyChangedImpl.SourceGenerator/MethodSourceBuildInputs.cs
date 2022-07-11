@@ -319,12 +319,12 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             {
                 return value switch
                 {
-                    AutomaticGenerator.NotificationAccessibilityPublic => GenerateMemberAccessibility.Public,
-                    AutomaticGenerator.NotificationAccessibilityInternal => GenerateMemberAccessibility.Internal,
-                    AutomaticGenerator.NotificationAccessibilityProtected => GenerateMemberAccessibility.Protected,
-                    AutomaticGenerator.NotificationAccessibilityProtectedInternal => GenerateMemberAccessibility.ProrectedInternal,
-                    AutomaticGenerator.NotificationAccessibilityPrivateProtected => GenerateMemberAccessibility.PrivateProrected,
-                    AutomaticGenerator.NotificationAccessibilityPrivate => GenerateMemberAccessibility.Private,
+                    SourceGenerator.NotificationAccessibilityPublic => GenerateMemberAccessibility.Public,
+                    SourceGenerator.NotificationAccessibilityInternal => GenerateMemberAccessibility.Internal,
+                    SourceGenerator.NotificationAccessibilityProtected => GenerateMemberAccessibility.Protected,
+                    SourceGenerator.NotificationAccessibilityProtectedInternal => GenerateMemberAccessibility.ProrectedInternal,
+                    SourceGenerator.NotificationAccessibilityPrivateProtected => GenerateMemberAccessibility.PrivateProrected,
+                    SourceGenerator.NotificationAccessibilityPrivate => GenerateMemberAccessibility.Private,
                     _ => GenerateMemberAccessibility.None,
                 };
             }
@@ -333,8 +333,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             {
                 return value switch
                 {
-                    AutomaticGenerator.ExplicitInterfaceImplementationEnable => true,
-                    AutomaticGenerator.ExplicitInterfaceImplementationDisable => false,
+                    SourceGenerator.ExplicitInterfaceImplementationEnable => true,
+                    SourceGenerator.ExplicitInterfaceImplementationDisable => false,
                     _ => true,
                 };
             }

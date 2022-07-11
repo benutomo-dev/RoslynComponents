@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>library</OutputType>
-    <Version>0.0.0.28</Version>
+    <Version>0.0.0.29</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
