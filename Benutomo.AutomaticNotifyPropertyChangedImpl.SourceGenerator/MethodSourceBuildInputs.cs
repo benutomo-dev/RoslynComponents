@@ -26,6 +26,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public string MethodName;
 
+        public string DefferedNotificationMethodName;
+
+        public string DefferedNotificationDisposableName;
+
         public string PropertyType;
 
         public bool PropertyTypeIsReferenceType;
@@ -67,6 +71,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 DefaultNotificationPropertyName = interfacePropertyName;
                 FieldName = $"__{interfaceName}_{interfacePropertyName}";
                 MethodName = $"_{interfaceName}_{interfacePropertyName}";
+                DefferedNotificationMethodName = $"_{interfaceName}_{interfacePropertyName}WithDefferedNotification";
+                DefferedNotificationDisposableName = $"___{interfaceName}_{interfacePropertyName}WithDefferedNotificationDisposable";
             }
             else
             {
@@ -74,6 +80,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 DefaultNotificationPropertyName = propertySymbol.Name;
                 FieldName = $"__{char.ToLowerInvariant(propertySymbol.Name[0])}{propertySymbol.Name.Substring(1)}";
                 MethodName = $"_{propertySymbol.Name}";
+                DefferedNotificationMethodName = $"_{propertySymbol.Name}WithDefferedNotification";
+                DefferedNotificationDisposableName = $"___{propertySymbol.Name}WithDefferedNotificationDisposable";
             }
 
             StringBuilder typeNameBuilder = new StringBuilder();

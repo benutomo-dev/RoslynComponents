@@ -81,6 +81,14 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedIm
             get => _Inner();
             set => _Inner(value);
         }
+
+        private void Test()
+        {
+            using (_NumberWithDefferedNotification(0))
+            {
+                ;
+            }
+        }
     }
 }
 

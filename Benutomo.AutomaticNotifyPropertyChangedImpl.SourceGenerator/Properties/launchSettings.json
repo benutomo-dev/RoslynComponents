@@ -2,7 +2,7 @@
   "profiles": {
     "SourceGenerator": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\SourceGeneratorDebug\\SourceGeneratorDebug.csproj"
+      "targetProject": "..\\SourceGeneratorDebug_StandardPatterns\\SourceGeneratorDebug_StandardPatterns.csproj"
     }
   }
 }
