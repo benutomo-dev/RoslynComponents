@@ -14,6 +14,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
     class MethodSourceBuildInputs : IEquatable<MethodSourceBuildInputs?>
     {
+        public const string DefferedNotificationMethodSuffix = "WithDefferedNotification";
+
         public TypeDefinitionInfo ContainingTypeInfo;
 
         public string InternalPropertyName;
@@ -71,7 +73,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 DefaultNotificationPropertyName = interfacePropertyName;
                 FieldName = $"__{interfaceName}_{interfacePropertyName}";
                 MethodName = $"_{interfaceName}_{interfacePropertyName}";
-                DefferedNotificationMethodName = $"_{interfaceName}_{interfacePropertyName}WithDefferedNotification";
+                DefferedNotificationMethodName = $"_{interfaceName}_{interfacePropertyName}{DefferedNotificationMethodSuffix}";
                 DefferedNotificationDisposableName = $"___{interfaceName}_{interfacePropertyName}WithDefferedNotificationDisposable";
             }
             else
@@ -80,7 +82,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 DefaultNotificationPropertyName = propertySymbol.Name;
                 FieldName = $"__{char.ToLowerInvariant(propertySymbol.Name[0])}{propertySymbol.Name.Substring(1)}";
                 MethodName = $"_{propertySymbol.Name}";
-                DefferedNotificationMethodName = $"_{propertySymbol.Name}WithDefferedNotification";
+                DefferedNotificationMethodName = $"_{propertySymbol.Name}{DefferedNotificationMethodSuffix}";
                 DefferedNotificationDisposableName = $"___{propertySymbol.Name}WithDefferedNotificationDisposable";
             }
 

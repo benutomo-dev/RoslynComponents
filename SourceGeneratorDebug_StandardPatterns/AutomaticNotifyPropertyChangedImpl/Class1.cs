@@ -84,6 +84,8 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedIm
 
         private void Test()
         {
+            using var x = _NumberWithDefferedNotification(0);
+
             using (_NumberWithDefferedNotification(0))
             {
                 ;

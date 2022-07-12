@@ -7,7 +7,8 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-SG0001  |  Usage   |  Error   | AutomaticNotifyPropertyChangedImpl
-SG0002  |  Usage   |  Warning | AutomaticNotifyPropertyChangedImpl
-SG0003  |  Usage   |  Error   | AutomaticNotifyPropertyChangedImpl
-SG0004  |  Usage   |  Error   | AutomaticNotifyPropertyChangedImpl
+AutoNotif0001  |  Usage   |  Error   | AutomaticNotifyPropertyChangedImpl
+AutoNotif0002  |  Usage   |  Warning | AutomaticNotifyPropertyChangedImpl
+AutoNotif0003  |  Usage   |  Error   | AutomaticNotifyPropertyChangedImpl
+AutoNotif0004  |  Usage   |  Error   | AutomaticNotifyPropertyChangedImpl
+AutoNotif0005  |  Usage   |  Warning | AutomaticNotifyPropertyChangedImpl
