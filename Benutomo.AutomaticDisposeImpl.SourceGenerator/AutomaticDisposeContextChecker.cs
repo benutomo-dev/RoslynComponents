@@ -10,7 +10,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         internal AutomaticDisposeContextChecker(AttributeData automaticDisposeImplAttributeData, UsingSymbols usingSymbols)
         {
-            var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == AutomaticDisposeGenerator.AutomaticDisposeImplAttributeModeName).Value.Value;
+            var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == nameof(AutomaticDisposeImplAttribute.Mode)).Value.Value;
 
             var defaultMode = defaultModeValue is int defaultModeRawValue ? (AutomaticDisposeImplMode)defaultModeRawValue : AutomaticDisposeImplMode.Explicit;
 

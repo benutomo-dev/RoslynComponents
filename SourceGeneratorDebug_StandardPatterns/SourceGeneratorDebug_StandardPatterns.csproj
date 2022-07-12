@@ -4,6 +4,14 @@
     <TargetFrameworks>net47;net6.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="StaticSource" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <AdditionalFiles Include="Benutomo.StaticSource.SourceGenerator\Class1.cs" StaticSource="true" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
@@ -12,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

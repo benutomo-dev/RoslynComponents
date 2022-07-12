@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SourceGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator\\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.csproj"
+    }
+  }
+}

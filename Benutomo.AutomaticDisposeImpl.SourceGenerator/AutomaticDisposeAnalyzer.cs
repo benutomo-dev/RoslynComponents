@@ -588,8 +588,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             var name = attributeSyntax.Name.ToString();
 
-            if (name.EndsWith(AutomaticDisposeGenerator.AutomaticDisposeImplAttributeCoreName)) return true;
-            if (name.EndsWith(AutomaticDisposeGenerator.AutomaticDisposeImplAttributeName)) return true;
+            if (name.EndsWith(StaticSources.AutomaticDisposeImplAttributeCoreName)) return true;
+            if (name.EndsWith(StaticSources.AutomaticDisposeImplAttributeName)) return true;
 
             return false;
         }

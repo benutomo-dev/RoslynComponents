@@ -319,12 +319,12 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             {
                 return value switch
                 {
-                    SourceGenerator.NotificationAccessibilityPublic => GenerateMemberAccessibility.Public,
-                    SourceGenerator.NotificationAccessibilityInternal => GenerateMemberAccessibility.Internal,
-                    SourceGenerator.NotificationAccessibilityProtected => GenerateMemberAccessibility.Protected,
-                    SourceGenerator.NotificationAccessibilityProtectedInternal => GenerateMemberAccessibility.ProrectedInternal,
-                    SourceGenerator.NotificationAccessibilityPrivateProtected => GenerateMemberAccessibility.PrivateProrected,
-                    SourceGenerator.NotificationAccessibilityPrivate => GenerateMemberAccessibility.Private,
+                    (int)NotificationAccessibility.Public            => GenerateMemberAccessibility.Public,
+                    (int)NotificationAccessibility.Internal          => GenerateMemberAccessibility.Internal,
+                    (int)NotificationAccessibility.Protected         => GenerateMemberAccessibility.Protected,
+                    (int)NotificationAccessibility.ProtectedInternal => GenerateMemberAccessibility.ProrectedInternal,
+                    (int)NotificationAccessibility.PrivateProtected  => GenerateMemberAccessibility.PrivateProrected,
+                    (int)NotificationAccessibility.Private           => GenerateMemberAccessibility.Private,
                     _ => GenerateMemberAccessibility.None,
                 };
             }
@@ -333,8 +333,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             {
                 return value switch
                 {
-                    SourceGenerator.ExplicitInterfaceImplementationEnable => true,
-                    SourceGenerator.ExplicitInterfaceImplementationDisable => false,
+                    (int)ExplicitInterfaceImplementation.Enable  => true,
+                    (int)ExplicitInterfaceImplementation.Disable => false,
                     _ => true,
                 };
             }

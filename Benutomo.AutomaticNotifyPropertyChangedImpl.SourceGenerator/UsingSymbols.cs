@@ -18,15 +18,15 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
     {
         public static UsingSymbols CreateFrom(Compilation compilation)
         {
-            var enableNotificationSupportAttributeSymbol = compilation.GetTypeByMetadataName(SourceGenerator.EnableNotificationSupportAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var changedEventAttributeSymbol = compilation.GetTypeByMetadataName(SourceGenerator.ChangedEventAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var changingEventAttributeSymbol = compilation.GetTypeByMetadataName(SourceGenerator.ChangingEventAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var changedObservableAttributeSymbol = compilation.GetTypeByMetadataName(SourceGenerator.ChangedObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var changingObservableAttributeSymbol = compilation.GetTypeByMetadataName(SourceGenerator.ChangingObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var enableNotificationSupportAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.EnableNotificationSupportAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var changedEventAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ChangedEventAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var changingEventAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ChangingEventAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var changedObservableAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ChangedObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var changingObservableAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ChangingObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var notifyPropertyChangedSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanged") ?? throw new InvalidOperationException();
             var notifyPropertyChangingSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanging") ?? throw new InvalidOperationException();
-            var notificationAccessibilitySymbol = compilation.GetTypeByMetadataName(SourceGenerator.NotificationAccessibilityFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var explicitInterfaceImplementationSymbol = compilation.GetTypeByMetadataName(SourceGenerator.ExplicitInterfaceImplementationFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var notificationAccessibilitySymbol = compilation.GetTypeByMetadataName(StaticSources.NotificationAccessibilityFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var explicitInterfaceImplementationSymbol = compilation.GetTypeByMetadataName(StaticSources.ExplicitInterfaceImplementationFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var actionSymbol = compilation.GetTypeByMetadataName("System.Action") ?? throw new InvalidOperationException();
             var eventHandlerSymbol = compilation.GetTypeByMetadataName("System.EventHandler") ?? throw new InvalidOperationException();
 
