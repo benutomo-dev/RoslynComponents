@@ -33,7 +33,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         public MethodSourceBuilderInputs(INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData automaticDisposeImplAttributeData)
         {
-            TargetTypeInfo = BuildTypeDefinitionInfo(namedTypeSymbol);
+            TargetTypeInfo = namedTypeSymbol.BuildTypeDefinitionInfo();
 
             var automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeImplAttributeData, usingSymbols);
 
@@ -136,86 +136,6 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
 
 
-            static TypeDefinitionInfo BuildTypeDefinitionInfo(ITypeSymbol typeSymbol)
-            {
-                ITypeContainer container;
-
-                if (typeSymbol.ContainingType is null)
-                {
-                    var namespaceBuilder = new StringBuilder();
-                    AppendFullNamespace(namespaceBuilder, typeSymbol.ContainingNamespace);
-
-                    container = new NameSpaceInfo(namespaceBuilder.ToString());
-                }
-                else
-                {
-                    container = BuildTypeDefinitionInfo(typeSymbol.ContainingType);
-                }
-
-                ImmutableArray<string> genericTypeArgs = ImmutableArray<string>.Empty;
-
-                if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
-                {
-                    var builder = ImmutableArray.CreateBuilder<string>(namedTypeSymbol.TypeArguments.Length);
-
-                    for (int i = 0; i < namedTypeSymbol.TypeArguments.Length; i++)
-                    {
-                        builder.Add(namedTypeSymbol.TypeArguments[i].Name);
-                    }
-
-                    genericTypeArgs = builder.MoveToImmutable();
-                }
-
-                return new TypeDefinitionInfo(container, typeSymbol.Name, typeSymbol.IsValueType, typeSymbol.NullableAnnotation == NullableAnnotation.Annotated, genericTypeArgs);
-            }
-
-            static void AppendFullTypeName(StringBuilder typeNameBuilder, ITypeSymbol typeSymbol)
-            {
-                if (typeSymbol.ContainingType is null)
-                {
-                    typeNameBuilder.Append("global::");
-                    AppendFullNamespace(typeNameBuilder, typeSymbol.ContainingNamespace);
-                }
-                else
-                {
-                    AppendFullTypeName(typeNameBuilder, typeSymbol.ContainingType);
-                }
-                typeNameBuilder.Append(".");
-
-                typeNameBuilder.Append(typeSymbol.Name);
-
-                if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
-                {
-                    var typeArguments = namedTypeSymbol.TypeArguments;
-
-                    typeNameBuilder.Append("<");
-
-                    for (int i = 0; i < typeArguments.Length - 1; i++)
-                    {
-                        AppendFullTypeName(typeNameBuilder, typeArguments[i]);
-                        typeNameBuilder.Append(", ");
-                    }
-                    AppendFullTypeName(typeNameBuilder, typeArguments[typeArguments.Length - 1]);
-
-                    typeNameBuilder.Append(">");
-                }
-
-                if (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation == NullableAnnotation.Annotated)
-                {
-                    typeNameBuilder.Append("?");
-                }
-            }
-
-            static void AppendFullNamespace(StringBuilder namespaceNameBuilder, INamespaceSymbol namespaceSymbol)
-            {
-                if (namespaceSymbol.ContainingNamespace is not null && !namespaceSymbol.ContainingNamespace.IsGlobalNamespace)
-                {
-                    AppendFullNamespace(namespaceNameBuilder, namespaceSymbol.ContainingNamespace);
-                    namespaceNameBuilder.Append(".");
-                }
-
-                namespaceNameBuilder.Append(namespaceSymbol.Name);
-            }
         }
 
         public override bool Equals(object? obj)

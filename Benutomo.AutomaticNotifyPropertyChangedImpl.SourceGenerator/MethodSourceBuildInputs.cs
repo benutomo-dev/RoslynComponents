@@ -60,7 +60,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public MethodSourceBuildInputs(IPropertySymbol propertySymbol, UsingSymbols usingSymbols, AttributeData enableNotificationSupportAttributeData)
         {
-            ContainingTypeInfo = BuildTypeDefinitionInfo(propertySymbol.ContainingType);
+            ContainingTypeInfo = propertySymbol.ContainingType.BuildTypeDefinitionInfo();
 
             InternalPropertyName = propertySymbol.Name;
             if (propertySymbol.ExplicitInterfaceImplementations.Length > 0)
@@ -87,10 +87,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             }
 
             StringBuilder typeNameBuilder = new StringBuilder();
-            AppendFullTypeName(typeNameBuilder, propertySymbol.Type);
+            typeNameBuilder.AppendFullTypeName(propertySymbol.Type);
             PropertyType = typeNameBuilder.ToString();
             PropertyTypeIsReferenceType = propertySymbol.Type.IsReferenceType;
-            PropertyTypeIsInterlockExchangeable = IsInterlockedExchangable(propertySymbol.Type);
+            PropertyTypeIsInterlockExchangeable = propertySymbol.Type.IsInterlockedExchangable();
             PropertyTypeNullableAnnotation = propertySymbol.Type.NullableAnnotation;
 
             PropertyDeclaringSyntaxReferences = propertySymbol.DeclaringSyntaxReferences;
@@ -213,20 +213,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             return;
 
-            static bool IsInterlockedExchangable(ITypeSymbol typeSymbol)
-            {
-                return typeSymbol switch
-                {
-                    { IsReferenceType: true } => true,
-                    { SpecialType: SpecialType.System_Int32 } => true,
-                    { SpecialType: SpecialType.System_Int64 } => true,
-                    { SpecialType: SpecialType.System_IntPtr } => true,
-                    { SpecialType: SpecialType.System_Single } => true,
-                    { SpecialType: SpecialType.System_Double } => true,
-                    _ => false,
-                };
-            }
-
 
             static void CollectExplicitImplimentaionEvents(
                 ref ImmutableArray<ExplicitImplementationArgs>.Builder? explicitImplementationsBuilder,
@@ -259,7 +245,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         if (interfaceType is null)
                         {
                             StringBuilder sb = new StringBuilder();
-                            AppendFullTypeName(sb, explicitInterfaceImplementation.ContainingType);
+                            sb.AppendFullTypeName(explicitInterfaceImplementation.ContainingType);
                             interfaceType = sb.ToString();
                         }
 
@@ -347,87 +333,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     (int)ExplicitInterfaceImplementation.Disable => false,
                     _ => true,
                 };
-            }
-
-            static TypeDefinitionInfo BuildTypeDefinitionInfo(ITypeSymbol typeSymbol)
-            {
-                ITypeContainer container;
-
-                if (typeSymbol.ContainingType is null)
-                {
-                    var namespaceBuilder = new StringBuilder();
-                    AppendFullNamespace(namespaceBuilder, typeSymbol.ContainingNamespace);
-
-                    container = new NameSpaceInfo(namespaceBuilder.ToString());
-                }
-                else
-                {
-                    container = BuildTypeDefinitionInfo(typeSymbol.ContainingType);
-                }
-
-                ImmutableArray<string> genericTypeArgs = ImmutableArray<string>.Empty;
-
-                if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
-                {
-                    var builder = ImmutableArray.CreateBuilder<string>(namedTypeSymbol.TypeArguments.Length);
-
-                    for (int i = 0; i < namedTypeSymbol.TypeArguments.Length; i++)
-                    {
-                        builder.Add(namedTypeSymbol.TypeArguments[i].Name);
-                    }
-
-                    genericTypeArgs = builder.MoveToImmutable();
-                }
-
-                return new TypeDefinitionInfo(container, typeSymbol.Name, typeSymbol.IsValueType, typeSymbol.NullableAnnotation == NullableAnnotation.Annotated, genericTypeArgs);
-            }
-
-            static void AppendFullTypeName(StringBuilder typeNameBuilder, ITypeSymbol typeSymbol)
-            {
-                if (typeSymbol.ContainingType is null)
-                {
-                    typeNameBuilder.Append("global::");
-                    AppendFullNamespace(typeNameBuilder, typeSymbol.ContainingNamespace);
-                }
-                else
-                {
-                    AppendFullTypeName(typeNameBuilder, typeSymbol.ContainingType);
-                }
-                typeNameBuilder.Append(".");
-
-                typeNameBuilder.Append(typeSymbol.Name);
-
-                if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
-                {
-                    var typeArguments = namedTypeSymbol.TypeArguments;
-
-                    typeNameBuilder.Append("<");
-
-                    for (int i = 0; i < typeArguments.Length - 1; i++)
-                    {
-                        AppendFullTypeName(typeNameBuilder, typeArguments[i]);
-                        typeNameBuilder.Append(", ");
-                    }
-                    AppendFullTypeName(typeNameBuilder, typeArguments[typeArguments.Length - 1]);
-
-                    typeNameBuilder.Append(">");
-                }
-
-                if (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation == NullableAnnotation.Annotated)
-                {
-                    typeNameBuilder.Append("?");
-                }
-            }
-
-            static void AppendFullNamespace(StringBuilder namespaceNameBuilder, INamespaceSymbol namespaceSymbol)
-            {
-                if (namespaceSymbol.ContainingNamespace is not null && !namespaceSymbol.ContainingNamespace.IsGlobalNamespace)
-                {
-                    AppendFullNamespace(namespaceNameBuilder, namespaceSymbol.ContainingNamespace);
-                    namespaceNameBuilder.Append(".");
-                }
-
-                namespaceNameBuilder.Append(namespaceSymbol.Name);
             }
         }
 

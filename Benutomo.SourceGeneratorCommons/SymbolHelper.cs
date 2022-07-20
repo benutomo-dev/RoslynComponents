@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Text;
 
 namespace Benutomo.SourceGeneratorCommons
 {
@@ -130,6 +132,114 @@ namespace Benutomo.SourceGeneratorCommons
             }
 
             return false;
+        }
+
+        internal static bool IsInterlockedExchangable(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol switch
+            {
+                { IsReferenceType: true } => true,
+                { SpecialType: SpecialType.System_Int32 } => true,
+                { SpecialType: SpecialType.System_Int64 } => true,
+                { SpecialType: SpecialType.System_IntPtr } => true,
+                { SpecialType: SpecialType.System_Single } => true,
+                { SpecialType: SpecialType.System_Double } => true,
+                _ => false,
+            };
+        }
+
+        internal static void AppendFullTypeName(this StringBuilder typeNameBuilder, ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
+            {
+                AppendFullTypeName(typeNameBuilder, arrayTypeSymbol.ElementType);
+                typeNameBuilder.Append("[");
+                for (var i = 1; i < arrayTypeSymbol.Rank; i++)
+                {
+                    typeNameBuilder.Append(",");
+                }
+                typeNameBuilder.Append("]");
+            }
+            else
+            {
+                if (typeSymbol.ContainingType is null)
+                {
+                    typeNameBuilder.Append("global::");
+                    AppendFullNamespace(typeNameBuilder, typeSymbol.ContainingNamespace);
+                }
+                else
+                {
+                    AppendFullTypeName(typeNameBuilder, typeSymbol.ContainingType);
+                }
+                typeNameBuilder.Append(".");
+
+                typeNameBuilder.Append(typeSymbol.Name);
+
+                if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+                {
+                    var typeArguments = namedTypeSymbol.TypeArguments;
+
+                    typeNameBuilder.Append("<");
+
+                    for (int i = 0; i < typeArguments.Length - 1; i++)
+                    {
+                        AppendFullTypeName(typeNameBuilder, typeArguments[i]);
+                        typeNameBuilder.Append(", ");
+                    }
+                    AppendFullTypeName(typeNameBuilder, typeArguments[typeArguments.Length - 1]);
+
+                    typeNameBuilder.Append(">");
+                }
+
+                if (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation == NullableAnnotation.Annotated)
+                {
+                    typeNameBuilder.Append("?");
+                }
+            }
+        }
+
+        internal static void AppendFullNamespace(this StringBuilder namespaceNameBuilder, INamespaceSymbol namespaceSymbol)
+        {
+            if (namespaceSymbol.ContainingNamespace is not null && !namespaceSymbol.ContainingNamespace.IsGlobalNamespace)
+            {
+                AppendFullNamespace(namespaceNameBuilder, namespaceSymbol.ContainingNamespace);
+                namespaceNameBuilder.Append(".");
+            }
+
+            namespaceNameBuilder.Append(namespaceSymbol.Name);
+        }
+
+        internal static TypeDefinitionInfo BuildTypeDefinitionInfo(this ITypeSymbol typeSymbol)
+        {
+            ITypeContainer container;
+
+            if (typeSymbol.ContainingType is null)
+            {
+                var namespaceBuilder = new StringBuilder();
+                AppendFullNamespace(namespaceBuilder, typeSymbol.ContainingNamespace);
+
+                container = new NameSpaceInfo(namespaceBuilder.ToString());
+            }
+            else
+            {
+                container = BuildTypeDefinitionInfo(typeSymbol.ContainingType);
+            }
+
+            ImmutableArray<string> genericTypeArgs = ImmutableArray<string>.Empty;
+
+            if (typeSymbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.TypeArguments.IsDefaultOrEmpty)
+            {
+                var builder = ImmutableArray.CreateBuilder<string>(namedTypeSymbol.TypeArguments.Length);
+
+                for (int i = 0; i < namedTypeSymbol.TypeArguments.Length; i++)
+                {
+                    builder.Add(namedTypeSymbol.TypeArguments[i].Name);
+                }
+
+                genericTypeArgs = builder.MoveToImmutable();
+            }
+
+            return new TypeDefinitionInfo(container, typeSymbol.Name, typeSymbol.IsValueType, typeSymbol.NullableAnnotation == NullableAnnotation.Annotated, genericTypeArgs);
         }
     }
 }
