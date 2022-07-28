@@ -289,20 +289,40 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 methodIdentifierName = $"_{propertySymbol.Name}";
             }
 
+            // get/setアクセサ内に必須のメソッド呼び出しが含まれている事をチェックする
             foreach (var invocationExpressionSyntax in accessorDeclarationSyntax.DescendantNodes(node => node is not InvocationExpressionSyntax).OfType<InvocationExpressionSyntax>())
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                if (invocationExpressionSyntax.Expression is IdentifierNameSyntax identifierName
-                    && (isSetter ? invocationExpressionSyntax.ArgumentList.Arguments.Count > 0 : invocationExpressionSyntax.ArgumentList.Arguments.Count == 0)
-                    && identifierName.Identifier.Text == methodIdentifierName
-                    )
+                if (invocationExpressionSyntax.Expression is IdentifierNameSyntax identifierName)
                 {
-                    var methodSymbolInfo = context.SemanticModel.GetSymbolInfo(identifierName, context.CancellationToken);
-
-                    if (methodSymbolInfo.Symbol is not null && methodSymbolInfo.Symbol.ContainingSymbol.IsSameSymbolTo(propertySymbol.ContainingSymbol))
+                    bool isMatchedExpectedMetohdSignature = false;
+                    if (isSetter)
                     {
-                        return;
+                        if (invocationExpressionSyntax.ArgumentList.Arguments.Count > 0
+                            && (identifierName.Identifier.Text == methodIdentifierName || identifierName.Identifier.Text == $"{methodIdentifierName}{MethodSourceBuildInputs.DefferedNotificationMethodSuffix}"))
+                        {
+                            isMatchedExpectedMetohdSignature = true;
+                        }
+                    }
+                    else
+                    {
+                        if (invocationExpressionSyntax.ArgumentList.Arguments.Count == 0 && identifierName.Identifier.Text == methodIdentifierName)
+                        {
+                            isMatchedExpectedMetohdSignature = true;
+                        }
+                    }
+
+                    if (isMatchedExpectedMetohdSignature)
+                    {
+                        // メソッドがプロパティを定義するクラス自身のメンバメソッドであることを確認
+
+                        var methodSymbolInfo = context.SemanticModel.GetSymbolInfo(identifierName, context.CancellationToken);
+
+                        if (methodSymbolInfo.Symbol is not null && methodSymbolInfo.Symbol.ContainingSymbol.IsSameSymbolTo(propertySymbol.ContainingSymbol))
+                        {
+                            return;
+                        }
                     }
                 }
             }
