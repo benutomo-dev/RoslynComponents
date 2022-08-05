@@ -13,20 +13,20 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
         partial class InnerClass : IDisposable, IAsyncDisposable
         {
             [EnableAutomaticDispose]
-            private IDisposable? disposable;
+            private IDisposable? disposable = null;
 
             [EnableAutomaticDispose]
-            private IAsyncDisposable? asyncDisposable;
+            private IAsyncDisposable? asyncDisposable = null;
         }
 
         [AutomaticDisposeImpl]
         partial class InnerClass<T> : IDisposable, IAsyncDisposable
         {
             [EnableAutomaticDispose]
-            private IDisposable? disposable;
+            private IDisposable? disposable = null;
 
             [EnableAutomaticDispose]
-            private IAsyncDisposable? asyncDisposable;
+            private IAsyncDisposable? asyncDisposable = null;
         }
 
     }
@@ -37,20 +37,20 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
         partial class InnerClass : IDisposable, IAsyncDisposable
         {
             [EnableAutomaticDispose]
-            private IDisposable? disposable;
+            private IDisposable? disposable = null;
 
             [EnableAutomaticDispose]
-            private IAsyncDisposable? asyncDisposable;
+            private IAsyncDisposable? asyncDisposable = null;
         }
 
         [AutomaticDisposeImpl]
         partial class InnerClass<U> : IDisposable, IAsyncDisposable
         {
             [EnableAutomaticDispose]
-            private IDisposable? disposable;
+            private IDisposable? disposable = null;
 
             [EnableAutomaticDispose]
-            private IAsyncDisposable? asyncDisposable;
+            private IAsyncDisposable? asyncDisposable = null;
         }
 
     }

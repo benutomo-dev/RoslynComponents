@@ -8,22 +8,22 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
     partial class DependencyMember : IDisposable, IAsyncDisposable
     {
         [EnableAutomaticDispose(nameof(_fieldDisposableDependencyField), nameof(_fieldDisposableDependencyProperty))]
-        private IDisposable? fieldDisposable;
+        private IDisposable? fieldDisposable = null;
 
         [EnableAutomaticDispose(nameof(_asyncFieldDisposableDependencyField), nameof(_asyncFieldDisposableDependencyProperty))]
-        private IAsyncDisposable? asyncFieldDisposable;
+        private IAsyncDisposable? asyncFieldDisposable = null;
     }
 
     partial class DependencyMember
     {
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
-        private IDisposable? _fieldDisposableDependencyField;
+        private IDisposable? _fieldDisposableDependencyField = null;
 
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
         private IDisposable? _fieldDisposableDependencyProperty { get; set; }
 
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
-        private IDisposable? _asyncFieldDisposableDependencyField;
+        private IDisposable? _asyncFieldDisposableDependencyField = null;
 
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
         private IDisposable? _asyncFieldDisposableDependencyProperty { get; set; }
