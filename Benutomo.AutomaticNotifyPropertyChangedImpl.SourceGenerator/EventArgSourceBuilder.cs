@@ -76,6 +76,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     AppendLine("\"</value>を設定した<see cref=\"global::System.ComponentModel.PropertyChangedEventArgs\" />クラスのインスタンスが設定された読取専用フィールドです。ユーザが実装するコード内からPropertyChangedイベントを発生させる場合などに利用することが出来ます。");
                     PutIndentSpace(); AppendLine("/// </summary>");
                     PutIndentSpace();
+                    AppendLine(@"[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+                    PutIndentSpace();
                     Append("private static readonly global::System.ComponentModel.PropertyChangedEventArgs ");
                     Append(changedEventArgFieldName);
                     Append(" = new global::System.ComponentModel.PropertyChangedEventArgs(\"");
@@ -94,6 +96,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     Append(property.Name);
                     AppendLine("\"</value>を設定した<see cref=\"global::System.ComponentModel.PropertyChangingEventArgs\"クラスのインスタンスが設定された読取専用フィールドです。ユーザが実装するコード内からPropertyChangingイベントを発生させる場合などに利用することが出来ます。");
                     PutIndentSpace(); AppendLine("/// </summary>");
+                    PutIndentSpace();
+                    AppendLine(@"[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
                     PutIndentSpace();
                     Append("private static readonly global::System.ComponentModel.PropertyChangingEventArgs ");
                     Append(changingEventArgFieldName);

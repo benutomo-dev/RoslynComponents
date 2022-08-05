@@ -62,26 +62,43 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             if (!_sourceBuildInputs._isDisposableSubClass)
             {
+#if !DEBUG
+                PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("private const int __generator_internal_BeNotInitiatedAnyDispose = 0;");
 
+#if !DEBUG
+                PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("private const int __generator_internal_InitiatedSyncDispose  = 1;");
 
+#if !DEBUG
+                PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("private const int __generator_internal_InitiatedAsyncDispose = 2;");
 
+#if !DEBUG
+                PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("private const int __generator_internal_DisposeAlreadyCompleted = 9;");
 
+                PutIndentSpace();
+
+#if !DEBUG
+                PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
@@ -92,6 +109,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             }
 
             _sourceBuilder.AppendLine();
+#if !DEBUG
+            PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
             PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
             PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
             PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
@@ -100,6 +120,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             if (IsEnabledFinalize)
             {
                 _sourceBuilder.AppendLine();
+#if !DEBUG
+                PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Diagnostics.DebuggerBrowsableAttribute(global::System.Diagnostics.DebuggerBrowsableState.Never)]");
+#endif
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.Browsable(false)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
                 PutIndentSpace(); _sourceBuilder.AppendLine("[global::System.Obsolete(\"AutomaticDisposeImplによって生成されたフィールドです。一般のコードから参照してはいけません。\")]");
