@@ -25,7 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.StaticSource.Sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticNotifyPropertyChangedImpl.StaticSources", "Benutomo.AutomaticNotifyPropertyChangedImpl.StaticSources\Benutomo.AutomaticNotifyPropertyChangedImpl.StaticSources.csproj", "{ED1B2741-EC4B-4EED-BFEB-022CEBEB6C8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benutomo.AutomaticDisposeImpl.StaticSources", "Benutomo.AutomaticDisposeImpl.StaticSources\Benutomo.AutomaticDisposeImpl.StaticSources.csproj", "{E70E59F0-B451-4D8F-A4C9-8F43F943D9FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.StaticSources", "Benutomo.AutomaticDisposeImpl.StaticSources\Benutomo.AutomaticDisposeImpl.StaticSources.csproj", "{E70E59F0-B451-4D8F-A4C9-8F43F943D9FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benutomo.Cancellation.Analyzer", "Benutomo.Cancellation.Analyzer\Benutomo.Cancellation.Analyzer.csproj", "{92B23A45-4507-498B-969A-72784B3B19BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benutomo.Cancellation.StaticSources", "Benutomo.Cancellation.StaticSources\Benutomo.Cancellation.StaticSources.csproj", "{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +77,14 @@ Global
 		{E70E59F0-B451-4D8F-A4C9-8F43F943D9FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E70E59F0-B451-4D8F-A4C9-8F43F943D9FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E70E59F0-B451-4D8F-A4C9-8F43F943D9FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92B23A45-4507-498B-969A-72784B3B19BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92B23A45-4507-498B-969A-72784B3B19BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92B23A45-4507-498B-969A-72784B3B19BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92B23A45-4507-498B-969A-72784B3B19BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +102,7 @@ Global
 		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{0382d9c3-23a4-4736-b9a1-c0c04f1ceffb}*SharedItemsImports = 5
 		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{1d1226cb-1216-4c7b-a02e-a01e2816c598}*SharedItemsImports = 5
 		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{8e985642-5b69-4538-9f8f-552d538a0ce4}*SharedItemsImports = 13
+		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5
 		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
