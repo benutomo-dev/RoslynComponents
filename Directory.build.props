@@ -4,11 +4,32 @@
   <PropertyGroup>
     <ProjectwiseSubDirectory>$(MSBuildProjectDirectoryNoRoot.Substring($(MSBuildThisFileDirectoryNoRoot.Length)))</ProjectwiseSubDirectory>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <StrongNameSigningKeyPairFile>$(MSBuildThisFileDirectory)\StrongNameSigningKeyPair.snk</StrongNameSigningKeyPairFile>
+    <StrongNameSingingPublicKeyFile>$(MSBuildThisFileDirectory)\StrongNameSingingPublicKey.snk</StrongNameSingingPublicKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(StrongNameSigningKeyPairFile)')">
+    <SignAssembly>True</SignAssembly>
+    <DelaySign>False</DelaySign>
+    <AssemblyOriginatorKeyFile>$(StrongNameSigningKeyPairFile)</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="!Exists('$(StrongNameSigningKeyPairFile)')">
+    <SignAssembly>True</SignAssembly>
+    <DelaySign>True</DelaySign>
+    <AssemblyOriginatorKeyFile>$(StrongNameSingingPublicKeyFile)</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <Target Name="DelaySignWarning" AfterTargets="CoreBuild">
+    <Warning Text="$(AssemblyName)の厳密名は遅延署名されています。" Condition="'$(DelaySign)' == 'true'"/>
+  </Target>
+  
   
   <PropertyGroup>
+    <ProjectsRootDir>$(MSBuildThisFileDirectory)</ProjectsRootDir>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/$(ProjectwiseSubDirectory)/</BaseIntermediateOutputPath>
     <BaseOutputPath>$(MSBuildThisFileDirectory)bin/$(ProjectwiseSubDirectory)/</BaseOutputPath>
   </PropertyGroup>
+
 
   <PropertyGroup>
     <LangVersion>10</LangVersion>

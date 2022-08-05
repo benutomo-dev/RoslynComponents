@@ -1,20 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <IsRoslynComponent>true</IsRoslynComponent>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <OutputType>library</OutputType>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>Benutomo</RootNamespace>
+    <Nullable>disable</Nullable>
     <Version>0.0.0.36</Version>
 
     <!-- NuGet -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <PackageId>Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements for INotifyPropertyChanged.</Description>
-    <PackageVersion>0.0.36</PackageVersion>
+    <PackageVersion>1.0.0-alpa2</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;inotifypropertychanged;propertychanged</PackageTags>
@@ -25,35 +23,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+    <None Include="$(ProjectsRootDir)\bin\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Core\$(Configuration)\netstandard2.0\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Core.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+    <ProjectReference Include="..\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Core\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Core.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Private="true" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
-  <ItemGroup>
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="StaticSource" />
-  </ItemGroup>  
-  <ItemGroup>
-    <AdditionalFiles Include="..\Benutomo.AutomaticNotifyPropertyChangedImpl.StaticSources\**\*.cs" StaticSource="true" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Benutomo.AutomaticNotifyPropertyChangedImpl.StaticSources\AlsoUsedInSourceGeneratorProject\**\*.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Using Include="Benutomo.SourceGeneratorCommons" />
-  </ItemGroup>
-
-  <Import Project="..\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems" Label="Shared" />
 
 </Project>

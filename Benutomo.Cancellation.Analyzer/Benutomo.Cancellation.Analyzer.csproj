@@ -1,20 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <IsRoslynComponent>true</IsRoslynComponent>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <OutputType>library</OutputType>
-    <Version>0.0.0.7</Version>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Benutomo</RootNamespace>
+    <Version>0.0.0.9</Version>
 
     <!-- NuGet -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <PackageId>Benutomo.Cancellation.Analyzer</PackageId>
     <Description>A Diagnostics Analyzer for cancallations.</Description>
-    <PackageVersion>0.0.7</PackageVersion>
+    <PackageVersion>1.0.0-alpha2</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>analyzer;cancellationtoken;cancellationtokensource</PackageTags>
@@ -25,35 +23,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+    <None Include="$(ProjectsRootDir)\bin\Benutomo.Cancellation.Analyzer.Core\$(Configuration)\netstandard2.0\Benutomo.Cancellation.Analyzer.Core.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+    <ProjectReference Include="..\Benutomo.Cancellation.Analyzer.Core\Benutomo.Cancellation.Analyzer.Core.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Private="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <Folder Include="_AlsoUsedInSourceGeneratorProject\" />
   </ItemGroup>
-  <ItemGroup>
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="StaticSource" />
-  </ItemGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="..\Benutomo.Cancellation.StaticSources\**\*.cs" StaticSource="true" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Benutomo.Cancellation.StaticSources\AlsoUsedInSourceGeneratorProject\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Benutomo.SourceGeneratorCommons" />
-  </ItemGroup>
-
-  <Import Project="..\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems" Label="Shared" />
 
 </Project>
