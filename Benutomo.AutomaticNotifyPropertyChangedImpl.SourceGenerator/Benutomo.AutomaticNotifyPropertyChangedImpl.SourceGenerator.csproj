@@ -12,7 +12,7 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <PackageId>Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements for INotifyPropertyChanged.</Description>
-    <PackageVersion>1.0.0-alpa2</PackageVersion>
+    <PackageVersion>1.0.0-alpha2</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;inotifypropertychanged;propertychanged</PackageTags>
