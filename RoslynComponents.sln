@@ -27,9 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticNotifyPro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.SourceGenerator", "Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.csproj", "{E70E59F0-B451-4D8F-A4C9-8F43F943D9FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.Cancellation.Analyzer.Core", "Benutomo.Cancellation.Analyzer.Core\Benutomo.Cancellation.Analyzer.Core.csproj", "{92B23A45-4507-498B-969A-72784B3B19BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.CancellationAnalyzer.Core", "Benutomo.CancellationAnalyzer.Core\Benutomo.CancellationAnalyzer.Core.csproj", "{92B23A45-4507-498B-969A-72784B3B19BA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.Cancellation.Analyzer", "Benutomo.Cancellation.Analyzer\Benutomo.Cancellation.Analyzer.csproj", "{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.CancellationAnalyzer", "Benutomo.CancellationAnalyzer\Benutomo.CancellationAnalyzer.csproj", "{24EBCD91-23AB-4C06-9218-DEE0CD5C1A3B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.Analyzer.Test", "Benutomo.AutomaticDisposeImpl.Analyzer.Test\Benutomo.AutomaticDisposeImpl.Analyzer.Test.csproj", "{0A180AA8-E498-4AC8-AD68-9BD3591066D3}"
 EndProject

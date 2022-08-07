@@ -5,9 +5,10 @@
     <LangVersion>latest</LangVersion>
     <IsRoslynComponent>true</IsRoslynComponent>
     <Nullable>enable</Nullable>
+    <RootNamespace>Benutomo.CancellationAnalyzer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>library</OutputType>
-    <Version>0.0.0.9</Version>
+    <Version>0.0.0.10</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,10 +27,10 @@
     <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="StaticSource" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="..\Benutomo.Cancellation.Analyzer\**\*.cs" StaticSource="true" />
+    <AdditionalFiles Include="..\Benutomo.CancellationAnalyzer\**\*.cs" StaticSource="true" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Benutomo.Cancellation.Analyzer\_AlsoUsedInSourceGeneratorProject\**\*.cs" />
+    <Compile Include="..\Benutomo.CancellationAnalyzer\_AlsoUsedInSourceGeneratorProject\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,14 +5,14 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>Benutomo</RootNamespace>
-    <Version>0.0.0.9</Version>
+    <Version>0.0.0.10</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <PackageId>Benutomo.Cancellation.Analyzer</PackageId>
+    <PackageId>Benutomo.CancellationAnalyzer</PackageId>
     <Description>A Diagnostics Analyzer for cancallations.</Description>
-    <PackageVersion>1.0.0-alpha2</PackageVersion>
+    <PackageVersion>1.0.0-alpha3</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>analyzer;cancellationtoken;cancellationtokensource</PackageTags>
@@ -23,15 +23,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(ProjectsRootDir)\bin\Benutomo.Cancellation.Analyzer.Core\$(Configuration)\netstandard2.0\Benutomo.Cancellation.Analyzer.Core.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+    <None Include="$(ProjectsRootDir)\bin\Benutomo.CancellationAnalyzer.Core\$(Configuration)\netstandard2.0\Benutomo.CancellationAnalyzer.Core.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Benutomo.Cancellation.Analyzer.Core\Benutomo.Cancellation.Analyzer.Core.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Private="true" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="_AlsoUsedInSourceGeneratorProject\" />
+    <ProjectReference Include="..\Benutomo.CancellationAnalyzer.Core\Benutomo.CancellationAnalyzer.Core.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Private="true" />
   </ItemGroup>
 
 </Project>
