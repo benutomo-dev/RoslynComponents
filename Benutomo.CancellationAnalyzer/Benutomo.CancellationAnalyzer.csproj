@@ -6,28 +6,6 @@
     <Nullable>disable</Nullable>
     <RootNamespace>Benutomo</RootNamespace>
     <Version>0.0.0.13</Version>
-
-    <!-- NuGet -->
-    <IncludeBuildOutput>true</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <PackageId>Benutomo.CancellationAnalyzer</PackageId>
-    <Description>A Diagnostics Analyzer for cancallations.</Description>
-    <PackageVersion>1.0.0-alpha9</PackageVersion>
-    <Authors>benutomo</Authors>
-    <Copyright>© benutomo.</Copyright>
-    <PackageTags>analyzer;cancellationtoken;cancellationtokensource</PackageTags>
-    <PackageProjectUrl>https://github.com/benutomo-dev/RoslynComponents</PackageProjectUrl>
-    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="$(ProjectsRootDir)\bin\Benutomo.CancellationAnalyzer.Core\$(Configuration)\netstandard2.0\Benutomo.CancellationAnalyzer.Core.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Benutomo.CancellationAnalyzer.Core\Benutomo.CancellationAnalyzer.Core.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Private="true" />
-  </ItemGroup>
 
 </Project>

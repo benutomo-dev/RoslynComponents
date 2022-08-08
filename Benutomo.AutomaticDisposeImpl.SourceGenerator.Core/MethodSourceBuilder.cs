@@ -50,6 +50,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             _sourceBuilder.AppendLine("#nullable enable");
             _sourceBuilder.AppendLine("#pragma warning disable CS0612,CS0618,CS0619");
+            _sourceBuilder.AppendLine("#pragma warning disable CS0436");
 
             WriteTypeDeclarationStart("This is implementation class by AutomaticDisposeImpl.");
 

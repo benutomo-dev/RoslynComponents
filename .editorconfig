@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0436: 型がインポートされた型と競合しています
+dotnet_diagnostic.CS0436.severity = suggestion

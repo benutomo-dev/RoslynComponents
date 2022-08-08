@@ -12,6 +12,7 @@
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.StaticSource.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically import static source for source generator.</Description>
     <PackageVersion>$(Version)</PackageVersion>
