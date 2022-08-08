@@ -8,6 +8,7 @@ namespace Benutomo.CancellationAnalyzer
     internal record UsingSymbols(
         INamedTypeSymbol CancellationToken,
         INamedTypeSymbol UncancelableAttribute,
+        INamedTypeSymbol DisableArgumentCancellationTokenCheckAttribute,
         INamedTypeSymbol Cancellation,
         INamedTypeSymbol? TaskCompletionSourceTResult,
         INamedTypeSymbol? TaskCompletionSource
@@ -17,12 +18,12 @@ namespace Benutomo.CancellationAnalyzer
     internal class Analyzer : DiagnosticAnalyzer
     {
         /// <summary>
-        /// CancellatoinTokenを受け付け可能なオーバーロードが存在
+        /// 引数のCancellatoinTokenを引き渡し可能なオーバーロードが存在
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_CT0001 = new DiagnosticDescriptor(
             "CT0001",
-            "CancellatoinTokenを受け付け可能なオーバーロードが存在",
-            "呼び出しメソッドには末尾の引数にCancellationTokenが追加されている以外は同一のシグネチャのオーバーロードが存在します。",
+            "引数のCancellatoinTokenを引き渡し可能なオーバーロードが存在",
+            "呼び出しメソッドには引数のCancellationTokenを引き渡すことが可能なオーバーロードが存在します。",
             "Usage",
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
@@ -72,12 +73,23 @@ namespace Benutomo.CancellationAnalyzer
             isEnabledByDefault: true);
 
         /// <summary>
-        /// <see cref="Cancellation.UncancelableSection"/>がusing文以外で使用されている
+        /// <see cref="Cancellation.Uncancelable"/>がusing文以外で使用されている
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_CT0006 = new DiagnosticDescriptor(
             "CT0006",
-            $"{nameof(Cancellation.UncancelableSection)}がusing文以外で使用されている",
-            $"{nameof(Cancellation)}.{nameof(Cancellation.UncancelableSection)}はusing文の括弧内の式以外で使用することはできません。using({nameof(Cancellation)}.{nameof(Cancellation.UncancelableSection)})のような記述のみが可能です。",
+            $"{nameof(Cancellation.Uncancelable)}がusing文以外で使用されている",
+            $"{nameof(Cancellation)}.{nameof(Cancellation.Uncancelable)}はusing文の括弧内の式以外で使用することはできません。using({nameof(Cancellation)}.{nameof(Cancellation.Uncancelable)})のような記述のみが可能です。",
+            "Usage",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        /// <summary>
+        /// <see cref="Cancellation.DisableArgumentCancellationTokenCheck"/>がusing文以外で使用されている
+        /// </summary>
+        internal static DiagnosticDescriptor s_diagnosticDescriptor_CT0007 = new DiagnosticDescriptor(
+            "CT0007",
+            $"{nameof(Cancellation.DisableArgumentCancellationTokenCheck)}がusing文以外で使用されている",
+            $"{nameof(Cancellation)}.{nameof(Cancellation.DisableArgumentCancellationTokenCheck)}はusing文の括弧内の式以外で使用することはできません。using({nameof(Cancellation)}.{nameof(Cancellation.DisableArgumentCancellationTokenCheck)})のような記述のみが可能です。",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
@@ -89,13 +101,14 @@ namespace Benutomo.CancellationAnalyzer
             s_diagnosticDescriptor_CT0003,
             s_diagnosticDescriptor_CT0004,
             s_diagnosticDescriptor_CT0005,
-            s_diagnosticDescriptor_CT0006
+            s_diagnosticDescriptor_CT0006,
+            s_diagnosticDescriptor_CT0007
             );
 
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-            context.EnableConcurrentExecution();
+            //context.EnableConcurrentExecution();
             context.RegisterSemanticModelAction(SemanticModelAction);
         }
 
@@ -103,15 +116,23 @@ namespace Benutomo.CancellationAnalyzer
         {
             var cancellationTokenSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("System.Threading.CancellationToken");
 
-            if (cancellationTokenSymbol is null) return;
+            if (cancellationTokenSymbol is null)
+                throw new InvalidOperationException("System.Threading.CancellationTokenが見つかりません。");
 
             var uncancelableAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSources.UncancelableAttributeFullyQualifiedMetadataName);
 
-            if (uncancelableAttributeSymbol is null) return;
+            if (uncancelableAttributeSymbol is null)
+                throw new InvalidOperationException($"{StaticSources.UncancelableAttributeFullyQualifiedMetadataName}が見つかりません。");
+
+            var disableArgumentCancellationTokenCheckAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSources.DisableArgumentCancellationTokenCheckAttributeFullyQualifiedMetadataName);
+
+            if (disableArgumentCancellationTokenCheckAttribute is null)
+                throw new InvalidOperationException($"{StaticSources.DisableArgumentCancellationTokenCheckAttributeFullyQualifiedMetadataName}が見つかりません。");
 
             var cancellationSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSources.CancellationFullyQualifiedMetadataName);
 
-            if (cancellationSymbol is null) return;
+            if (cancellationSymbol is null)
+                throw new InvalidOperationException($"{StaticSources.CancellationFullyQualifiedMetadataName}が見つかりません。");
 
             var taskCompletionSourceTResultSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.TaskCompletionSource`1");
             var taskCompletionSourceSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.TaskCompletionSource");
@@ -119,6 +140,7 @@ namespace Benutomo.CancellationAnalyzer
             var usingSymbols = new UsingSymbols(
                 CancellationToken: cancellationTokenSymbol,
                 UncancelableAttribute: uncancelableAttributeSymbol,
+                DisableArgumentCancellationTokenCheckAttribute: disableArgumentCancellationTokenCheckAttribute,
                 Cancellation: cancellationSymbol,
                 TaskCompletionSourceTResult: taskCompletionSourceTResultSymbol,
                 TaskCompletionSource: taskCompletionSourceSymbol
@@ -137,66 +159,89 @@ namespace Benutomo.CancellationAnalyzer
                     continue;
                 }
 
-                var isUncancelableAttributedMethod = declatationMethodSymbol.GetAttributes()
-                    .Where(v => SymbolEqualityComparer.Default.Equals(v.AttributeClass, uncancelableAttributeSymbol))
-                    .Any();
+                bool isUncancelableAttributedMethod = false;
+                bool isAllowIgnoreArgumentCancellationTokenAttributedMethod = false;
 
+                foreach (var attribute in declatationMethodSymbol.GetAttributes())
+                {
+                    if (!isUncancelableAttributedMethod && SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, uncancelableAttributeSymbol))
+                    {
+                        isUncancelableAttributedMethod = true;
+                    }
+
+                    if (!isAllowIgnoreArgumentCancellationTokenAttributedMethod && SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, disableArgumentCancellationTokenCheckAttribute))
+                    {
+                        isAllowIgnoreArgumentCancellationTokenAttributedMethod = true;
+                    }
+                }
+                
                 var existsCancellationTokenSymbolInParameters = declatationMethodSymbol.Parameters
                     .Where(parameter => SymbolEqualityComparer.Default.Equals(parameter.Type, cancellationTokenSymbol))
                     .Any();
 
-                if (isUncancelableAttributedMethod && existsCancellationTokenSymbolInParameters)
+                if (isUncancelableAttributedMethod)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_CT0004, methodDeclaration.Identifier.GetLocation()));
-                }
+                    if (existsCancellationTokenSymbolInParameters)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_CT0004, methodDeclaration.Identifier.GetLocation()));
+                    }
 
-                var isCancellationChecklessMethod = isUncancelableAttributedMethod || (!declatationMethodSymbol.IsAsync && !existsCancellationTokenSymbolInParameters);
-
-                if (isCancellationChecklessMethod)
-                {
-                    ReportCancellationChecklessContextDiagnosticRecursiveRoot(context, usingSymbols, methodDeclaration);
+                    // メソッド全体をキャンセル禁止区間として分析
+                    ReportCancelingProhibitionDiagnosticRecursiveRoot(context, usingSymbols, methodDeclaration);
                 }
                 else
                 {
-                    ReportCancellationCheckContextDiagnosticRecursiveRoot(context, usingSymbols, methodDeclaration, out var isReportedCT0001OrCT0002);
+                    var isCancellationChecklessMethod = isAllowIgnoreArgumentCancellationTokenAttributedMethod || (!declatationMethodSymbol.IsAsync && !existsCancellationTokenSymbolInParameters);
 
-                    bool needCancellationTokenArg = isReportedCT0001OrCT0002;
-
-                    if (true
-                        && needCancellationTokenArg
-                        && !existsCancellationTokenSymbolInParameters
-                        && !declatationMethodSymbol.IsOverride                             // オーバーライドしているメソッドのシグネチャは親クラスの定義で決定されるのでCT0003対象外にする
-                        && !declatationMethodSymbol.ExplicitInterfaceImplementations.Any() // 明示的実装をしているメソッドのシグネチャは実装インターフェイスの定義で決定されるのでCT0003対象外にする
-                        )
+                    if (isCancellationChecklessMethod)
                     {
-                        // MEMO:
-                        // あるメソッドが特定のインターフェイスを実装している物であるか否かを直接調べる方法が見つからなかった。
-                        // 逆にインターフェイスのメンバに対応する実装クラスのメンバを得る方法(FindImplementationForInterfaceMember)はあったので、
-                        // 全ての実装インターフェイスについて目的のメソッドと同等のシグネチャのメソッドを絞り込んだうえで、
-                        // FindImplementationForInterfaceMemberにかけて目的のメソッドと一致するメソッドがないかを調べる方法をとった。
+                        // メソッド全体をCancellationTokenの引数渡しチェック不要区間として分析
+                        ReportCancellationChecklessContextDiagnosticRecursiveRoot(context, usingSymbols, methodDeclaration);
+                    }
+                    else
+                    {
+                        // メソッド全体をCancellationTokenの引数渡し込みのチェック込みの区間として分析
+                        ReportCancellationCheckContextDiagnosticRecursiveRoot(context, usingSymbols, methodDeclaration, out var isReportedCT0001OrCT0002);
 
-                        var isInterfaceImplementationMethod = declatationMethodSymbol.ContainingType.AllInterfaces
-                            .SelectMany(interfaceSymbol =>
-                                interfaceSymbol.GetMembers().OfType<IMethodSymbol>().Where(candidateMethodSymbol => IsSameSignatureMethods(declatationMethodSymbol, candidateMethodSymbol))
+                        // 継承等と無関係にクラス独自に定義されているCancellationTokenを引数に持たないメソッドに対して、
+                        // CancellationTokenの引数渡しに関する警告が実際に発生した場合は、そのメソッドの引数に
+                        // CancellationTokenを追加することを推奨する(warningで(笑))
+                        if (true
+                            && isReportedCT0001OrCT0002
+                            && !existsCancellationTokenSymbolInParameters
+                            && !declatationMethodSymbol.IsOverride                             // オーバーライドしているメソッドのシグネチャは親クラスの定義で決定されるのでCT0003対象外にする
+                            && !declatationMethodSymbol.ExplicitInterfaceImplementations.Any() // 明示的実装をしているメソッドのシグネチャは実装インターフェイスの定義で決定されるのでCT0003対象外にする
                             )
-                            .Select(interfaceMemberMethodSymbol => declatationMethodSymbol.ContainingType.FindImplementationForInterfaceMember(interfaceMemberMethodSymbol))
-                            .Where(implementationMethodSymbol => SymbolEqualityComparer.Default.Equals(declatationMethodSymbol, implementationMethodSymbol))
-                            .Any();
-
-                        if (!isInterfaceImplementationMethod) // インターフェイスの実装に対応しているメソッドのシグネチャは実装インターフェイスの定義で決定されるのでCT0003対象外にする
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_CT0003, methodDeclaration.Identifier.GetLocation()));
-                        }
+                            // MEMO:
+                            // あるメソッドが特定のインターフェイスを実装している物であるか否かを直接調べる方法が見つからなかった。
+                            // 逆にインターフェイスのメンバに対応する実装クラスのメンバを得る方法(FindImplementationForInterfaceMember)はあったので、
+                            // 全ての実装インターフェイスについて目的のメソッドと同等のシグネチャのメソッドを絞り込んだうえで、
+                            // FindImplementationForInterfaceMemberにかけて目的のメソッドと一致するメソッドがないかを調べる方法をとった。
 
-                        static bool IsSameSignatureMethods(IMethodSymbol a, IMethodSymbol b)
-                        {
-                            if (a.Arity != b.Arity) return false;
-                            if (a.Parameters.Length != b.Parameters.Length) return false;
-                            if (a.Name != b.Name) return false;
-                            if (!SymbolEqualityComparer.Default.Equals(a.ReturnType, b.ReturnType)) return false;
-                            if (!a.Parameters.Select(v => v.Type).SequenceEqual(b.Parameters.Select(v => v.Type), SymbolEqualityComparer.Default)) return false;
+                            var isInterfaceImplementationMethod = declatationMethodSymbol.ContainingType.AllInterfaces
+                                .SelectMany(interfaceSymbol =>
+                                    interfaceSymbol.GetMembers().OfType<IMethodSymbol>().Where(candidateMethodSymbol => IsSameSignatureMethods(declatationMethodSymbol, candidateMethodSymbol))
+                                )
+                                .Select(interfaceMemberMethodSymbol => declatationMethodSymbol.ContainingType.FindImplementationForInterfaceMember(interfaceMemberMethodSymbol))
+                                .Where(implementationMethodSymbol => SymbolEqualityComparer.Default.Equals(declatationMethodSymbol, implementationMethodSymbol))
+                                .Any();
 
-                            return true;
+                            if (!isInterfaceImplementationMethod) // インターフェイスの実装に対応しているメソッドのシグネチャは実装インターフェイスの定義で決定されるのでCT0003対象外にする
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_CT0003, methodDeclaration.Identifier.GetLocation()));
+                            }
+
+                            static bool IsSameSignatureMethods(IMethodSymbol a, IMethodSymbol b)
+                            {
+                                if (a.Arity != b.Arity) return false;
+                                if (a.Parameters.Length != b.Parameters.Length) return false;
+                                if (a.Name != b.Name) return false;
+                                if (!SymbolEqualityComparer.Default.Equals(a.ReturnType, b.ReturnType)) return false;
+                                if (!a.Parameters.Select(v => v.Type).SequenceEqual(b.Parameters.Select(v => v.Type), SymbolEqualityComparer.Default)) return false;
+
+                                return true;
+                            }
                         }
                     }
                 }
@@ -254,35 +299,34 @@ namespace Benutomo.CancellationAnalyzer
             if (syntaxNode is InvocationExpressionSyntax invocationExpressionSyntax)
             {
                 ReportCancellationDiagnosticIfNeeds(context, usingSymbols, invocationExpressionSyntax, out isReportedCT0001OrCT0002);
-                return;
             }
             else if (syntaxNode is UsingStatementSyntax usingStatementSyntax)
             {
                 if (IsUncancelableUsingStatementBlock(context, usingSymbols, usingStatementSyntax))
                 {
+                    // これ以下のノードはキャンセル禁止区間として探索する
+
                     isReportedCT0001OrCT0002 = false;
                     ReportCancelingProhibitionDiagnosticRecursiveRoot(context, usingSymbols, usingStatementSyntax.Statement);
+                    return;
                 }
-                else if (usingStatementSyntax.Expression is null)
+                else if (IsDisableArgumentCancellationTokenCheckUsingStatementBlock(context, usingSymbols, usingStatementSyntax))
                 {
+                    // これ以下のノードはCancellationTokenの引数渡しチェック不要区間として探索する
+
                     isReportedCT0001OrCT0002 = false;
+                    ReportCancellationChecklessContextDiagnosticRecursiveRoot(context, usingSymbols, usingStatementSyntax.Statement);
+                    return;
                 }
-                else
-                {
-                    ReportCancellationCheckContextDiagnosticRecursiveRoot(context, usingSymbols, usingStatementSyntax.Expression, out isReportedCT0001OrCT0002);
-                }
-                return;
             }
-            else
+
+            isReportedCT0001OrCT0002 = false;
+            foreach (var child in syntaxNode.ChildNodes())
             {
-                isReportedCT0001OrCT0002 = false;
-                foreach (var child in syntaxNode.ChildNodes())
-                {
-                    ReportCancellationCheckContextDiagnosticRecursiveRoot(context, usingSymbols, child, out var _isReportedCT0001OrCT0002);
-                    isReportedCT0001OrCT0002 = isReportedCT0001OrCT0002 || _isReportedCT0001OrCT0002;
-                }
-                return;
+                ReportCancellationCheckContextDiagnosticRecursiveRoot(context, usingSymbols, child, out var _isReportedCT0001OrCT0002);
+                isReportedCT0001OrCT0002 = isReportedCT0001OrCT0002 || _isReportedCT0001OrCT0002;
             }
+            return;
         }
 
         public void ReportCancellationChecklessContextDiagnosticRecursiveRoot(SemanticModelAnalysisContext context, UsingSymbols usingSymbols, SyntaxNode syntaxNode)
@@ -293,19 +337,16 @@ namespace Benutomo.CancellationAnalyzer
             {
                 if (IsUncancelableUsingStatementBlock(context, usingSymbols, usingStatementSyntax))
                 {
-                    if (usingStatementSyntax.Expression is not null)
-                    {
-                        ReportCancelingProhibitionDiagnosticRecursiveRoot(context, usingSymbols, usingStatementSyntax.Statement);
-                    }
+                    // これ以下のノードはキャンセル禁止区間として探索する
+
+                    ReportCancelingProhibitionDiagnosticRecursiveRoot(context, usingSymbols, usingStatementSyntax.Statement);
+                    return;
                 }
             }
-            else
+
+            foreach (var child in syntaxNode.ChildNodes())
             {
-                foreach (var child in syntaxNode.ChildNodes())
-                {
-                    ReportCancellationChecklessContextDiagnosticRecursiveRoot(context, usingSymbols, child);
-                }
-                return;
+                ReportCancellationChecklessContextDiagnosticRecursiveRoot(context, usingSymbols, child);
             }
         }
 
@@ -316,14 +357,20 @@ namespace Benutomo.CancellationAnalyzer
             if (syntaxNode is InvocationExpressionSyntax invocationExpressionSyntax)
             {
                 ReportCancelingProhibitionDiagnosticIfNeeds(context, usingSymbols, invocationExpressionSyntax);
-                return;
             }
-            else
+            else if (syntaxNode is UsingStatementSyntax usingStatementSyntax)
             {
-                foreach (var child in syntaxNode.ChildNodes())
+                if (IsDisableArgumentCancellationTokenCheckUsingStatementBlock(context, usingSymbols, usingStatementSyntax))
                 {
-                    ReportCancelingProhibitionDiagnosticRecursiveRoot(context, usingSymbols, child);
+                    // これ以下のノードはCancellationTokenの引数渡しチェック不要区間として探索する
+                    ReportCancellationChecklessContextDiagnosticRecursiveRoot(context, usingSymbols, usingStatementSyntax.Statement);
+                    return;
                 }
+            }
+
+            foreach (var child in syntaxNode.ChildNodes())
+            {
+                ReportCancelingProhibitionDiagnosticRecursiveRoot(context, usingSymbols, child);
             }
         }
 
@@ -471,7 +518,16 @@ namespace Benutomo.CancellationAnalyzer
         {
             var memberAccessExpressionSyntax = usingStatementSyntax.Expression as MemberAccessExpressionSyntax;
 
-            var isUncancelable = memberAccessExpressionSyntax?.Name.Identifier.ValueText == nameof(Cancellation.UncancelableSection);
+            var isUncancelable = memberAccessExpressionSyntax?.Name.Identifier.ValueText == nameof(Cancellation.Uncancelable);
+
+            return isUncancelable;
+        }
+
+        private static bool IsDisableArgumentCancellationTokenCheckUsingStatementBlock(SemanticModelAnalysisContext context, UsingSymbols usingSymbols, UsingStatementSyntax usingStatementSyntax)
+        {
+            var memberAccessExpressionSyntax = usingStatementSyntax.Expression as MemberAccessExpressionSyntax;
+
+            var isUncancelable = memberAccessExpressionSyntax?.Name.Identifier.ValueText == nameof(Cancellation.DisableArgumentCancellationTokenCheck);
 
             return isUncancelable;
         }

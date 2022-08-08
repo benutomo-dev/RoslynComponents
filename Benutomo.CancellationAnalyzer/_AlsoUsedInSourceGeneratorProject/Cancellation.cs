@@ -1,14 +1,27 @@
 ﻿#nullable enable
 
 
+using System;
+
 namespace Benutomo
 {
     public static class Cancellation
     {
-        public static _UncancelableBlock UncancelableSection => new _UncancelableBlock();
+        public static _UncancelableSection Uncancelable => _UncancelableSection.Defualt;
 
-        public readonly ref struct _UncancelableBlock
+        public class _UncancelableSection : IDisposable
         {
+            internal static _UncancelableSection Defualt { get; } = new _UncancelableSection();
+
+            public void Dispose(){ }
+        }
+
+        public static _DisableArgumentCancellationTokenCheckSection DisableArgumentCancellationTokenCheck => _DisableArgumentCancellationTokenCheckSection.Defualt;
+
+        public class _DisableArgumentCancellationTokenCheckSection : IDisposable
+        {
+            internal static _DisableArgumentCancellationTokenCheckSection Defualt { get; } = new _DisableArgumentCancellationTokenCheckSection();
+
             public void Dispose() { }
         }
     }

@@ -5,14 +5,14 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>Benutomo</RootNamespace>
-    <Version>0.0.0.10</Version>
+    <Version>0.0.0.13</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <PackageId>Benutomo.CancellationAnalyzer</PackageId>
     <Description>A Diagnostics Analyzer for cancallations.</Description>
-    <PackageVersion>1.0.0-alpha3</PackageVersion>
+    <PackageVersion>1.0.0-alpha9</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>analyzer;cancellationtoken;cancellationtokensource</PackageTags>
