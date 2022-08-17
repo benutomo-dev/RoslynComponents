@@ -244,10 +244,12 @@ TODO
 
 ### Introduction
 
-コード生成に関するマーキングに利用する属性などをinternalなクラスとして生成するソースジェネレータを利用するアセンブリ同士でInternalsVisbleTo属性が使用されていると、InternalsVisbleToに指定されたアセンブリからソースジェネレータが生成した属性などを利用する箇所で、自分自身の中で生成された属性とInternalsVisbleToの指定によってinternalクラスが参照できるアセンブリに含まれる属性の定義が重複してしまうことで[CS0436](https://docs.microsoft.com/dotnet/csharp/misc/cs0436)警告が発生します。
+ソースジェネレータを利用するアセンブリ同士の参照にInternalsVisbleTo属性が適用されていると、InternalsVisbleToに指定されたアセンブリからソースジェネレータが生成した属性などを利用する箇所で、[CS0436](https://docs.microsoft.com/dotnet/csharp/misc/cs0436)警告が発生する場合があります。
+
+ソースジェネレータを利用する場合、ソースジェネレータが属性などをinternalなクラスとしてソース生成し、ユーザコード内でそれらをソース生成に関するマークとして使用する場合があります。通常、internalなクラスは異なるアセンブリを跨いで直接参照することが出来ないため問題となりませんが、InternalsVisbleTo属性が指定されている場合はinternalクラスも参照できてしまうため、ソースジェネレータが生成した型が、自分自身と参照アセンブリの両方に全く同一の名前空間と識別子で存在する状態となってしまい、以下の例の中にあるような形で競合(CS0436)が発生します。
 
 ```cs
-// A.dll,B.dll,C.dllアセンブリに対してソースジェネレータが暗黙的に生成している属性クラス
+// この例で、A.dll,B.dll,C.dllアセンブリに対してソースジェネレータが暗黙的に生成している属性クラス
 
 namespace SourceGen;
 
@@ -285,7 +287,7 @@ class ClassB {}
 ```cs
 // C.dll (A.dllを参照アセンブリに含む)
 
-namespace B;
+namespace C;
 
 // C.dllでは、自分自身と参照アセンブリのA.dllで
 // ExampleMarkerの定義が重複している上に、
@@ -295,7 +297,7 @@ namespace B;
 class ClassC {}
 ```
 
-Cs0436RelaxationはCS0436を抑止しつつ、上記の様なソースジェネレータ都合以外で発生していたCS0436についてを別のIDに置き換えて警告することで、実質的にCS0436の警告をソースジェネレータに由来する以外の物だけに緩和することが出来ます。
+Cs0436Relaxationは、CS0436を一旦抑止(suggestion化)する代わりに、Cs0436Relaxationgaが上記の様なソースジェネレータ都合以外で発生する抑止する必要のなかったCS0436を別のID(RX_CS0436_1)のwarningとして報告することで、実質的にソースジェネレータに関わるCS0436だけを抑止することが出来ます。
 
 ### インストール
 
