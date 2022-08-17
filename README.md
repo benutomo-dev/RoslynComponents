@@ -321,7 +321,9 @@ Cs0436Relaxationを利用するためにはCs0436Relaxation自体をプロジェ
 
 最新のバージョンは[NuGet](https://www.nuget.org/packages/Benutomo.Cs0436Relaxation/)をご参照ください。
 
-参考： [ビルドのカスタマイズ](https://docs.microsoft.com/visualstudio/msbuild/customize-your-build)
+##### 参考
+
+- [ビルドのカスタマイズ](https://docs.microsoft.com/visualstudio/msbuild/customize-your-build)
 
 #### 手順２ editorconfigの配置(編集)
 
