@@ -338,7 +338,7 @@ dotnet_diagnostic.CS0436.severity = suggestion
 
 ##### 参考
 
-- [EditorCofig.org](https://editorconfig.org/)
+- [EditorConfig.org](https://editorconfig.org/)
 - [EditorConfig で移植可能なカスタム エディター設定を作成する](https://docs.microsoft.com/visualstudio/ide/create-portable-custom-editor-options)
 
 ### Cs0436Relaxationが正しく機能している場合の警告について
