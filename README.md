@@ -244,7 +244,7 @@ TODO
 
 ### Introduction
 
-コード生成に関するマーキングに利用する属性などをinternalなクラスとして生成するソースジェネレータを利用するアセンブリ同士でInternalVisbleTo属性が使用されていると、InternalVisbleToに指定されたアセンブリからソースジェネレータが生成した属性などを利用する箇所で、自分自身の中で生成された属性とInternalVisbleToの指定によってinternalクラスが参照できるアセンブリに含まれる属性の定義が重複してしまうことで[CS0436](https://docs.microsoft.com/dotnet/csharp/misc/cs0436)警告が発生します。
+コード生成に関するマーキングに利用する属性などをinternalなクラスとして生成するソースジェネレータを利用するアセンブリ同士でInternalsVisbleTo属性が使用されていると、InternalsVisbleToに指定されたアセンブリからソースジェネレータが生成した属性などを利用する箇所で、自分自身の中で生成された属性とInternalsVisbleToの指定によってinternalクラスが参照できるアセンブリに含まれる属性の定義が重複してしまうことで[CS0436](https://docs.microsoft.com/dotnet/csharp/misc/cs0436)警告が発生します。
 
 ```cs
 // A.dll,B.dll,C.dllアセンブリに対してソースジェネレータが暗黙的に生成している属性クラス
@@ -258,13 +258,13 @@ internal ExampleMarkerAttribute : Attribute
 ```cs
 // A.dll
 
-[assembly: InternalVisibleTo("C")]
+[assembly: InternalsVisibleTo("C")]
 
 namespace A;
 
 // A.dllでは自分自身の中で生成されているソースが
 // 唯一のExampleMarker属性の定義であるので、
-// CS0436は発生しない
+// ExampleMarkerが競合することはない
 [SourceGen.ExampleMarker]
 class ClassA {}
 ```
@@ -277,7 +277,7 @@ namespace B;
 // B.dllでは、自分自身と参照アセンブリのA.dllで
 // ExampleMarkerの定義が重複しているが、
 // ExampleMarkerがinternalでB.dllからアクセスが出来ないため、
-// CS0436は発生しない (A.dllとB.dllのExampleMarkerは競合しない)
+// A.dllとB.dllのExampleMarkerは競合しない
 [SourceGen.ExampleMarker]
 class ClassB {}
 ```
@@ -290,8 +290,8 @@ namespace B;
 // C.dllでは、自分自身と参照アセンブリのA.dllで
 // ExampleMarkerの定義が重複している上に、
 // B.dllでinternalな型やメンバにもアクセスが出来てしまうため、
-// CS0436が発生する (A.dllとC.dllのExampleMarkerが競合する)
-[SourceGen.ExampleMarker]
+// A.dllとC.dllのExampleMarkerが競合する
+[SourceGen.ExampleMarker] // CS0436が発生する
 class ClassC {}
 ```
 
@@ -332,7 +332,7 @@ Cs0436Relaxationを利用するためにはCs0436Relaxation自体をプロジェ
 dotnet_diagnostic.CS0436.severity = suggestion
 ```
 
-既存の.editorconfigが既に存在するが愛はその中に付け加えます。Cs0436Relaxationが働くプロジェクトに対してCS0436の重要度をwarningからsuggestionまで落とします。
+既存の.editorconfigが既に存在する場合はその中に付け加えます。Cs0436Relaxationが働くプロジェクトに対してCS0436の重要度をwarningからsuggestionまで落とします。
 
 ##### 参考
 
