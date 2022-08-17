@@ -289,7 +289,7 @@ namespace B;
 
 // C.dllでは、自分自身と参照アセンブリのA.dllで
 // ExampleMarkerの定義が重複している上に、
-// B.dllでinternalな型やメンバにもアクセスが出来てしまうため、
+// C.dllからA.dllのinternalな型やメンバにもアクセスが出来てしまうため、
 // A.dllとC.dllのExampleMarkerが競合する
 [SourceGen.ExampleMarker] // CS0436が発生する
 class ClassC {}
