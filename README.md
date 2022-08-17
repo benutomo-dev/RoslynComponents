@@ -1,6 +1,6 @@
 # RoslynComponents
 
-C#のRoslynコンパイラ用のソースジェネレータです。
+C#のRoslynコンパイラ用のアナライザ/ソースジェネレータです。
 
 ## 一覧
 
@@ -8,6 +8,10 @@ C#のRoslynコンパイラ用のソースジェネレータです。
   C#で`IDisposable`と`IAsyncDisposable`の実装パターンに対応するメソッドを自動実装するソースジェネレータ
 - AutomaticNotifyPropertyChangedImpl<br>
   C#で`INotifyPropertyChanged`などの変更通知付きプロパティの実装を補助するソースジェネレータ
+- CancellationAnalyzer<br>
+  キャンセルトークンの適切な引き渡しとキャンセルトークン付きのシグネチャのメソッドの優先的使用を補助するためのアナライザ
+- Cs0436Relaxation<br>
+  ソースジェネレータが生成したクラス等を含むアセンブリ同士でInternalsVisbleTo属性が指定されている場合に発生する場合があるCS0436警告を適切に緩和(ソースジェネレータ起因でない報告のみを別IDで再警告)するためのアナライザ
 
 ## AutomaticDisposeImpl
 
@@ -93,6 +97,7 @@ namespace SampleCode
 ```
 
 #### サンプルコードを実行した際の出力例
+
 以下のようにクラス内に含まれる`IDisposable`または`IAsyncDisposable`を実装したメンバの`Dispose()`と`DisposeAsync()`は、自動実装されたコードから呼び出されます。
 自動実装クラスの`DisposeAsync()`は基本的にメンバの破棄にも`DisposeAsync()`を呼び出しますが、メンバが`IDisposable`しか実装していない場合は`Dispose()`を使用して破棄します。
 ```
@@ -113,9 +118,12 @@ End disposeTestInstance.DisposeAsync()
 ### 使用方法
 
 #### インストール
+
+⚠️ VisualStudioを利用する場合は2022の最新版が必要です。
+
 [Nuget](https://www.nuget.org/packages/Benutomo.AutomaticDisposeImpl.SourceGenerator/)などを利用してプロジェクトのアナライザにBenutomo.AutomaticDisposeImpl.SourceGenerator.dllを追加します。
 
-```
+```ps
 Install-Package Benutomo.AutomaticDisposeImpl.SourceGenerator
 ```
 
@@ -225,3 +233,121 @@ partial class UserDefinedFinalizeImplSample : IDisposable, IAsyncDisposable
 ## AutomaticNotifyPropertyChangedImpl
 
 TODO
+
+## CancellationAnalyzer
+
+TODO
+
+## Cs0436Relaxation
+
+ソースジェネレータが生成したクラス等を含むアセンブリ同士でInternalsVisbleTo属性が指定されている場合に発生する場合があるCS0436警告を適切に緩和するためのアナライザです。
+
+### Introduction
+
+コード生成に関するマーキングに利用する属性などをinternalなクラスとして生成するソースジェネレータを利用するアセンブリ同士でInternalVisbleTo属性が使用されていると、InternalVisbleToに指定されたアセンブリからソースジェネレータが生成した属性などを利用する箇所で、自分自身の中で生成された属性とInternalVisbleToの指定によってinternalクラスが参照できるアセンブリに含まれる属性の定義が重複してしまうことで[CS0436](https://docs.microsoft.com/dotnet/csharp/misc/cs0436)警告が発生します。
+
+```cs
+// A.dll,B.dll,C.dllアセンブリに対してソースジェネレータが暗黙的に生成している属性クラス
+
+namespace SourceGen;
+
+internal ExampleMarkerAttribute : Attribute
+{}
+```
+
+```cs
+// A.dll
+
+[assembly: InternalVisibleTo("C")]
+
+namespace A;
+
+// A.dllでは自分自身の中で生成されているソースが
+// 唯一のExampleMarker属性の定義であるので、
+// CS0436は発生しない
+[SourceGen.ExampleMarker]
+class ClassA {}
+```
+
+```cs
+// B.dll (A.dllを参照アセンブリに含む)
+
+namespace B;
+
+// B.dllでは、自分自身と参照アセンブリのA.dllで
+// ExampleMarkerの定義が重複しているが、
+// ExampleMarkerがinternalでB.dllからアクセスが出来ないため、
+// CS0436は発生しない (A.dllとB.dllのExampleMarkerは競合しない)
+[SourceGen.ExampleMarker]
+class ClassB {}
+```
+
+```cs
+// C.dll (A.dllを参照アセンブリに含む)
+
+namespace B;
+
+// C.dllでは、自分自身と参照アセンブリのA.dllで
+// ExampleMarkerの定義が重複している上に、
+// B.dllでinternalな型やメンバにもアクセスが出来てしまうため、
+// CS0436が発生する (A.dllとC.dllのExampleMarkerが競合する)
+[SourceGen.ExampleMarker]
+class ClassC {}
+```
+
+Cs0436RelaxationはCS0436を抑止しつつ、上記の様なソースジェネレータ都合以外で発生していたCS0436についてを別のIDに置き換えて警告することで、実質的にCS0436の警告をソースジェネレータに由来する以外の物だけに緩和することが出来ます。
+
+### インストール
+
+⚠️ VisualStudioを利用する場合は2022の最新版が必要です。
+
+Cs0436Relaxationを利用するためにはCs0436Relaxation自体をプロジェクトのPackageReferenceに加えるだけでなく、生のCS0436をwarningからsuggestionに変更するeditorconfigの設定も必要になります。また、Cs0436Relaxationが機能していないプロジェクトでeditorconfigの設定の方だけが有効となってしまうとそのプロジェクトでは単純にCS0436が警告対象から外れたままとなってしまうので、どちらの設定も全てのプロジェクトに共通化されるように設定することをお勧めします。
+
+以下の手順は、全てのプロジェクトに共通で設定する前提のものです。
+
+#### 手順１ Directory.Build.propsの配置(編集)
+
+以下のDirectory.Build.propsを全てのプロジェクトを含むルートフォルダに配置します。
+
+```xml
+<Project>
+  <ItemGroup>
+    <PackageReference Include="Benutomo.Cs0436Relaxation" Version="1.0.0-alpha9" PrivateAssets="true" />
+  </ItemGroup>
+</Project>
+```
+
+既にDirectory.Build.propsが存在している場合は、既存のDirectory.Build.propsの中に上記のPackageReferenceを加えます。
+
+最新のバージョンは[NuGet](https://www.nuget.org/packages/Benutomo.Cs0436Relaxation/)をご参照ください。
+
+参考： [ビルドのカスタマイズ](https://docs.microsoft.com/visualstudio/msbuild/customize-your-build)
+
+#### 手順２ editorconfigの配置(編集)
+
+以下の.editorconfigを全てのプロジェクトを含むルートフォルダに配置します。
+
+```conf
+# CS0436(型がインポートされた型と競合しています)を抑止。ソースジェネレータ起因以外のCS0436はCs0436RelaxationがRX_CS0436_1としてwarning。
+dotnet_diagnostic.CS0436.severity = suggestion
+```
+
+既存の.editorconfigが既に存在するが愛はその中に付け加えます。Cs0436Relaxationが働くプロジェクトに対してCS0436の重要度をwarningからsuggestionまで落とします。
+
+##### 参考
+
+- [ビルドのカスタマイズ](https://docs.microsoft.com/visualstudio/msbuild/customize-your-build)
+
+### Cs0436Relaxationが正しく機能している場合の警告について
+
+Cs0436Relaxationが機能している環境では以下の警告が発生します。下記の通り、ソースジェネレータ起因でないCS0436のみが、RX_CS0436_1として報告されるようになります。
+
+| ID | 概要 |
+|---------|--|
+| RX_CS0436_0 | Cs0436Relaxationが機能しているプロジェクトのコンパイルでCS0436がwarningとして発生した場合に発生するwarningです。Cs0436Relaxationを取り除くか.editroconfigを編集してCS0436をsuggestionにする必要があります。 |
+| RX_CS0436_1 | ソースジェネレータに起因する定義以外に対してCS0436が発生したことをwarningで知らせます。生のCS0436が発生した場合と同様の対処が必要です。 |
+
+##### 参考
+
+- [EditorCofig.org](https://editorconfig.org/)
+- [EditorConfig で移植可能なカスタム エディター設定を作成する](https://docs.microsoft.com/visualstudio/ide/create-portable-custom-editor-options)
