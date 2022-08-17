@@ -336,7 +336,8 @@ dotnet_diagnostic.CS0436.severity = suggestion
 
 ##### 参考
 
-- [ビルドのカスタマイズ](https://docs.microsoft.com/visualstudio/msbuild/customize-your-build)
+- [EditorCofig.org](https://editorconfig.org/)
+- [EditorConfig で移植可能なカスタム エディター設定を作成する](https://docs.microsoft.com/visualstudio/ide/create-portable-custom-editor-options)
 
 ### Cs0436Relaxationが正しく機能している場合の警告について
 
@@ -346,8 +347,3 @@ Cs0436Relaxationが機能している環境では以下の警告が発生しま�
 |---------|--|
 | RX_CS0436_0 | Cs0436Relaxationが機能しているプロジェクトのコンパイルでCS0436がwarningとして発生した場合に発生するwarningです。Cs0436Relaxationを取り除くか.editroconfigを編集してCS0436をsuggestionにする必要があります。 |
 | RX_CS0436_1 | ソースジェネレータに起因する定義以外に対してCS0436が発生したことをwarningで知らせます。生のCS0436が発生した場合と同様の対処が必要です。 |
-
-##### 参考
-
-- [EditorCofig.org](https://editorconfig.org/)
-- [EditorConfig で移植可能なカスタム エディター設定を作成する](https://docs.microsoft.com/visualstudio/ide/create-portable-custom-editor-options)
