@@ -26,6 +26,17 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedIm
 
     }
 
+    public partial class Class99<T1, T2>
+    {
+        [EnableNotificationSupport]
+        private Func<T1?, T2> Texts
+        {
+            get => _Texts();
+            set => _Texts(value);
+        }
+
+    }
+
     public partial class Class1 : INotifyPropertyChanged, INotifyPropertyChanging, IInterface1
     {
         public event PropertyChangingEventHandler? PropertyChanging;

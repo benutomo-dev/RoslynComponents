@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
@@ -276,11 +277,49 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 PutIndentSpace();
                 Append("private ");
                 Append(_sourceBuildInputs.ContainingTypeInfo.Name);
+                if (_sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length > 0)
+                {
+                    Append("<");
+
+                    for (int i = 0; i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length; i++)
+                    {
+                        var genericTypeArg = _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs[i];
+
+                        Append(genericTypeArg);
+
+                        if (i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length - 1)
+                        {
+                            Append(", ");
+                        }
+                    }
+
+                    Append(">");
+                }
                 AppendLine("? _source;");
 
                 AppendLine();
 
-                BeginBlock($"internal {_sourceBuildInputs.DefferedNotificationDisposableName}({_sourceBuildInputs.ContainingTypeInfo.Name}? source)");
+                Append($"internal {_sourceBuildInputs.DefferedNotificationDisposableName}({_sourceBuildInputs.ContainingTypeInfo.Name}");
+                if (_sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length > 0)
+                {
+                    Append("<");
+
+                    for (int i = 0; i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length; i++)
+                    {
+                        var genericTypeArg = _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs[i];
+
+                        Append(genericTypeArg);
+
+                        if (i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length - 1)
+                        {
+                            Append(", ");
+                        }
+                    }
+
+                    Append(">");
+                }
+                Append($"? source)");
+                BeginBlock();
                 {
                     PutIndentSpace();
                     AppendLine("_source = source;");

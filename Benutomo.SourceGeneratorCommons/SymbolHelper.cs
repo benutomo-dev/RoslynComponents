@@ -160,6 +160,15 @@ namespace Benutomo.SourceGeneratorCommons
                 }
                 typeNameBuilder.Append("]");
             }
+            else if (typeSymbol is ITypeParameterSymbol typeParameterSymbol)
+            {
+                typeNameBuilder.Append(typeParameterSymbol.Name);
+
+                if (typeParameterSymbol.NullableAnnotation == NullableAnnotation.Annotated)
+                {
+                    typeNameBuilder.Append("?");
+                }
+            }
             else
             {
                 if (typeSymbol.ContainingType is null)
