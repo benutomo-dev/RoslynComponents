@@ -45,7 +45,7 @@ namespace Benutomo.SourceGeneratorCommons
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + IsValueType.GetHashCode();
             hashCode = hashCode * -1521134295 + IsNullableAnoteted.GetHashCode();
-            hashCode = hashCode * -1521134295 + GenericTypeArgs.Sum(v => v.GetHashCode());
+            hashCode = hashCode * -1521134295 + GenericTypeArgs.Aggregate(0, (hash, v) => hash ^ v.GetHashCode());
             return hashCode;
         }
     }

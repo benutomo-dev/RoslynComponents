@@ -166,9 +166,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             int hashCode = -160234080;
             hashCode = hashCode * -1521134295 + EqualityComparer<TypeDefinitionInfo>.Default.GetHashCode(TargetTypeInfo);
-            hashCode = hashCode * -1521134295 + SyncDisposeMembersInDisposeMethod.Sum(v => EqualityComparer<string>.Default.GetHashCode(v));
-            hashCode = hashCode * -1521134295 + SyncDisposeMembersInAsyncDisposeMethod.Sum(v => EqualityComparer<string>.Default.GetHashCode(v));
-            hashCode = hashCode * -1521134295 + AsyncDisposeMembersInAsyncDisposeMethod.Sum(v => EqualityComparer<string>.Default.GetHashCode(v));
+            hashCode = hashCode * -1521134295 + SyncDisposeMembersInDisposeMethod.Aggregate(0, (hash, v) => hash ^ EqualityComparer<string>.Default.GetHashCode(v));
+            hashCode = hashCode * -1521134295 + SyncDisposeMembersInAsyncDisposeMethod.Aggregate(0, (hash, v) => hash ^ EqualityComparer<string>.Default.GetHashCode(v));
+            hashCode = hashCode * -1521134295 + AsyncDisposeMembersInAsyncDisposeMethod.Aggregate(0, (hash, v) => hash ^ EqualityComparer<string>.Default.GetHashCode(v));
             hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_userDefinedUnmanagedResourceReleaseMethodName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_userDefinedManagedObjectDisposeMethodName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string?>.Default.GetHashCode(_userDefinedManagedObjectAsyncDisposeMethodName);
