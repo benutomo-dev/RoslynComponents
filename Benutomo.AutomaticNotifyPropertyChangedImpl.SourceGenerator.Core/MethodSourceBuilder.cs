@@ -408,10 +408,20 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     }
                 }
 
-                PutIndentSpace();
-                Append("if (object.ReferenceEquals(");
-                Append(_sourceBuildInputs.FieldName);
-                Append(", value)) ");
+                if (_sourceBuildInputs.PropertyTypeIsSystemString)
+                {
+                    PutIndentSpace();
+                    Append("if (");
+                    Append(_sourceBuildInputs.FieldName);
+                    Append(" == value) ");
+                }
+                else
+                {
+                    PutIndentSpace();
+                    Append("if (object.ReferenceEquals(");
+                    Append(_sourceBuildInputs.FieldName);
+                    Append(", value)) ");
+                }
             }
             else
             {
@@ -630,10 +640,20 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     {
                         // Changing系の通知を行う場合は無駄な通知を避けるために、実際の設定前に同一性の判定を挟む
 
-                        PutIndentSpace();
-                        Append("if (object.ReferenceEquals(global::System.Threading.Volatile.Read(ref ");
-                        Append(_sourceBuildInputs.FieldName);
-                        AppendLine("!), value))");
+                        if (_sourceBuildInputs.PropertyTypeIsSystemString)
+                        {
+                            PutIndentSpace();
+                            Append("if (global::System.Threading.Volatile.Read(ref ");
+                            Append(_sourceBuildInputs.FieldName);
+                            AppendLine("!) == value)");
+                        }
+                        else
+                        {
+                            PutIndentSpace();
+                            Append("if (object.ReferenceEquals(global::System.Threading.Volatile.Read(ref ");
+                            Append(_sourceBuildInputs.FieldName);
+                            AppendLine("!), value))");
+                        }
                         BeginBlock();
                         {
                             PutIndentSpace(); AppendLine("prevValue = default;");
@@ -687,8 +707,16 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 // ChangingとChangedはFormClosingとFormClosedの関係を参考にするならばXxxingに対して必ずしもXxxedの通知が発生する必要はない
                 if (_sourceBuildInputs.PropertyTypeIsReferenceType)
                 {
-                    PutIndentSpace();
-                    AppendLine("if (object.ReferenceEquals(prevValue, value))");
+                    if (_sourceBuildInputs.PropertyTypeIsSystemString)
+                    {
+                        PutIndentSpace();
+                        AppendLine("if (prevValue == value)");
+                    }
+                    else
+                    {
+                        PutIndentSpace();
+                        AppendLine("if (object.ReferenceEquals(prevValue, value))");
+                    }
                     BeginBlock();
                     {
                         PutIndentSpace(); AppendLine("prevValue = default;");

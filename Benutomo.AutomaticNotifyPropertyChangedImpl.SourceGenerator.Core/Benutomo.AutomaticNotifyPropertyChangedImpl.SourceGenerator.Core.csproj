@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>library</OutputType>
-    <Version>0.0.0.36</Version>
+    <Version>0.0.0.37</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -15,7 +15,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements for INotifyPropertyChanged.</Description>
-    <PackageVersion>1.0.0-alpha5</PackageVersion>
+    <PackageVersion>1.0.0-alpha6</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;inotifypropertychanged;propertychanged</PackageTags>

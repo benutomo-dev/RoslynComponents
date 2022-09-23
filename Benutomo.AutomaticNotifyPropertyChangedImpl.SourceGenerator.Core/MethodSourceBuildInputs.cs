@@ -36,6 +36,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public bool PropertyTypeIsReferenceType;
 
+        public bool PropertyTypeIsSystemString;
+
         public bool PropertyTypeIsInterlockExchangeable;
 
         public NullableAnnotation PropertyTypeNullableAnnotation;
@@ -90,6 +92,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             typeNameBuilder.AppendFullTypeName(propertySymbol.Type);
             PropertyType = typeNameBuilder.ToString();
             PropertyTypeIsReferenceType = propertySymbol.Type.IsReferenceType;
+            PropertyTypeIsSystemString = propertySymbol.Type.SpecialType == SpecialType.System_String;
             PropertyTypeIsInterlockExchangeable = propertySymbol.Type.IsInterlockedExchangable();
             PropertyTypeNullableAnnotation = propertySymbol.Type.NullableAnnotation;
 
