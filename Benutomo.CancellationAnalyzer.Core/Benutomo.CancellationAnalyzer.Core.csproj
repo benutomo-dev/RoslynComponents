@@ -8,7 +8,7 @@
     <RootNamespace>Benutomo.CancellationAnalyzer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>library</OutputType>
-    <Version>0.0.0.15</Version>
+    <Version>0.0.0.16</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -16,7 +16,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.CancellationAnalyzer</PackageId>
     <Description>A Diagnostics Analyzer for cancallations.</Description>
-    <PackageVersion>1.0.0-alpha10</PackageVersion>
+    <PackageVersion>1.0.0-alpha12</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>analyzer;cancellationtoken;cancellationtokensource</PackageTags>
