@@ -107,7 +107,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             if (member is IFieldSymbol fieldSymbol)
             {
                 var isAssignableToIDisposableMember = fieldSymbol.IsAssignableTo(usingSymbols.IDisposable);
-                var isAssignableToIAsyncDisposableMember = fieldSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+                var isAssignableToIAsyncDisposableMember = usingSymbols.IAsyncDisposable is not null && fieldSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
                 var isEnableAutomaticDisposeMember = automaticDisposeContextChecker.IsEnableField(fieldSymbol);
 
                 DoReportForFieldOrProptertyMember(member.Name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
@@ -116,7 +116,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             if (member is IPropertySymbol propertySymbol)
             {
                 var isAssignableToIDisposableMember = propertySymbol.IsAssignableTo(usingSymbols.IDisposable);
-                var isAssignableToIAsyncDisposableMember = propertySymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+                var isAssignableToIAsyncDisposableMember = usingSymbols.IAsyncDisposable is not null && propertySymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
                 var isEnableAutomaticDisposeMember = automaticDisposeContextChecker.IsEnableProperty(propertySymbol);
 
                 DoReportForFieldOrProptertyMember(member.Name, isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);

@@ -422,7 +422,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             AutomaticDisposeContextChecker automaticDisposeContextChecker = new AutomaticDisposeContextChecker(attributeData, usingSymbols);
 
             var isAssignableToIDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable);
-            var isAssignableToIAsyncDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+            var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
 
             List<ISymbol> unmanagedResourceReleaseMethodAttributeedMembers = new();
             List<ISymbol> managedObjectDisposeMethodAttributeedMembers = new();

@@ -144,7 +144,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     return null;
                 }
 
-                if (!namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable) && !namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable))
+                if (!namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable) && (usingSymbols.IAsyncDisposable is null || !namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable)))
                 {
                     return null;
                 }

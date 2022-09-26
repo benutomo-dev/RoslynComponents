@@ -10,9 +10,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         INamedTypeSymbol ManagedObjectDisposeMethodAttribute,
         INamedTypeSymbol ManagedObjectAsyncDisposeMethodAttribute,
         INamedTypeSymbol IDisposable,
-        INamedTypeSymbol IAsyncDisposable,
+        INamedTypeSymbol? IAsyncDisposable,
         INamedTypeSymbol Task,
-        INamedTypeSymbol ValueTask
+        INamedTypeSymbol? ValueTask
         )
     {
         internal static UsingSymbols CreateFrom(Compilation compilation)
@@ -24,9 +24,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             var managedObjectDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var managedObjectAsyncDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var disposableSymbol = compilation.GetTypeByMetadataName("System.IDisposable") ?? throw new InvalidOperationException();
-            var asyncDisposableSymbol = compilation.GetTypeByMetadataName("System.IAsyncDisposable") ?? throw new InvalidOperationException();
+            var asyncDisposableSymbol = compilation.GetTypeByMetadataName("System.IAsyncDisposable");
             var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task") ?? throw new InvalidOperationException();
-            var valueTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask") ?? throw new InvalidOperationException();
+            var valueTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask");
 
             return new UsingSymbols(
                 automaticDisposeImplAttributeSymbol,

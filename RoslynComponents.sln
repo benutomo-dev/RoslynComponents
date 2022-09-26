@@ -33,14 +33,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.CancellationAnalyz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.Analyzer.Test", "Benutomo.AutomaticDisposeImpl.Analyzer.Test\Benutomo.AutomaticDisposeImpl.Analyzer.Test.csproj", "{0A180AA8-E498-4AC8-AD68-9BD3591066D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benutomo.Cs0436Relaxation", "Benutomo.Cs0436Relaxation\Benutomo.Cs0436Relaxation.csproj", "{FBAEA42E-BC13-4AE1-ACA6-B36484692D03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.Cs0436Relaxation", "Benutomo.Cs0436Relaxation\Benutomo.Cs0436Relaxation.csproj", "{FBAEA42E-BC13-4AE1-ACA6-B36484692D03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorDebug_CS0436", "SourceGeneratorDebug_CS0436\SourceGeneratorDebug_CS0436.csproj", "{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_CS0436", "SourceGeneratorDebug_CS0436\SourceGeneratorDebug_CS0436.csproj", "{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9713E0AB-700C-4E6C-8B3D-F3B21655B80B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorDebug_NoPolyfill", "SourceGeneratorDebug_NoPolyfill\SourceGeneratorDebug_NoPolyfill.csproj", "{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,6 +110,10 @@ Global
 		{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +124,7 @@ Global
 		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
 		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
 		{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
+		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AE10D511-0B11-446C-A9EC-1B47E6A85530}
