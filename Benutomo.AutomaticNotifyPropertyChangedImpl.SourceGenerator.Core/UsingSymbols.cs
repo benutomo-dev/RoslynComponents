@@ -9,7 +9,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         INamedTypeSymbol ChangedObservableAttribute,
         INamedTypeSymbol ChantingObservableAttribute,
         INamedTypeSymbol INotifyPropertyChanged,
-        INamedTypeSymbol INotifyPropertyChanging,
+        INamedTypeSymbol? INotifyPropertyChanging,
         INamedTypeSymbol NotificationAccessibility,
         INamedTypeSymbol ExplicitInterfaceImplementation,
         INamedTypeSymbol Action,
@@ -24,7 +24,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             var changedObservableAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ChangedObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var changingObservableAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ChangingObservableAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var notifyPropertyChangedSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanged") ?? throw new InvalidOperationException();
-            var notifyPropertyChangingSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanging") ?? throw new InvalidOperationException();
+            var notifyPropertyChangingSymbol = compilation.GetTypeByMetadataName("System.ComponentModel.INotifyPropertyChanging");
             var notificationAccessibilitySymbol = compilation.GetTypeByMetadataName(StaticSources.NotificationAccessibilityFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var explicitInterfaceImplementationSymbol = compilation.GetTypeByMetadataName(StaticSources.ExplicitInterfaceImplementationFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
             var actionSymbol = compilation.GetTypeByMetadataName("System.Action") ?? throw new InvalidOperationException();

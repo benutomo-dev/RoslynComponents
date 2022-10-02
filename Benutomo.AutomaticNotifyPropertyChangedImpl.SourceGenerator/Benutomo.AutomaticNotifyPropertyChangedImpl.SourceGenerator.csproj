@@ -5,7 +5,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>Benutomo</RootNamespace>
     <Nullable>disable</Nullable>
-    <Version>0.0.0.38</Version>
+    <Version>0.0.0.39</Version>
   </PropertyGroup>
   
 </Project>
