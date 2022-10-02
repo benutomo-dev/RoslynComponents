@@ -1,6 +1,8 @@
 <Project>
   <!-- <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" /> -->
 
+  <Import Project="$(MSBuildThisFileFullPath).user" Condition="Exists('$(MSBuildThisFileFullPath).user')"/>
+
   <PropertyGroup>
     <ProjectwiseSubDirectory>$(MSBuildProjectDirectoryNoRoot.Substring($(MSBuildThisFileDirectoryNoRoot.Length)))</ProjectwiseSubDirectory>
   </PropertyGroup>
