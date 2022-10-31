@@ -167,6 +167,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         void WriteIsDisposedProperty()
         {
             AppendLine();
+            PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
             PutIndentSpace(); AppendLine("public bool IsDisposed => (global::System.Threading.Thread.VolatileRead(ref __generator_internal_disposeState) != __generator_internal_BeNotInitiatedAnyDispose);");
         }
 
@@ -174,6 +175,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             AppendLine();
 
+            PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
             PutIndentSpace();
             Append("~");
             Append(_sourceBuildInputs.TargetTypeInfo.Name);
@@ -190,6 +192,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             AppendLine();
 
+            PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
             BeginBlock("public void Dispose()");
             {
                 PutIndentSpace(); AppendLine("var dispose_state = global::System.Threading.Interlocked.CompareExchange(ref __generator_internal_disposeState, __generator_internal_InitiatedSyncDispose, __generator_internal_BeNotInitiatedAnyDispose);");
@@ -221,6 +224,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             AppendLine();
 
+            PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
             if (_sourceBuildInputs._isInheritalbeClass)
             {
                 if (_sourceBuildInputs._isDisposableSubClass)
@@ -344,6 +348,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             AppendLine();
 
+            PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
             AppendLine("#pragma warning disable CS1998");
             BeginBlock("public async global::System.Threading.Tasks.ValueTask DisposeAsync()");
             {
@@ -381,6 +386,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             AppendLine();
 
+            PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
             AppendLine("#pragma warning disable CS1998");
             PutIndentSpace();
             if (_sourceBuildInputs._isInheritalbeClass)

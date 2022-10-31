@@ -6,6 +6,7 @@ namespace Benutomo
     /// <summary>
     /// 指定したクラスに破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを破棄する<see cref=""System.IDisposable.Dispose"" />メソッドおよび<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッド(当該クラスに<see cref=""System.IAsyncDisposable"" />インターフェイスが含まれている場合のみ)を自動実装する。
     /// </summary>
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
     public class AutomaticDisposeImplAttribute : global::System.Attribute
     {

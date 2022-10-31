@@ -1,11 +1,10 @@
-﻿#nullable enable
+﻿using System;
 
-
-using System;
+#nullable enable
 
 namespace Benutomo
 {
-    public static class Cancellation
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class Cancellation
     {
         public static _UncancelableSection Uncancelable => _UncancelableSection.Defualt;

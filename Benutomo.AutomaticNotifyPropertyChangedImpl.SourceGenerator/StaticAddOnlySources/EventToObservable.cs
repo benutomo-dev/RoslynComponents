@@ -3,6 +3,7 @@
 
 namespace Benutomo.Internal
 {
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class EventToObservable<T> : global::System.IObservable<T>
     {
         global::System.Action<global::System.EventHandler> _addHandler;

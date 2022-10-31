@@ -6,6 +6,7 @@ namespace Benutomo
     /// <summary>
     /// Todo
     /// </summary>
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [global::System.AttributeUsage(global::System.AttributeTargets.Property)]
     public class EnableNotificationSupportAttribute : global::System.Attribute
     {
