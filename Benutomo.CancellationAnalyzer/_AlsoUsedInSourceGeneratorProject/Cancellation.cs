@@ -6,6 +6,7 @@ using System;
 namespace Benutomo
 {
     public static class Cancellation
+    internal static class Cancellation
     {
         public static _UncancelableSection Uncancelable => _UncancelableSection.Defualt;
 
