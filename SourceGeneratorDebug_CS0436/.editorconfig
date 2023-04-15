@@ -1,0 +1,3 @@
+﻿[*.cs]
+
+dotnet_diagnostic.RX_CS0436_1.severity = suggestion

@@ -1,6 +1,7 @@
 ﻿using Benutomo;
 using System;
 
+#pragma warning disable CS0414
 
 namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
 {
