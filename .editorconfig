@@ -1,4 +1,9 @@
 ﻿[*.cs]
 
+# スペルチェック
+spelling_languages = en-us,ja-jp
+spelling_checkable_types = strings,identifiers,comments
+spelling_error_severity = hint
+
 # CS0436: 型がインポートされた型と競合しています
 dotnet_diagnostic.CS0436.severity = suggestion
