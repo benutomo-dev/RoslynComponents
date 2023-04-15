@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Benutomo.CancellationAnalyzer
 {
@@ -105,10 +106,15 @@ namespace Benutomo.CancellationAnalyzer
             s_diagnosticDescriptor_CT0007
             );
 
+#if DEBUG
+        [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1026:同時実行を有効にします", Justification = "<保留中>")]
+#endif
         public override void Initialize(AnalysisContext context)
         {
+#if !DEBUG
+            context.EnableConcurrentExecution();
+#endif
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-            //context.EnableConcurrentExecution();
             context.RegisterSemanticModelAction(SemanticModelAction);
         }
 

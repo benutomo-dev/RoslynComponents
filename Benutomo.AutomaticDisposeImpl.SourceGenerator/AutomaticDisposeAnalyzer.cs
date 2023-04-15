@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
@@ -313,9 +314,14 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             s_diagnosticDescriptor_SG9999
             );
 
+#if DEBUG
+        [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1026:同時実行を有効にします", Justification = "<保留中>")]
+#endif
         public override void Initialize(AnalysisContext context)
         {
+#if !DEBUG
             context.EnableConcurrentExecution();
+#endif
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
             context.RegisterSymbolAction(AnalyzeNamedTypeSymbol, SymbolKind.NamedType);

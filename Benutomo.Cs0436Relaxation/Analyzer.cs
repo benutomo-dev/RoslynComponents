@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Benutomo.Cs0436Relaxation
 {
@@ -39,10 +40,15 @@ namespace Benutomo.Cs0436Relaxation
             s_diagnosticDescriptor_RX_CS0436_1
             );
 
+#if DEBUG
+        [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1026:同時実行を有効にします", Justification = "<保留中>")]
+#endif
         public override void Initialize(AnalysisContext context)
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+#if !DEBUG
             context.EnableConcurrentExecution();
+#endif
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.RegisterSemanticModelAction(SemanticModelAction);
             context.RegisterCompilationAction(CompilationAction);
         }

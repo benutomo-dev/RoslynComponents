@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
@@ -76,9 +77,14 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             s_diagnosticDescriptor_SG0005
             );
 
+#if DEBUG
+        [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1026:同時実行を有効にします", Justification = "<保留中>")]
+#endif
         public override void Initialize(AnalysisContext context)
         {
+#if !DEBUG
             context.EnableConcurrentExecution();
+#endif
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
             context.RegisterSyntaxNodeAction(AnalyzeClassDeclarationSyntaxNode, SyntaxKind.ClassDeclaration);
