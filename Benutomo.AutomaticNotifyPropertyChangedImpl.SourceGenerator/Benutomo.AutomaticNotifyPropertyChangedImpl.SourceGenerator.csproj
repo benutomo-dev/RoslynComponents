@@ -1,11 +1,62 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <RootNamespace>Benutomo</RootNamespace>
-    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>library</OutputType>
     <Version>0.0.0.40</Version>
+
+    <!-- NuGet -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageId>Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator</PackageId>
+    <Description>A Source Generator that automatically implements for INotifyPropertyChanged.</Description>
+    <PackageVersion>1.0.0-alpha10</PackageVersion>
+    <Authors>benutomo</Authors>
+    <Copyright>© benutomo.</Copyright>
+    <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;inotifypropertychanged;propertychanged</PackageTags>
+    <PackageProjectUrl>https://github.com/benutomo-dev/RoslynComponents</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="StaticSource" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="UseSelfBuilding" />
+    <AdditionalFiles Include="..\$(MSBuildProjectName).StaticSource\StaticAddOnlySources\**\*.cs">
+      <Link>StaticSource\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <StaticSource>true</StaticSource>
+    </AdditionalFiles>
+    <AdditionalFiles Include="..\$(MSBuildProjectName).StaticSource\AlsoUsedInSourceGeneratorProject\**\*.cs">
+      <Link>StaticSource\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <StaticSource>true</StaticSource>
+      <UseSelfBuilding>true</UseSelfBuilding>
+    </AdditionalFiles>
+  </ItemGroup>
   
+  <ItemGroup>
+    <Using Include="Benutomo.SourceGeneratorCommons" />
+  </ItemGroup>
+
+  <Import Project="..\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems" Label="Shared" />
+
 </Project>

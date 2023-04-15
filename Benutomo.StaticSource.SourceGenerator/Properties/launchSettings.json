@@ -2,7 +2,7 @@
   "profiles": {
     "SourceGenerator": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator\\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.csproj"
+      "targetProject": "..\\Benutomo.CancellationAnalyzer.Core\\Benutomo.CancellationAnalyzer.Core.csproj"
     }
   }
 }

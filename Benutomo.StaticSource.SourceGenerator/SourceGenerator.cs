@@ -72,6 +72,16 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         return null!;
                     }
 
+                    if (!options.TryGetValue("build_metadata.AdditionalFiles.UseSelfBuilding", out var useSelfBuildingValue))
+                    {
+                        useSelfBuildingValue = null;
+                    }
+
+                    if (!bool.TryParse(useSelfBuildingValue, out var useSelfBuilding))
+                    {
+                        useSelfBuilding = false;
+                    }
+
                     var sourceText = additionalText.GetText(context.CancellationToken);
 
                     if (sourceText is null)
@@ -95,7 +105,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         return null!;
                     }
 
-                    return new MethodSourceBuildInputs(sourceText, namespaceMatch.Groups[1].Value, typeMatch.Groups[1].Value);
+                    return new MethodSourceBuildInputs(sourceText, namespaceMatch.Groups[1].Value, typeMatch.Groups[1].Value, useSelfBuilding);
                 })
                 .Where(v => v is not null)
                 .ToArray();
@@ -111,6 +121,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 sourceBuilder.Build();
 
                 context.AddSource("StaticSources.cs", sourceBuilder.SourceText);
+
+                foreach (var selfUseSource in sourceBuildInputs.Where(v => v.UseSelfBuilding))
+                {
+                    context.AddSource($"{selfUseSource.Namespace}.{selfUseSource.TypeName}.cs", selfUseSource.SourceText.ToString());
+                }
 
                 WriteLogLine($"End Generate StaticSource");
             }

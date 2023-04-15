@@ -774,12 +774,12 @@ partial class A : IDisposable
     void MyDispose(int n) {}
 }
 ";
-            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator.Core\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\gen_A_global_AutomaticDisposeImpl.cs";
+            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\gen_A_global_AutomaticDisposeImpl.cs";
 
             var expected2 = new[]
             {
                 Verify.Diagnostic("SG0010").WithLocation(10, 10),
-                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 45, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 47, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
             };
 
             await Verify.VerifyAnalyzerAsync(source2, expected2);
@@ -874,7 +874,7 @@ partial class A : IAsyncDisposable
         [Fact]
         public async Task SG0014_不適当なシグネチャのメソッドにManagedObjectAsyncDisposeMethod属性を付与()
         {
-            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator.Core\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\gen_A_global_AutomaticDisposeImpl.cs";
+            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\gen_A_global_AutomaticDisposeImpl.cs";
 
             var source = @"
 using System;
@@ -892,7 +892,7 @@ partial class A : IAsyncDisposable
             var expected1 = new[]
             {
                 Verify.Diagnostic("SG0014").WithLocation(10, 9),
-                DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 57, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
+                DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 60, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
             };
 
             await Verify.VerifyAnalyzerAsync(source, expected1);
@@ -914,7 +914,7 @@ partial class A : IAsyncDisposable
             var expected2 = new[]
             {
                 Verify.Diagnostic("SG0014").WithLocation(10, 10),
-                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 57, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 60, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
             };
 
             await Verify.VerifyAnalyzerAsync(source2, expected2);
@@ -935,7 +935,7 @@ partial class A : IAsyncDisposable
             var expected3 = new[]
             {
                 Verify.Diagnostic("SG0014").WithLocation(10, 15),
-                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 57, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 60, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
             };
 
             await Verify.VerifyAnalyzerAsync(source3, expected3);
