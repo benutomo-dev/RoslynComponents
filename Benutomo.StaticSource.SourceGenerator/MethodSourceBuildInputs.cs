@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis.Text;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {

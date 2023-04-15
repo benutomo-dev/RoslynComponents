@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Runtime.InteropServices;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
