@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>net47;net6.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

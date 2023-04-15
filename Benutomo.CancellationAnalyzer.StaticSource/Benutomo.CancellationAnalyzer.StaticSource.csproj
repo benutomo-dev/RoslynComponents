@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
     <RootNamespace>Benutomo</RootNamespace>
     <Version>0.0.0.17</Version>
   </PropertyGroup>

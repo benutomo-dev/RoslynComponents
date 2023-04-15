@@ -34,7 +34,8 @@
 
 
   <PropertyGroup>
-    <LangVersion>10</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
