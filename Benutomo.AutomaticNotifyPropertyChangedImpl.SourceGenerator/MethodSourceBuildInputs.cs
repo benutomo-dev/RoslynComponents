@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding;
+using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Text;
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.AutomaticDisposeImpl.SourceGenerator.Embedding;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
@@ -594,8 +595,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             var name = attributeSyntax.Name.ToString();
 
-            if (name.EndsWith(StaticSources.AutomaticDisposeImplAttributeCoreName)) return true;
-            if (name.EndsWith(StaticSources.AutomaticDisposeImplAttributeName)) return true;
+            if (name.EndsWith(StaticSourceAttribute.GetAttributeName<AutomaticDisposeImplAttribute>())) return true;
+            if (name.EndsWith(nameof(AutomaticDisposeImplAttribute))) return true;
 
             return false;
         }

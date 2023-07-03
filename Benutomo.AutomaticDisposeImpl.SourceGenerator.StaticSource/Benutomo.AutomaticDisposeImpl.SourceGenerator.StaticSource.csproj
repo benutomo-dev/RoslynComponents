@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <RootNamespace>Benutomo</RootNamespace>
-    <Version>2.1.0.6</Version>
-  </PropertyGroup>
-</Project>

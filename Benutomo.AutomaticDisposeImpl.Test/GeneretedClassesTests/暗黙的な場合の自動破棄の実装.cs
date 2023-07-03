@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using Xunit;
 
 namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests

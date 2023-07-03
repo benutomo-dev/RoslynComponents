@@ -37,7 +37,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         {
             WriteLogLine("Begin Initialize");
 
-            context.RegisterPostInitializationOutput(PostInitialization);
+            StaticSources.StaticSource.Register(context);
 
             var usingSymbols = context.CompilationProvider
                 .Select((compilation, cancellationToken) =>
@@ -77,20 +77,6 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             WriteLogLine("End Initialize");
         }
-
-        void PostInitialization(IncrementalGeneratorPostInitializationContext context)
-        {
-            WriteLogLine("Begin PostInitialization");
-
-            foreach (var source in StaticSources.Sources)
-            {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                context.AddSource(source.HintName, source.Source);
-            }
-
-            WriteLogLine("End PostInitialization");
-        }
-
 
         bool Predicate(SyntaxNode node, CancellationToken cancellationToken)
         {

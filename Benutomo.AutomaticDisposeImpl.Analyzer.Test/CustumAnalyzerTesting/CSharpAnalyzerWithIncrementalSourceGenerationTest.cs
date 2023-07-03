@@ -3,11 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Linq;
 using Microsoft.CodeAnalysis.Testing.Model;
 
 namespace Benutomo.AutomaticDisposeImpl.Test.CustumAnalyzerTesting

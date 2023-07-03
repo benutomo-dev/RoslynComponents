@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.CancellationAnalyzer.Embedding;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
@@ -125,20 +126,20 @@ namespace Benutomo.CancellationAnalyzer
             if (cancellationTokenSymbol is null)
                 throw new InvalidOperationException("System.Threading.CancellationTokenが見つかりません。");
 
-            var uncancelableAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSources.UncancelableAttributeFullyQualifiedMetadataName);
+            var uncancelableAttributeSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<UncancelableAttribute>());
 
             if (uncancelableAttributeSymbol is null)
-                throw new InvalidOperationException($"{StaticSources.UncancelableAttributeFullyQualifiedMetadataName}が見つかりません。");
+                throw new InvalidOperationException($"{StaticSourceAttribute.GetFullyQualifiedMetadataName<UncancelableAttribute>()}が見つかりません。");
 
-            var disableArgumentCancellationTokenCheckAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSources.DisableArgumentCancellationTokenCheckAttributeFullyQualifiedMetadataName);
+            var disableArgumentCancellationTokenCheckAttribute = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<DisableArgumentCancellationTokenCheckAttribute>());
 
             if (disableArgumentCancellationTokenCheckAttribute is null)
-                throw new InvalidOperationException($"{StaticSources.DisableArgumentCancellationTokenCheckAttributeFullyQualifiedMetadataName}が見つかりません。");
+                throw new InvalidOperationException($"{StaticSourceAttribute.GetFullyQualifiedMetadataName<DisableArgumentCancellationTokenCheckAttribute>()}が見つかりません。");
 
-            var cancellationSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSources.CancellationFullyQualifiedMetadataName);
+            var cancellationSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName(typeof(Cancellation)));
 
             if (cancellationSymbol is null)
-                throw new InvalidOperationException($"{StaticSources.CancellationFullyQualifiedMetadataName}が見つかりません。");
+                throw new InvalidOperationException($"{StaticSourceAttribute.GetFullyQualifiedMetadataName(typeof(Cancellation))}が見つかりません。");
 
             var taskCompletionSourceTResultSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.TaskCompletionSource`1");
             var taskCompletionSourceSymbol = context.SemanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.TaskCompletionSource");

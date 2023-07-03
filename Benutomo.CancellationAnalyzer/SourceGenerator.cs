@@ -7,16 +7,7 @@ namespace Benutomo.CancellationAnalyzer
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            context.RegisterPostInitializationOutput(PostInitializationOutput);
-        }
-
-        public void PostInitializationOutput(IncrementalGeneratorPostInitializationContext context)
-        {
-            foreach (var source in StaticSources.Sources)
-            {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                context.AddSource(source.HintName, source.Source);
-            }
+            StaticSources.StaticSource.Register(context);
         }
     }
 }

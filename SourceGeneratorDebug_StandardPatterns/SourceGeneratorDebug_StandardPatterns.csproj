@@ -15,11 +15,4 @@
     <ProjectReference Include="..\Benutomo.CancellationAnalyzer\Benutomo.CancellationAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="StaticSource" />
-    <Compile Remove="Benutomo.StaticSource.SourceGenerator\Class1.cs" />
-    <AdditionalFiles Include="Benutomo.StaticSource.SourceGenerator\Class1.cs" StaticSource="true" Visible="false" />
-  </ItemGroup>
-
 </Project>

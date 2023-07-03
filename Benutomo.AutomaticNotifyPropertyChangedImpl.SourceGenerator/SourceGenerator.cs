@@ -38,7 +38,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         {
             WriteLogLine("Begin Initialize");
 
-            context.RegisterPostInitializationOutput(PostInitialization);
+            StaticSources.StaticSource.Register(context);
 
             var enableNotificationSupportAttributeSymbol = context.CompilationProvider
                 .Select((compilation, cancellationToken) =>
@@ -106,19 +106,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     yield return new (propertiesInClass.Key, properties);
                 }
             }
-        }
-
-        void PostInitialization(IncrementalGeneratorPostInitializationContext context)
-        {
-            WriteLogLine("Begin PostInitialization");
-
-            foreach (var source in StaticSources.Sources)
-            {
-                context.CancellationToken.ThrowIfCancellationRequested();
-                context.AddSource(source.HintName, source.Source);
-            }
-
-            WriteLogLine("End PostInitialization");
         }
 
         bool IsAttributeAttachedPropertyDeclarationSystax(SyntaxNode node, CancellationToken cancellationToken)

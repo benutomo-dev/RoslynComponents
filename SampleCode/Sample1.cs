@@ -1,5 +1,4 @@
 ﻿using Benutomo;
-using System;
 
 // 同期的な破棄(IDisposable)を自動実装
 [AutomaticDisposeImpl]

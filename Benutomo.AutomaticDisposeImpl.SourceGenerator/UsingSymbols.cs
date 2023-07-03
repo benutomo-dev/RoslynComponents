@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.AutomaticDisposeImpl.SourceGenerator.Embedding;
+using Microsoft.CodeAnalysis;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
@@ -17,12 +18,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     {
         internal static UsingSymbols CreateFrom(Compilation compilation)
         {
-            var automaticDisposeImplAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.AutomaticDisposeImplAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var enableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.EnableAutomaticDisposeAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var disableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.DisableAutomaticDisposeAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var unmanagedResourceReleaseMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.UnmanagedResourceReleaseMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var managedObjectDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ManagedObjectDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
-            var managedObjectAsyncDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSources.ManagedObjectAsyncDisposeMethodAttributeFullyQualifiedMetadataName) ?? throw new InvalidOperationException();
+            var automaticDisposeImplAttributeSymbol = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<AutomaticDisposeImplAttribute>()) ?? throw new InvalidOperationException();
+            var enableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<EnableAutomaticDisposeAttribute>()) ?? throw new InvalidOperationException();
+            var disableAutomaticDisposeAttributeSymbol = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<DisableAutomaticDisposeAttribute>()) ?? throw new InvalidOperationException();
+            var unmanagedResourceReleaseMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<UnmanagedResourceReleaseMethodAttribute>()) ?? throw new InvalidOperationException();
+            var managedObjectDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<ManagedObjectDisposeMethodAttribute>()) ?? throw new InvalidOperationException();
+            var managedObjectAsyncDisposeMethodAttributeSymbol = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<ManagedObjectAsyncDisposeMethodAttribute>()) ?? throw new InvalidOperationException();
             var disposableSymbol = compilation.GetTypeByMetadataName("System.IDisposable") ?? throw new InvalidOperationException();
             var asyncDisposableSymbol = compilation.GetTypeByMetadataName("System.IAsyncDisposable");
             var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task") ?? throw new InvalidOperationException();

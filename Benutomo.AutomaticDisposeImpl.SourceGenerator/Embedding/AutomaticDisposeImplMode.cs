@@ -1,11 +1,14 @@
-﻿#pragma warning disable CS0436
-#nullable enable
-
-namespace Benutomo
+﻿namespace Benutomo.AutomaticDisposeImpl.SourceGenerator.Embedding
 {
     /// <summary>
     /// 破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを自動実装Disposeの対象とすることに関する振る舞いの指定。
     /// </summary>
+    [StaticSource("Benutomo",
+        Usings = new[] { "using System;" },
+        Directives = new[] {
+            "#pragma warning disable CS0436",
+            "#nullable enable",
+        })]
     public enum AutomaticDisposeImplMode
     {
         /// <summary>

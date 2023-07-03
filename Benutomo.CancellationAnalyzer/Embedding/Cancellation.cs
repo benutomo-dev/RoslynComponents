@@ -1,10 +1,10 @@
-﻿using System;
-
-#nullable enable
-
-namespace Benutomo
+﻿namespace Benutomo.CancellationAnalyzer.Embedding
 {
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [StaticSource("Benutomo",
+        Usings = new[] { "using System;" },
+        Attributes = new[] {
+            @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
+        })]
     internal static class Cancellation
     {
         public static _UncancelableSection Uncancelable => _UncancelableSection.Defualt;
@@ -13,7 +13,7 @@ namespace Benutomo
         {
             internal static _UncancelableSection Defualt { get; } = new _UncancelableSection();
 
-            public void Dispose(){ }
+            public void Dispose() { }
         }
 
         public static _DisableArgumentCancellationTokenCheckSection DisableArgumentCancellationTokenCheck => _DisableArgumentCancellationTokenCheckSection.Defualt;

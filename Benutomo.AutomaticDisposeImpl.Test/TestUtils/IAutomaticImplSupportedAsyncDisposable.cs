@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Benutomo.AutomaticDisposeImpl.Test.TestUtils
+﻿namespace Benutomo.AutomaticDisposeImpl.Test.TestUtils
 {
     public interface IAutomaticImplSupportedAsyncDisposable : IDisposable, IAsyncDisposable
     {

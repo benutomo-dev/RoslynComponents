@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis.Testing;
-using System.Threading.Tasks;
 using Xunit;
 
 using Verify = Benutomo.AutomaticDisposeImpl.Test.CustumAnalyzerTesting.CSharpAnalyzerWithIncrementalSourceGenerationVerifier<Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeAnalyzer, Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator>;
