@@ -778,7 +778,11 @@ partial class A : IDisposable
             var expected2 = new[]
             {
                 Verify.Diagnostic("SG0010").WithLocation(10, 10),
+#if DEBUG
                 DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 47, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
+#else
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 53, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
+#endif
             };
 
             await Verify.VerifyAnalyzerAsync(source2, expected2);
@@ -891,7 +895,11 @@ partial class A : IAsyncDisposable
             var expected1 = new[]
             {
                 Verify.Diagnostic("SG0014").WithLocation(10, 9),
+#if DEBUG
                 DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 60, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
+#else
+                DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 66, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
+#endif
             };
 
             await Verify.VerifyAnalyzerAsync(source, expected1);
@@ -913,7 +921,11 @@ partial class A : IAsyncDisposable
             var expected2 = new[]
             {
                 Verify.Diagnostic("SG0014").WithLocation(10, 10),
+#if DEBUG
                 DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 60, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+#else
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 66, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+#endif
             };
 
             await Verify.VerifyAnalyzerAsync(source2, expected2);
@@ -934,7 +946,11 @@ partial class A : IAsyncDisposable
             var expected3 = new[]
             {
                 Verify.Diagnostic("SG0014").WithLocation(10, 15),
+#if DEBUG
                 DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 60, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+#else
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 66, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+#endif
             };
 
             await Verify.VerifyAnalyzerAsync(source3, expected3);
