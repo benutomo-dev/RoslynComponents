@@ -11,17 +11,29 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [EnableNotificationSupport]
-        [EqualityComparer(nameof(EqualityComparer<long>.Default))]
+        [RepresentingEquivalenceFor(nameof(__x))]
+        [AutoGenEqualsEqualityComparer(nameof(EqualityComparer<long>.Default))]
         public int X { get => _X(); set => _X(value); }
 
+        int y;
+        int tt;
     }
 
     [AutomaticEqualsImpl]
-    internal partial class Class2 : Class1<int>
+    internal sealed partial class Class2 : Class1<int>
     {
-        [EnableNotificationSupport]
-        [EqualityComparer(nameof(EqualityComparer<long>.Default))]
-        public int Y { get => _Y(); set => _Y(value); }
+        //[EnableNotificationSupport]
+        //[AutoGenEqualsEqualityComparer(nameof(EqualityComparer<long>.Default))]
+        //public int Y { get => _Y(); set => _Y(value); }
 
+        int tt;
     }
+
+    [AutomaticEqualsImpl]
+    partial struct Struct1 : IEquatable<Struct1>
+    {
+        //[IsNotEquivalenceFactor]
+        int x;
+    }
+
 }

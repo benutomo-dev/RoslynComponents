@@ -17,7 +17,7 @@ namespace Benutomo.EqualsGenerator
             AutomaticEqualsImplAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<AutomaticEqualsImplAttribute>()) ?? throw new InvalidOperationException();
             IsNotEquivalenceFactorAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<IsNotEquivalenceFactorAttribute>()) ?? throw new InvalidOperationException();
             RepresentingEquivalenceForAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<RepresentingEquivalenceForAttribute>()) ?? throw new InvalidOperationException();
-            EqualityComparerAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<EqualityComparerAttribute>()) ?? throw new InvalidOperationException();
+            EqualityComparerAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<AutoGenEqualsEqualityComparerAttribute>()) ?? throw new InvalidOperationException();
             IEquatable = compilation.GetTypeByMetadataName("System.IEquatable`1") ?? throw new InvalidOperationException();
         }
 

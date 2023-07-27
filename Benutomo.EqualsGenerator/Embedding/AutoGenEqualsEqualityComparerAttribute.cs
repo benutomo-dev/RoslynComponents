@@ -1,7 +1,7 @@
 ﻿namespace Benutomo.EqualsGenerator.Embedding
 {
     /// <summary>
-    /// 指定したクラスに<see cref="IEquatable{T}"/>のメンバを自動実装する。
+    /// Equalsメソッドの自動実装でこの属性を付与したメンバの等価性判定に使用する<see cref="IEqualityComparer{T}"。/>
     /// </summary>
     [StaticSource("Benutomo",
         Usings = new[] {
@@ -14,14 +14,12 @@
         },
         Attributes = new[] {
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
-            @"[AttributeUsage(AttributeTargets.Class)]",
+            @"[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]
-    public class AutomaticEqualsImplAttribute : Attribute
+    public class AutoGenEqualsEqualityComparerAttribute : Attribute
     {
-        /// <summary>
-        /// 自動破棄実装の既定動作を設定する。
-        /// </summary>
-        public AutomaticEqualsImplMode Mode { get; set; }
+        public AutoGenEqualsEqualityComparerAttribute(string nameofIEqualityComparerMember) { }
     }
 }
+
