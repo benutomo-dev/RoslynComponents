@@ -14,14 +14,11 @@
         },
         Attributes = new[] {
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
-            @"[AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct)]",
+            @"[AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]
     public class AutomaticEqualsImplAttribute : Attribute
     {
-        /// <summary>
-        /// 自動破棄実装の既定動作を設定する。
-        /// </summary>
-        public AutomaticEqualsImplMode Mode { get; set; }
+        public AutomaticEqualsImplAttribute(AutomaticEqualsImplOptions options = AutomaticEqualsImplOptions.None) { }
     }
 }

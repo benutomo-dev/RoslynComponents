@@ -10,11 +10,14 @@
         Directives = new[] {
             "#pragma warning disable CS0436",
             "#nullable enable",
+        },
+        Attributes = new[] {
+            @"[Flags]",
         })]
     [Flags]
-    public enum AutomaticEqualsImplMode
+    public enum AutomaticEqualsImplOptions
     {
-        None,
-        WithOperator,
+        None         = 0b0000,
+        WithOperator = 0b0001,
     }
 }

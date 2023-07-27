@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
 {
-    [AutomaticEqualsImpl]
+    [AutomaticEqualsImpl(AutomaticEqualsImplOptions.WithOperator)]
     internal partial class Class1<T> : INotifyPropertyChanged, IEquatable<Class1<T>>
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -19,11 +19,11 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
         int tt;
     }
 
-    [AutomaticEqualsImpl]
+    [AutomaticEqualsImpl(AutomaticEqualsImplOptions.None)]
     internal sealed partial class Class2 : Class1<int>
     {
         //[EnableNotificationSupport]
-        //[AutoGenEqualsEqualityComparer(nameof(EqualityComparer<long>.Default))]
+        [AutoGenEqualsEqualityComparer(nameof(EqualityComparer<long>.Default))]
         //public int Y { get => _Y(); set => _Y(value); }
 
         int tt;

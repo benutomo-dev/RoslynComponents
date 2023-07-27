@@ -2,6 +2,9 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -22,7 +25,7 @@ namespace Benutomo.EqualsGenerator
             var anotatedClasses = context.SyntaxProvider
                 .ForAttributeWithMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<AutomaticEqualsImplAttribute>(), Predicate, Transform)
                 .Where(v => v.targetSymbol is not null)
-                .Select((v, ct) => (v.targetSymbol!, new UsingSymbols(v.semanticModel.Compilation), v.semanticModel));
+                .Select((v, ct) => (v.targetSymbol!, v.attribute, new UsingSymbols(v.semanticModel.Compilation), v.semanticModel));
 
             context.RegisterSourceOutput(anotatedClasses, Generate);
         }
@@ -35,7 +38,7 @@ namespace Benutomo.EqualsGenerator
             };
         }
 
-        static (INamedTypeSymbol? targetSymbol, SemanticModel semanticModel) Transform(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
+        static (INamedTypeSymbol? targetSymbol, AttributeData attribute, SemanticModel semanticModel) Transform(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
         {
             var typeDeclarationSyntax = (TypeDeclarationSyntax)context.TargetNode;
 
@@ -46,10 +49,12 @@ namespace Benutomo.EqualsGenerator
 
             var namedTypeSymbol = context.SemanticModel.GetDeclaredSymbol(typeDeclarationSyntax, cancellationToken) as INamedTypeSymbol;
 
-            return (namedTypeSymbol, context.SemanticModel);
+            Debug.Assert(context.Attributes.Length == 1);
+
+            return (namedTypeSymbol, context.Attributes[0], context.SemanticModel);
         }
 
-        void Generate(SourceProductionContext context, (INamedTypeSymbol targetSymbol, UsingSymbols usingSymbols, SemanticModel semanticModel) generateArgs)
+        void Generate(SourceProductionContext context, (INamedTypeSymbol targetSymbol, AttributeData attribute, UsingSymbols usingSymbols, SemanticModel semanticModel) generateArgs)
         {
             using var builder = new SourceBuilderEx(context);
 
@@ -117,17 +122,17 @@ namespace Benutomo.EqualsGenerator
 
                 foreach (var baseTypeEqualsType in baseTypeEqualsQuery)
                 {
-                    ITypeSymbol argTypeSymbol;
+                    ITypeSymbol argBaseTypeSymbol;
                     if (baseTypeEqualsType.IsValueType)
                     {
-                        argTypeSymbol = baseTypeEqualsType;
+                        argBaseTypeSymbol = baseTypeEqualsType;
                     }
                     else
                     {
-                        argTypeSymbol = baseTypeEqualsType.WithNullableAnnotation(NullableAnnotation.Annotated);
+                        argBaseTypeSymbol = baseTypeEqualsType.WithNullableAnnotation(NullableAnnotation.Annotated);
                     }
                     
-                    using (builder.BeginBlock($@"public override bool Equals({argTypeSymbol} other)"))
+                    using (builder.BeginBlock($@"public override bool Equals({argBaseTypeSymbol} other)"))
                     {
                         builder.PutIndentSpace();
                         builder.Append("return other is ");
@@ -182,15 +187,17 @@ namespace Benutomo.EqualsGenerator
 
                 using (builder.BeginBlock($@"public{(generateArgs.targetSymbol.IsSealed ? " " : " virtual")} bool Equals({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "": "?")} other)"))
                 {
+                    if (!generateArgs.targetSymbol.IsValueType)
+                    {
+                        builder.PutIndentSpace();
+                        builder.AppendLine($@"if (other is null) return false;");
+
+                        builder.PutIndentSpace();
+                        builder.AppendLine($@"if (object.ReferenceEquals(this, other)) return true;");
+                    }
+
                     builder.PutIndentSpace();
-                    if (generateArgs.targetSymbol.IsValueType)
-                    {
-                        builder.AppendLine($@"return true");
-                    }
-                    else
-                    {
-                        builder.AppendLine($@"return other is not null");
-                    }
+                    builder.AppendLine($@"return true");
 
                     if (!generateArgs.targetSymbol.IsValueType && generateArgs.targetSymbol.BaseType is { SpecialType: not SpecialType.System_Object })
                     {
@@ -213,6 +220,23 @@ namespace Benutomo.EqualsGenerator
 
                     builder.PutIndentSpace();
                     builder.AppendLine("  ;");
+                }
+
+                var options = (AutomaticEqualsImplOptions)(int)generateArgs.attribute.ConstructorArguments[0].Value!;
+
+                if (options.HasFlag(AutomaticEqualsImplOptions.WithOperator))
+                {
+                    using (builder.BeginBlock($@"public static bool operator ==({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} left, {typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} right)"))
+                    {
+                        builder.PutIndentSpace();
+                        builder.AppendLine($@"return System.Collections.Generic.EqualityComparer<{typeDefinitionInfo.NameWithGenericArgs}>.Default.Equals(left, right);");
+                    }
+
+                    using (builder.BeginBlock($@"public static bool operator !=({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} left, {typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} right)"))
+                    {
+                        builder.PutIndentSpace();
+                        builder.AppendLine($@"return !System.Collections.Generic.EqualityComparer<{typeDefinitionInfo.NameWithGenericArgs}>.Default.Equals(left, right);");
+                    }
                 }
             }
 
