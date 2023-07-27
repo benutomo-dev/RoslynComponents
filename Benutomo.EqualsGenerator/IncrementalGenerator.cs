@@ -56,9 +56,11 @@ namespace Benutomo.EqualsGenerator
 
         void Generate(SourceProductionContext context, (INamedTypeSymbol targetSymbol, AttributeData attribute, UsingSymbols usingSymbols, SemanticModel semanticModel) generateArgs)
         {
-            using var builder = new SourceBuilderEx(context);
-
             var typeDefinitionInfo = generateArgs.targetSymbol.BuildTypeDefinitionInfo();
+
+            var hintName = typeDefinitionInfo.MakeHintName();
+
+            using var builder = new SourceBuilderEx(context, $"{hintName}.cs");
 
             builder.AppendLine(generateArgs.semanticModel.SyntaxTree.GetCompilationUnitRoot().Usings.ToString());
 
@@ -240,7 +242,7 @@ namespace Benutomo.EqualsGenerator
                 }
             }
 
-            context.AddSource(typeDefinitionInfo.MakeHintName(), builder.SourceText);
+            builder.Commit();
         }
     }
 }

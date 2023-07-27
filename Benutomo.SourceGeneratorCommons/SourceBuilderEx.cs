@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Buffers;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
 
@@ -19,12 +20,23 @@ internal class SourceBuilderEx : IDisposable
 
     private SourceProductionContext _context;
 
+    private string _hintName;
+
     private const string IndentText = "    ";
 
-    public SourceBuilderEx(SourceProductionContext context)
+    private static ConcurrentDictionary<string, int> _initialBufferSizeDictionary = new ConcurrentDictionary<string, int>();
+
+    public SourceBuilderEx(SourceProductionContext context, string hintName)
     {
         _context = context;
-        _buffer = ArrayPool<char>.Shared.Rent(1024);
+        _hintName = hintName;
+
+        if (!_initialBufferSizeDictionary.TryGetValue(hintName, out var initialMinimumCapacityLength))
+        {
+            initialMinimumCapacityLength = 1024;
+        }
+        _buffer = ArrayPool<char>.Shared.Rent(initialMinimumCapacityLength);
+        _length = 0;
     }
 
     public void Dispose()
@@ -35,6 +47,15 @@ internal class SourceBuilderEx : IDisposable
             ArrayPool<char>.Shared.Return(_buffer);
             _buffer = null;
         }
+    }
+
+    public void Commit()
+    {
+        _context.AddSource(_hintName, SourceText);
+
+        _initialBufferSizeDictionary.AddOrUpdate(_hintName, _length, (_, _) => _length);
+
+        Dispose();
     }
 
     void ExpandBuffer(int requiredSize)
