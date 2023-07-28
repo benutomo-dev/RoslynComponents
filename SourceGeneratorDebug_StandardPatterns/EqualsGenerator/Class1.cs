@@ -23,6 +23,9 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
 
         int y;
         int tt;
+
+        [HashCodeCacheField]
+        int _hashCode;
     }
 
     [AutomaticEqualsImpl(AutomaticEqualsImplOptions.None)]
@@ -44,19 +47,37 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
 
     internal sealed partial class Class3
     {
+        event EventHandler? Event;
+
         int X { get; set; }
 
         [RepresentingEquivalenceFor(nameof(y))]
         int Y { get => y; set => y = value; }
-        
+
         int Z => 1;
 
         int y;
 
+        int this[int x] => x;
+
+
+        [HashCodeCacheField]
+        int _hashCode;
+
+        [GetHashCodeImpl]
+        public int GetHashCodeImpl()
+        {
+            if (_hashCode != 0) return _hashCode;
+            _hashCode = HashCode.Combine(X, Y);
+            _hashCode = _hashCode == 0 ? 1 : _hashCode;
+            return _hashCode;
+        }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(X, Y);
+            //return 0;
+            return GetHashCodeImpl();
+            //return HashCode.Combine(X, Y);
         }
 
         public override bool Equals(object? obj) => obj is Class3 class3 && Equals(class3);
@@ -64,6 +85,7 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
         public bool Equals(Class3? obj)
         {
             return obj is not null
+                && GetHashCode() == obj.GetHashCode()
                 && X == obj.X
                 && Y == obj.Y
                 ;

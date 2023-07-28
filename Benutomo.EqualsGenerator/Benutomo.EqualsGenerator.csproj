@@ -12,7 +12,7 @@
 		<DevelopmentDependency>true</DevelopmentDependency>
 		<PackageId>Benutomo.EqualsGenerator</PackageId>
 		<Description>A Source Generator that automatically implements the Equals method of IEquatable&lt;T&gt;</Description>
-		<PackageVersion>1.0.0-alpha2</PackageVersion>
+		<PackageVersion>1.0.0-alpha5</PackageVersion>
 		<Authors>benutomo</Authors>
 		<Copyright>© benutomo.</Copyright>
 		<PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;iequatable;equals;gethashcode</PackageTags>

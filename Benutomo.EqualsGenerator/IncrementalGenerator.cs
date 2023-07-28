@@ -6,6 +6,7 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 
@@ -115,12 +116,15 @@ namespace Benutomo.EqualsGenerator
                             equalityComparer = equalityComparerBuilder.ToString();
                         }
 
-                        return (member.symbol, member.type, equalityComparer);
-                    });
+                        return (member.symbol, member.type, member.isHashCodeCache, equalityComparer);
+                    })
+                    .ToArray();
 
                 var baseTypeEqualsQuery = enumerableBaseTypeEqualsMethodTypes(generateArgs.targetSymbol.BaseType)
                     .Distinct(SymbolEqualityComparer.Default)
                     .Select(v => (ITypeSymbol)v!);
+
+                var hashCodeCacheField = members.FirstOrDefault(v => v.isHashCodeCache);
 
                 foreach (var baseTypeEqualsType in baseTypeEqualsQuery)
                 {
@@ -163,28 +167,57 @@ namespace Benutomo.EqualsGenerator
 
                 using (builder.BeginBlock($@"public override int GetHashCode()"))
                 {
-                    builder.PutIndentSpace();
-                    builder.AppendLine($@"var hashCode = new System.HashCode();");
-
-                    if (!generateArgs.targetSymbol.IsValueType && generateArgs.targetSymbol.BaseType is { SpecialType: not SpecialType.System_Object })
+                    SourceBuilderEx._BlockEndDisposable block = default;
+                    try
                     {
+                        if (hashCodeCacheField.symbol is not null)
+                        {
+                            block = builder.BeginBlock($@"if ({hashCodeCacheField.symbol.Name} == 0)");
+                        }
+
                         builder.PutIndentSpace();
-                        builder.AppendLine("hashCode.Add(base.GetHashCode());");
+                        builder.AppendLine($@"var hashCode = new System.HashCode();");
+
+                        if (!generateArgs.targetSymbol.IsValueType && generateArgs.targetSymbol.BaseType is { SpecialType: not SpecialType.System_Object })
+                        {
+                            builder.PutIndentSpace();
+                            builder.AppendLine("hashCode.Add(base.GetHashCode());");
+                        }
+
+                        foreach (var member in members)
+                        {
+                            builder.PutIndentSpace();
+                            builder.Append("hashCode.Add(this.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(", ");
+                            builder.Append(member.equalityComparer);
+                            builder.Append(");");
+                            builder.AppendLine();
+                        }
+
+                        if (hashCodeCacheField.symbol is not null)
+                        {
+                            builder.PutIndentSpace();
+                            builder.AppendLine($@"this.{hashCodeCacheField.symbol.Name} = hashCode.ToHashCode();");
+                            builder.PutIndentSpace();
+                            builder.AppendLine($@"if (this.{hashCodeCacheField.symbol.Name} == 0) this.{hashCodeCacheField.symbol.Name} = 1;");
+                        }
+                    }
+                    finally
+                    {
+                        block.Dispose();
                     }
 
-                    foreach (var member in members)
+                    if (hashCodeCacheField.symbol is not null)
                     {
                         builder.PutIndentSpace();
-                        builder.Append("hashCode.Add(");
-                        builder.Append(member.symbol.Name);
-                        builder.Append(", ");
-                        builder.Append(member.equalityComparer);
-                        builder.Append(");");
-                        builder.AppendLine();
+                        builder.AppendLine($@"return this.{hashCodeCacheField.symbol.Name};");
                     }
-
-                    builder.PutIndentSpace();
-                    builder.AppendLine("return hashCode.ToHashCode();");
+                    else
+                    {
+                        builder.PutIndentSpace();
+                        builder.AppendLine($@"return hashCode.ToHashCode();");
+                    }
                 }
 
                 using (builder.BeginBlock($@"public{(generateArgs.targetSymbol.IsSealed ? " " : " virtual")} bool Equals({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "": "?")} other)"))
@@ -200,6 +233,12 @@ namespace Benutomo.EqualsGenerator
 
                     builder.PutIndentSpace();
                     builder.AppendLine($@"return true");
+
+                    if (hashCodeCacheField.symbol is not null)
+                    {
+                        builder.PutIndentSpace();
+                        builder.AppendLine($@"  && this.GetHashCode() == other.GetHashCode()");
+                    }
 
                     if (!generateArgs.targetSymbol.IsValueType && generateArgs.targetSymbol.BaseType is { SpecialType: not SpecialType.System_Object })
                     {

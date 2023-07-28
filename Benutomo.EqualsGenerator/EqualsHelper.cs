@@ -9,7 +9,7 @@ namespace Benutomo.EqualsGenerator
 {
     internal class EqualsHelper
     {
-        public static IEnumerable<(ISymbol symbol, ITypeSymbol type)> EnumerateValidMembers(ITypeSymbol typeSymbol, UsingSymbols usingSymbols, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static IEnumerable<(ISymbol symbol, ITypeSymbol type, bool isHashCodeCache)> EnumerateValidMembers(ITypeSymbol typeSymbol, UsingSymbols usingSymbols, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var shadowingMembersQuery = typeSymbol.GetMembers()
                 .Where(v => v is IFieldSymbol or IPropertySymbol)
@@ -27,7 +27,7 @@ namespace Benutomo.EqualsGenerator
             return members;
 
 
-            static IEnumerable<(ISymbol symbol, ITypeSymbol type)> enumerateValidMembers(ITypeSymbol typeSymbol, UsingSymbols usingSymbols, SemanticModel semanticModel, HashSet<string> shadowingMembers, CancellationToken cancellationToken)
+            static IEnumerable<(ISymbol symbol, ITypeSymbol type, bool isHashCodeCache)> enumerateValidMembers(ITypeSymbol typeSymbol, UsingSymbols usingSymbols, SemanticModel semanticModel, HashSet<string> shadowingMembers, CancellationToken cancellationToken)
             {
                 foreach (var member in typeSymbol.GetMembers())
                 {
@@ -66,7 +66,7 @@ namespace Benutomo.EqualsGenerator
                     }
 
 
-                    yield return (member, memberType);
+                    yield return (member, memberType, member.IsAttributedBy(usingSymbols.HashCodeCacheFieldAttribute));
                 }
             }
         }

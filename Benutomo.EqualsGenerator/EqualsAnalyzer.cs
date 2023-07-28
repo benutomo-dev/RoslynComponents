@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.SourceGeneratorCommons;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -39,7 +40,7 @@ namespace Benutomo.EqualsGenerator
         /// </summary>
         internal static DiagnosticDescriptor s_diagnosticDescriptor_EqualsGenerator0003 = new DiagnosticDescriptor(
             "EqualsGenerator0003",
-            "等価性判定の要因から除外されたメンバーを未使用",
+            "等価性判定の要因となるメンバーを未使用",
             "等価性判定の要因となるメンバー({0})が使用されていません。",
             "Usage",
             DiagnosticSeverity.Warning,
@@ -68,7 +69,7 @@ namespace Benutomo.EqualsGenerator
 
         private static void AnalyzeEqualityMethodsImpl(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is not MethodDeclarationSyntax { Identifier.ValueText: nameof(Equals) or nameof(GetHashCode) } methodDeclarationSyntax)
+            if (context.Node is not MethodDeclarationSyntax methodDeclarationSyntax)
             {
                 return;
             }
@@ -85,16 +86,97 @@ namespace Benutomo.EqualsGenerator
                 return;
             }
 
-            if (methodSymbol.Name == nameof(Equals))
-            {
-                if (methodSymbol.Parameters.Length != 1)
-                {
-                    return;
-                }
+            var usingSymbols = new UsingSymbols(context.Compilation);
 
+            if (methodSymbol.Name == nameof(Equals) && methodSymbol.Parameters.Length == 1)
+            {
+                var isCallOtherEqualsImpl = methodBody.DescendantNodes()
+                    .OfType<InvocationExpressionSyntax>()
+                    .Select(symbol => context.SemanticModel.GetSymbolInfo(symbol.Expression).Symbol as IMethodSymbol)
+                    .Where(invokationMethodSymbol => invokationMethodSymbol is not null
+                        && SymbolEqualityComparer.Default.Equals(invokationMethodSymbol.ContainingType, methodSymbol.ContainingType)
+                        && invokationMethodSymbol.IsAttributedBy(usingSymbols.EqualsImplAttribute)
+                    )
+                    .Any();
+
+                if (!isCallOtherEqualsImpl)
+                {
+                    analyzeEqualsMethod(context, usingSymbols, methodDeclarationSyntax, methodSymbol, methodBody);
+                }
+            }
+            else if (methodSymbol.IsAttributedBy(usingSymbols.EqualsImplAttribute))
+            {
+                analyzeEqualsMethod(context, usingSymbols, methodDeclarationSyntax, methodSymbol, methodBody);
+            }
+
+            if (methodSymbol.Name == nameof(GetHashCode) && methodSymbol.Parameters.Length == 0)
+            {
+                var isCallOtherGetHashCodeImpl = methodBody.DescendantNodes()
+                    .OfType<InvocationExpressionSyntax>()
+                    .Select(syntax => context.SemanticModel.GetSymbolInfo(syntax.Expression).Symbol as IMethodSymbol)
+                    .Where(invokationMethodSymbol => invokationMethodSymbol is not null
+                        && SymbolEqualityComparer.Default.Equals(invokationMethodSymbol.ContainingType, methodSymbol.ContainingType)
+                        && invokationMethodSymbol.IsAttributedBy(usingSymbols.GetHashCodeImplAttribute)
+                    )
+                    .Any();
+
+                if (!isCallOtherGetHashCodeImpl)
+                {
+                    analyzeGetHashCodeMethod(context, usingSymbols, methodDeclarationSyntax, methodSymbol, methodBody);
+                }
+            }
+            else if (methodSymbol.IsAttributedBy(usingSymbols.GetHashCodeImplAttribute))
+            {
+                analyzeGetHashCodeMethod(context, usingSymbols, methodDeclarationSyntax, methodSymbol, methodBody);
+            }
+
+
+            static void validateEqualityFactorMembersAccessing(SyntaxNodeAnalysisContext context, UsingSymbols usingSymbols, IMethodSymbol methodSymbol, SyntaxNode methodBody, bool isEqualsMethod, out IEnumerable<string> unusedEqualityFactorMembers, out IEnumerable<IdentifierNameSyntax> usedNotEqualityFactorMembers)
+            {
+                var readAccessMembersLookup = methodBody.DescendantNodes()
+                    .OfType<IdentifierNameSyntax>()
+                    .Select(syntax => (syntax, symbol: context.SemanticModel.GetSymbolInfo(syntax).Symbol!))
+                    .Where(v => v.symbol is not null)
+                    .Where(v => v.syntax.Parent is not AssignmentExpressionSyntax assignmentExpression || assignmentExpression.Left != v.syntax)
+                    .Where(v => v.symbol is IFieldSymbol or IPropertySymbol)
+                    .Where(v => SymbolEqualityComparer.Default.Equals(v.symbol.ContainingType, methodSymbol.ContainingType))
+                    .Select(v => (name: v.symbol.Name, v.syntax))
+                    .ToLookup(v => v.name);
+
+                var readAccessMembers = new HashSet<string>(readAccessMembersLookup.Select(v => v.Key));
+
+                var equalityFacterMembersQuery = EqualsHelper.EnumerateValidMembers(methodSymbol.ContainingType, usingSymbols, context.SemanticModel, context.CancellationToken)
+                    .Where(v => isEqualsMethod ? !v.isHashCodeCache : true)
+                    .Select(v => v.symbol.Name);
+
+                var equalityFacterMembers = new HashSet<string>(equalityFacterMembersQuery);
+
+                if (readAccessMembers.SetEquals(equalityFacterMembers))
+                {
+                    unusedEqualityFactorMembers = Array.Empty<string>();
+                    usedNotEqualityFactorMembers = Array.Empty<IdentifierNameSyntax>();
+                }
+                else
+                {
+                    var intersection = new HashSet<string>(readAccessMembers, readAccessMembers.Comparer);
+                    intersection.IntersectWith(equalityFacterMembers);
+
+                    equalityFacterMembers.ExceptWith(intersection);
+                    readAccessMembers.ExceptWith(intersection);
+
+                    unusedEqualityFactorMembers = equalityFacterMembers;
+                    usedNotEqualityFactorMembers = readAccessMembers
+                        .SelectMany(v => readAccessMembersLookup[v])
+                        .Select(v => v.syntax)
+                        .ToArray();
+                }
+            }
+
+            static void analyzeEqualsMethod(SyntaxNodeAnalysisContext context, UsingSymbols usingSymbols, MethodDeclarationSyntax methodDeclarationSyntax, IMethodSymbol methodSymbol, SyntaxNode methodBody)
+            {
                 if (SymbolEqualityComparer.Default.Equals(methodSymbol.Parameters[0].Type, methodSymbol.ContainingSymbol))
                 {
-                    validateEqualityFactorMembersAccessing(context, methodSymbol, methodBody, out var unusedEqualityFactorMembers, out var usedNotEqualityFactorMembers);
+                    validateEqualityFactorMembersAccessing(context, usingSymbols, methodSymbol, methodBody, isEqualsMethod: true, out var unusedEqualityFactorMembers, out var usedNotEqualityFactorMembers);
 
                     Debug.Assert(unusedEqualityFactorMembers is ICollection<string>);
                     Debug.Assert(usedNotEqualityFactorMembers is ICollection<IdentifierNameSyntax>);
@@ -131,15 +213,10 @@ namespace Benutomo.EqualsGenerator
                     }
                 }
             }
-            else
-            {
-                Debug.Assert(methodSymbol.Name == nameof(GetHashCode));
-                if (methodSymbol.Parameters.Length != 0)
-                {
-                    return;
-                }
 
-                validateEqualityFactorMembersAccessing(context, methodSymbol, methodBody, out var unusedEqualityFactorMembers, out var usedNotEqualityFactorMembers);
+            static void analyzeGetHashCodeMethod(SyntaxNodeAnalysisContext context, UsingSymbols usingSymbols, MethodDeclarationSyntax methodDeclarationSyntax, IMethodSymbol methodSymbol, SyntaxNode methodBody)
+            {
+                validateEqualityFactorMembersAccessing(context, usingSymbols, methodSymbol, methodBody, isEqualsMethod: false, out var unusedEqualityFactorMembers, out var usedNotEqualityFactorMembers);
 
                 Debug.Assert(unusedEqualityFactorMembers is ICollection<string>);
                 Debug.Assert(usedNotEqualityFactorMembers is ICollection<IdentifierNameSyntax>);
@@ -154,49 +231,6 @@ namespace Benutomo.EqualsGenerator
                 {
                     var diagnostic = Diagnostic.Create(s_diagnosticDescriptor_EqualsGenerator0003, methodDeclarationSyntax.Identifier.GetLocation(), unusedEqualityFactorMember);
                     context.ReportDiagnostic(diagnostic);
-                }
-            }
-
-
-            static void validateEqualityFactorMembersAccessing(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol, SyntaxNode methodBody, out IEnumerable<string> unusedEqualityFactorMembers, out IEnumerable<IdentifierNameSyntax> usedNotEqualityFactorMembers)
-            {
-                var readAccessMembersLookup = methodBody.DescendantNodes()
-                    .OfType<IdentifierNameSyntax>()
-                    .Select(syntax => (syntax, symbol: context.SemanticModel.GetSymbolInfo(syntax).Symbol!))
-                    .Where(v => v.symbol is not null)
-                    .Where(v => v.syntax.Parent is not AssignmentExpressionSyntax assignmentExpression || assignmentExpression.Left != v.syntax)
-                    .Where(v => v.symbol is IFieldSymbol or IPropertySymbol)
-                    .Where(v => SymbolEqualityComparer.Default.Equals(v.symbol.ContainingType, methodSymbol.ContainingType))
-                    .Select(v => (name: v.symbol.Name, v.syntax))
-                    .ToLookup(v => v.name);
-
-                var readAccessMembers = new HashSet<string>(readAccessMembersLookup.Select(v => v.Key));
-
-                var usingSymbols = new UsingSymbols(context.Compilation);
-
-                var equalityFacterMembersQuery = EqualsHelper.EnumerateValidMembers(methodSymbol.ContainingType, usingSymbols, context.SemanticModel, context.CancellationToken)
-                    .Select(v => v.symbol.Name);
-
-                var equalityFacterMembers = new HashSet<string>(equalityFacterMembersQuery);
-
-                if (readAccessMembers.SetEquals(equalityFacterMembers))
-                {
-                    unusedEqualityFactorMembers = Array.Empty<string>();
-                    usedNotEqualityFactorMembers = Array.Empty<IdentifierNameSyntax>();
-                }
-                else
-                {
-                    var intersection = new HashSet<string>(readAccessMembers, readAccessMembers.Comparer);
-                    intersection.IntersectWith(equalityFacterMembers);
-
-                    equalityFacterMembers.ExceptWith(intersection);
-                    readAccessMembers.ExceptWith(intersection);
-
-                    unusedEqualityFactorMembers = equalityFacterMembers;
-                    usedNotEqualityFactorMembers = readAccessMembers
-                        .SelectMany(v => readAccessMembersLookup[v])
-                        .Select(v => v.syntax)
-                        .ToArray();
                 }
             }
         }

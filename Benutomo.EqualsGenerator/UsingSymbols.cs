@@ -9,6 +9,9 @@ namespace Benutomo.EqualsGenerator
         public INamedTypeSymbol IsNotEquivalenceFactorAttribute { get; init; }
         public INamedTypeSymbol RepresentingEquivalenceForAttribute { get; init; }
         public INamedTypeSymbol EqualityComparerAttribute { get; init; }
+        public INamedTypeSymbol GetHashCodeImplAttribute { get; init; }
+        public INamedTypeSymbol EqualsImplAttribute { get; init; }
+        public INamedTypeSymbol HashCodeCacheFieldAttribute { get; init; }
 
         public INamedTypeSymbol IEquatable { get; init; }
 
@@ -18,6 +21,9 @@ namespace Benutomo.EqualsGenerator
             IsNotEquivalenceFactorAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<IsNotEquivalenceFactorAttribute>()) ?? throw new InvalidOperationException();
             RepresentingEquivalenceForAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<RepresentingEquivalenceForAttribute>()) ?? throw new InvalidOperationException();
             EqualityComparerAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<AutoGenEqualsEqualityComparerAttribute>()) ?? throw new InvalidOperationException();
+            GetHashCodeImplAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<GetHashCodeImplAttribute>()) ?? throw new InvalidOperationException();
+            EqualsImplAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<EqualsImplAttribute>()) ?? throw new InvalidOperationException();
+            HashCodeCacheFieldAttribute = compilation.GetTypeByMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName<HashCodeCacheFieldAttribute>()) ?? throw new InvalidOperationException();
             IEquatable = compilation.GetTypeByMetadataName("System.IEquatable`1") ?? throw new InvalidOperationException();
         }
 
@@ -33,6 +39,9 @@ namespace Benutomo.EqualsGenerator
                    SymbolEqualityComparer.Default.Equals(IsNotEquivalenceFactorAttribute, other.IsNotEquivalenceFactorAttribute) &&
                    SymbolEqualityComparer.Default.Equals(RepresentingEquivalenceForAttribute, other.RepresentingEquivalenceForAttribute) &&
                    SymbolEqualityComparer.Default.Equals(EqualityComparerAttribute, other.EqualityComparerAttribute) &&
+                   SymbolEqualityComparer.Default.Equals(GetHashCodeImplAttribute, other.GetHashCodeImplAttribute) &&
+                   SymbolEqualityComparer.Default.Equals(EqualsImplAttribute, other.EqualsImplAttribute) &&
+                   SymbolEqualityComparer.Default.Equals(HashCodeCacheFieldAttribute, other.HashCodeCacheFieldAttribute) &&
                    SymbolEqualityComparer.Default.Equals(IEquatable, other.IEquatable);
         }
 
@@ -43,6 +52,9 @@ namespace Benutomo.EqualsGenerator
             hashCode.Add(IsNotEquivalenceFactorAttribute, SymbolEqualityComparer.Default);
             hashCode.Add(RepresentingEquivalenceForAttribute, SymbolEqualityComparer.Default);
             hashCode.Add(EqualityComparerAttribute, SymbolEqualityComparer.Default);
+            hashCode.Add(GetHashCodeImplAttribute, SymbolEqualityComparer.Default);
+            hashCode.Add(EqualsImplAttribute, SymbolEqualityComparer.Default);
+            hashCode.Add(HashCodeCacheFieldAttribute, SymbolEqualityComparer.Default);
             hashCode.Add(IEquatable, SymbolEqualityComparer.Default);
             return hashCode.ToHashCode();
         }
