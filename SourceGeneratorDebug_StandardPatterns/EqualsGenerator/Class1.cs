@@ -10,10 +10,16 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public int Y { get; set; }
+
+
         [EnableNotificationSupport]
         [RepresentingEquivalenceFor(nameof(__x))]
         [AutoGenEqualsEqualityComparer(nameof(EqualityComparer<long>.Default))]
         public int X { get => _X(); set => _X(value); }
+
+        [RepresentingEquivalenceFor(nameof(tt))]
+        public int Tt { get => tt; set => tt = value; }
 
         int y;
         int tt;
@@ -34,6 +40,34 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
     {
         //[IsNotEquivalenceFactor]
         int x;
+    }
+
+    internal sealed partial class Class3
+    {
+        int X { get; set; }
+
+        [RepresentingEquivalenceFor(nameof(y))]
+        int Y { get => y; set => y = value; }
+        
+        int Z => 1;
+
+        int y;
+
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y);
+        }
+
+        public override bool Equals(object? obj) => obj is Class3 class3 && Equals(class3);
+
+        public bool Equals(Class3? obj)
+        {
+            return obj is not null
+                && X == obj.X
+                && Y == obj.Y
+                ;
+        }
     }
 
 }

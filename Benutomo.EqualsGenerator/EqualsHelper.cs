@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.SourceGeneratorCommons;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
@@ -50,6 +51,12 @@ namespace Benutomo.EqualsGenerator
                     else if (member is IPropertySymbol propertySymbol)
                     {
                         if (propertySymbol.IsImplicitlyDeclared) continue;
+
+                        if (!propertySymbol.IsAttributedBy(usingSymbols.RepresentingEquivalenceForAttribute))
+                        {
+                            var isAutoImplementedProperty = propertySymbol.IsAutoImplimenedProperty(cancellationToken);
+                            if (!isAutoImplementedProperty) continue;
+                        }
 
                         memberType = propertySymbol.Type;
                     }
