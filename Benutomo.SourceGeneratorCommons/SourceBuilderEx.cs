@@ -205,16 +205,6 @@ internal class SourceBuilderEx : IDisposable
         }
     }
 
-    public _BlockEndDisposable BeginTryBlock()
-    {
-        return BeginBlock("try".AsSpan());
-    }
-
-    public _BlockEndDisposable BeginFinallyBlock()
-    {
-        return BeginBlock("finally".AsSpan());
-    }
-
     public _BlockEndDisposable BeginBlock(ReadOnlySpan<char> blockHeadLine)
     {
         PutIndentSpace();
