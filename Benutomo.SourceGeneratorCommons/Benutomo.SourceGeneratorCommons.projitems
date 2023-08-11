@@ -10,8 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ClassSourceBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SymbolExtensions\SymbolExtensions.Appender.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SymbolExtensions\SymbolExtensions.IsAssignableTo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\SemanticModelExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Symbols\SymbolExtensions.Appender.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Symbols\SymbolExtensions.IsAssignableTo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Polyfills\CompilerFeatureRequiredAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Polyfills\IsExternalInit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITypeContainer.cs" />
@@ -19,12 +20,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Polyfills\RequiredAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SourceBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SourceBuilderEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SymbolExtensions\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Symbols\SymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeDefinitionInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SymbolExtensions\PropertySymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SymbolExtensions\TypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Symbols\PropertySymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\Symbols\TypeSymbolExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)SymbolExtensions\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Extensions\Symbols\" />
   </ItemGroup>
 </Project>

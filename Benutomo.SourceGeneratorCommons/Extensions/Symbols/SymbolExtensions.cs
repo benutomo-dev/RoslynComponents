@@ -24,5 +24,16 @@ internal static partial class SymbolExtensions
         return false;
     }
 
-
+    internal static ITypeSymbol? GetTypeOfExpressionSymbol(this ISymbol? symbol)
+    {
+        return symbol switch
+        {
+            IMethodSymbol method => method.ReturnType,
+            IPropertySymbol property => property.Type,
+            IFieldSymbol field => field.Type,
+            ILocalSymbol local => local.Type,
+            IParameterSymbol parameter => parameter.Type,
+            _ => null,
+        };
+    }
 }

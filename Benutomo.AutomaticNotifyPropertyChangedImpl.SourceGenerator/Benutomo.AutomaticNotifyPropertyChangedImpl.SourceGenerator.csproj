@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <Version>0.0.0.40</Version>
+    <Version>0.0.0.41</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -11,7 +11,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements for INotifyPropertyChanged.</Description>
-    <PackageVersion>1.0.0-alpha10</PackageVersion>
+    <PackageVersion>1.0.0-alpha11</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;inotifypropertychanged;propertychanged</PackageTags>
@@ -27,11 +27,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>

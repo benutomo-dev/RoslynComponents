@@ -7,20 +7,20 @@ namespace Benutomo.SourceGeneratorCommons;
 
 internal static partial class SymbolExtensions
 {
-    internal static void AppendTypeName(this StringBuilder stringBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(stringBuilder), typeSymbol, includeContainerNames: false);
+    internal static void AppendTypeName(this StringBuilder stringBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(stringBuilder), typeSymbol, includeContainerNames: false, isCref: false);
 
-    internal static void AppendTypeName(this SourceBuilderEx sourceBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(sourceBuilder), typeSymbol, includeContainerNames: false);
+    internal static void AppendTypeName(this SourceBuilderEx sourceBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(sourceBuilder), typeSymbol, includeContainerNames: false, isCref: false);
 
 
-    internal static void AppendFullTypeName(this StringBuilder stringBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(stringBuilder), typeSymbol, includeContainerNames: true);
+    internal static void AppendFullTypeName(this StringBuilder stringBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(stringBuilder), typeSymbol, includeContainerNames: true, isCref: false);
 
-    internal static void AppendFullTypeName(this SourceBuilderEx sourceBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(sourceBuilder), typeSymbol, includeContainerNames: true);
+    internal static void AppendFullTypeName(this SourceBuilderEx sourceBuilder, ITypeSymbol typeSymbol) => AppendTypeNameCore(new Appender(sourceBuilder), typeSymbol, includeContainerNames: true, isCref: false);
 
-    private static void AppendTypeNameCore(Appender appender, ITypeSymbol typeSymbol, bool includeContainerNames)
+    private static void AppendTypeNameCore(Appender appender, ITypeSymbol typeSymbol, bool includeContainerNames, bool isCref)
     {
         if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
         {
-            AppendTypeNameCore(appender, arrayTypeSymbol.ElementType, includeContainerNames);
+            AppendTypeNameCore(appender, arrayTypeSymbol.ElementType, includeContainerNames, isCref);
             appender.Append("[");
             for (var i = 1; i < arrayTypeSymbol.Rank; i++)
             {
@@ -48,7 +48,7 @@ internal static partial class SymbolExtensions
                 }
                 else
                 {
-                    AppendTypeNameCore(appender, typeSymbol.ContainingType, includeContainerNames);
+                    AppendTypeNameCore(appender, typeSymbol.ContainingType, includeContainerNames, isCref);
                 }
                 appender.Append(".");
             }
@@ -59,16 +59,16 @@ internal static partial class SymbolExtensions
             {
                 var typeArguments = namedTypeSymbol.TypeArguments;
 
-                appender.Append("<");
+                appender.Append(isCref ? "{" : "<");
 
                 for (int i = 0; i < typeArguments.Length - 1; i++)
                 {
-                    AppendTypeNameCore(appender, typeArguments[i], includeContainerNames);
+                    AppendTypeNameCore(appender, typeArguments[i], includeContainerNames, isCref);
                     appender.Append(", ");
                 }
-                AppendTypeNameCore(appender, typeArguments[typeArguments.Length - 1], includeContainerNames);
+                AppendTypeNameCore(appender, typeArguments[typeArguments.Length - 1], includeContainerNames, isCref);
 
-                appender.Append(">");
+                appender.Append(isCref ? "}" : ">");
             }
 
             if (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation == NullableAnnotation.Annotated)
@@ -91,6 +91,51 @@ internal static partial class SymbolExtensions
         }
 
         appender.Append(namespaceSymbol.Name);
+    }
+
+
+    internal static void AppendCref(this StringBuilder stringBuilder, IMethodSymbol methodSymbol) => AppendCref(new Appender(stringBuilder), methodSymbol);
+
+    internal static void AppendCref(this SourceBuilderEx sourceBuilder, IMethodSymbol methodSymbol) => AppendCref(new Appender(sourceBuilder), methodSymbol);
+
+    private static void AppendCref(Appender appender, IMethodSymbol methodSymbol)
+    {
+        AppendTypeNameCore(appender, methodSymbol.ContainingType, includeContainerNames: true, isCref: true);
+        appender.Append(".");
+        appender.Append(methodSymbol.Name);
+        if (methodSymbol.IsGenericMethod)
+        {
+            appender.Append("{");
+            appender.Append(methodSymbol.TypeParameters[0].Name);
+            for (int i = 1; i < methodSymbol.TypeParameters.Length; i++)
+            {
+                appender.Append(", ");
+                appender.Append(methodSymbol.TypeParameters[i].Name);
+            }
+            appender.Append("}");
+        }
+        appender.Append("(");
+        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+        {
+            if (i > 0)
+            {
+                appender.Append(", ");
+            }
+            switch (methodSymbol.Parameters[i].RefKind)
+            {
+                case RefKind.Ref:
+                    appender.Append("ref ");
+                    break;
+                case RefKind.In:
+                    appender.Append("in ");
+                    break;
+                case RefKind.Out:
+                    appender.Append("out ");
+                    break;
+            }
+            AppendTypeNameCore(appender, methodSymbol.Parameters[i].Type, includeContainerNames: true, isCref: true);
+        }
+        appender.Append(")");
     }
 
     struct Appender
