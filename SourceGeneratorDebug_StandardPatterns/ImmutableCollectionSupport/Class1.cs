@@ -16,10 +16,14 @@ namespace SourceGeneratorDebug_StandardPatterns.ImmutableCollectionSupport
         {
             var zz = ImmutableArray.Create(ImmutableArray.Create<int>(1, 2, 3));
 
-            zz.Cast<int>().ToList();
-            zz.Select((v, i) => v);
+            zz.SelectMany(v => v.BoxlessAsReadOnlyList()).ToArray();
 
-            zz.IntSum();
+            //zz.Cast<int>().ToList();
+            //zz.Select((v, i) => v);
+
+            //var x = ImmutableArray.Create(1, 2, 3);
+
+            //x.IntSum();
         }
 
         public void Method2() => x.Add(1);
@@ -34,9 +38,9 @@ namespace SourceGeneratorDebug_StandardPatterns.ImmutableCollectionSupport
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public ImmutableArray<int> Method5(object[,] obj, ref int x)
+        public ImmutableArray<int> Method5(ImmutableArray<int> obj, ref int x)
         {
-            return x.Add(1);
+            return obj.Add(1);
         }
 
         public void X(IEnumerable<int> x)
@@ -52,7 +56,7 @@ namespace SourceGeneratorDebug_StandardPatterns.ImmutableCollectionSupport
 }
 
 
-namespace SourceGeneratorDebug_StandardPatterns
+namespace SourceGeneratorDebug_StandardPatterns.ImmutableCollectionSupport
 {
     class XXX { }
 
@@ -76,7 +80,7 @@ namespace SourceGeneratorDebug_StandardPatterns
         /// <param name="x">param x.</param>
         /// <param name="cancellationToken">param cancellationToken</param>
         /// <returns>retun value.</returns>
-        internal static IEnumerable<int> IntSum(this IEnumerable<int> @this)
+        public static IEnumerable<int> IntSum(this IEnumerable<int> @this)
         {
             return @this;
         }

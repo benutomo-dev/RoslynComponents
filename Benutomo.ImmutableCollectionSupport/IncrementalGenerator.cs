@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Benutomo.ImmutableCollectionSupport;
@@ -127,7 +128,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             .Collect()
             .SelectMany(selector)
             .Combine(extensionNameSpaceSource)
-            .Select((v, ct) => (namespaceName: v.Right, v.Left.name, v.Left.extensionMethodSources));
+            .Select((v, ct) => (namespaceName: v.Left.namespaceName, defaultNameSpceName: v.Right, v.Left.methodName, v.Left.extensionMethodSources));
 
         context.RegisterSourceOutput(source, generate);
 
@@ -187,9 +188,9 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             return false;
         }
 
-        static ImmutableArray<(string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources)> selector(ImmutableArray<(GeneratorSyntaxContext context, IInvocationOperation? operation, Symbols? symbols)> collection, CancellationToken cancellationToken)
+        static ImmutableArray<(string? namespaceName, string methodName, ImmutableArray<ExtensionMethodSource> extensionMethodSources)> selector(ImmutableArray<(GeneratorSyntaxContext context, IInvocationOperation? operation, Symbols? symbols)> collection, CancellationToken cancellationToken)
         {
-            var dictionary = new Dictionary<string, HashSet<ExtensionMethodSource>>();
+            var dictionary = new Dictionary<(string? namespaceName, string methodName), HashSet<ExtensionMethodSource>>();
 
             foreach (var item in collection)
             {
@@ -234,25 +235,66 @@ public partial class IncrementalGenerator : IIncrementalGenerator
 
                 var source = new ExtensionMethodSource(method.OriginalDefinition, flags.MoveToImmutable(), item.symbols.ImmutableArrayT);
 
-                if (!dictionary.TryGetValue(source.Method.Name, out var sources))
+                string? namespaceName;
+                if (method.DeclaringSyntaxReferences.Length == 0)
+                {
+                    namespaceName = null;
+                }
+                else
+                {
+                    var namespaceBuilder = new StringBuilder();
+                    namespaceBuilder.AppendFullNamespace(source.Method.ContainingType.ContainingNamespace);
+                    namespaceName = namespaceBuilder.ToString();
+                }
+
+                var dictionaryKey = (namespaceName, source.Method.Name);
+
+                if (!dictionary.TryGetValue(dictionaryKey, out var sources))
                 {
                     sources = new HashSet<ExtensionMethodSource>();
-                    dictionary.Add(source.Method.Name, sources);
+                    dictionary.Add(dictionaryKey, sources);
                 }
 
                 sources.Add(source);
             }
 
-            return dictionary.Select(v => (v.Key, v.Value.ToImmutableArray())).ToImmutableArray();
+            return dictionary.Select(v => (v.Key.namespaceName, v.Key.methodName, v.Value.ToImmutableArray())).ToImmutableArray();
         }
 
-        static void generate(SourceProductionContext context, (string namespaceName, string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources) arg)
+        static void generate(SourceProductionContext context, (string? namespaceName, string defaultNameSpceName, string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources) arg)
         {
-            using var sourceBuilder = new SourceBuilderEx(context, $"{AutoGenImmutableArrayExtensionsClassName}.{arg.name}.cs");
+            string namespaceName;
+            string hintName;
+            bool extensionOfSelfDefinedMethod;
 
-            using (sourceBuilder.BeginBlock($"namespace {arg.namespaceName}"))
+            if (arg.namespaceName is null)
             {
-                using (sourceBuilder.BeginBlock($"internal static partial class {AutoGenImmutableArrayExtensionsClassName}"))
+                namespaceName = arg.defaultNameSpceName;
+                hintName = $"{AutoGenImmutableArrayExtensionsClassName}.{arg.name}.cs";
+                extensionOfSelfDefinedMethod = false;
+            }
+            else
+            {
+                namespaceName = arg.namespaceName;
+                hintName = $"{AutoGenImmutableArrayExtensionsClassName}.{arg.name}.{namespaceName}.cs";
+                extensionOfSelfDefinedMethod = true;
+            }
+
+            using var sourceBuilder = new SourceBuilderEx(context, hintName);
+
+            using (sourceBuilder.BeginBlock($"namespace {namespaceName}"))
+            {
+                string classDefinition;
+                if (extensionOfSelfDefinedMethod)
+                {
+                    classDefinition = $"public static partial class {AutoGenImmutableArrayExtensionsClassName}";
+                }
+                else
+                {
+                    classDefinition = $"internal static partial class {AutoGenImmutableArrayExtensionsClassName}";
+                }
+
+                using (sourceBuilder.BeginBlock(classDefinition))
                 {
                     foreach (var extensionMethodSource in arg.extensionMethodSources)
                     {
@@ -362,6 +404,11 @@ public partial class IncrementalGenerator : IIncrementalGenerator
 
                             if (extensionMethodSource.ModifyArgFlags[i] is not null)
                             {
+                                argValue.Append("global::");
+                                argValue.Append(arg.defaultNameSpceName);
+                                argValue.Append(".");
+                                argValue.Append(AutoGenImmutableArrayExtensionsClassName);
+                                argValue.Append(".");
                                 argValue.Append(BoxlessAsReadOnlyListMethodName);
                                 argValue.Append("(@");
                                 argValue.Append(v.Name);
@@ -384,14 +431,28 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                         sourceBuilder.AppendCref(extensionMethodSource.Method);
                         sourceBuilder.AppendLine("\"/>");
 
-                        string methodDefinition;
-                        if (string.IsNullOrEmpty(typeParameters))
+                        string methodAccessibility;
+                        if (true
+                            && extensionOfSelfDefinedMethod
+                            && extensionMethodSource.Method.DeclaredAccessibility == Accessibility.Public
+                            && extensionMethodSource.Method.ContainingType.DeclaredAccessibility == Accessibility.Public
+                            )
                         {
-                            methodDefinition = $"public static {returnType} {extensionMethodSource.Method.Name}(this {args})";
+                            methodAccessibility = "public";
                         }
                         else
                         {
-                            methodDefinition = $"public static {returnType} {extensionMethodSource.Method.Name}<{typeParameters}>(this {args})";
+                            methodAccessibility = "internal";
+                        }
+
+                        string methodDefinition;
+                        if (string.IsNullOrEmpty(typeParameters))
+                        {
+                            methodDefinition = $"{methodAccessibility} static {returnType} {extensionMethodSource.Method.Name}(this {args})";
+                        }
+                        else
+                        {
+                            methodDefinition = $"{methodAccessibility} static {returnType} {extensionMethodSource.Method.Name}<{typeParameters}>(this {args})";
                         }
 
                         using (sourceBuilder.BeginBlock(methodDefinition))

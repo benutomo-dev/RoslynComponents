@@ -12,7 +12,7 @@
 		<DevelopmentDependency>true</DevelopmentDependency>
 		<PackageId>Benutomo.ImmutableCollectionSupport</PackageId>
 		<Description></Description>
-		<PackageVersion>1.0.0-alpha13</PackageVersion>
+		<PackageVersion>1.0.0-alpha15</PackageVersion>
 		<Authors>benutomo</Authors>
 		<Copyright>© benutomo.</Copyright>
 		<PackageTags>analyzer;immutablecollection</PackageTags>
