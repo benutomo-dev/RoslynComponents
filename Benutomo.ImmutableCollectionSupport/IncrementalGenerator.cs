@@ -1,10 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Threading;
 
 namespace Benutomo.ImmutableCollectionSupport;
 
@@ -66,17 +68,17 @@ public partial class IncrementalGenerator : IIncrementalGenerator
         var extensionNameSpaceSource = context.CompilationProvider
             .Combine(context.AnalyzerConfigOptionsProvider)
             .Select((v, ct) => (compilation: v.Left, configOptions: v.Right))
-            .Select((v, ct) => $"Benutomo.ImmutableArraySupport.AutoGenExtensions.{v.compilation.AssemblyName}");
+            .Select((v, ct) => (v.compilation, extensionNameSpace: $"Benutomo.ImmutableArraySupport.AutoGenExtensions.{v.compilation.AssemblyName}"));
 
-        context.RegisterSourceOutput(extensionNameSpaceSource, (context, namespaceName) =>
+        context.RegisterSourceOutput(extensionNameSpaceSource, (context, args) =>
         {
             context.AddSource($"{AutoGenImmutableArrayExtensionsClassName}.cs", $$"""
-                global using {{namespaceName}};
+                global using {{args.extensionNameSpace}};
 
                 #pragma warning disable CS0436
                 #nullable enable
 
-                namespace {{namespaceName}}
+                namespace {{args.extensionNameSpace}}
                 {
                     /// <summary>
                     /// Equalsメソッドの自動実装でこの属性を付与したメンバの等価性判定に使用する<see cref="IEqualityComparer{T}"。/>
@@ -111,24 +113,46 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                 """);
         });
 
-        var symbolSource = context.CompilationProvider
-            .Select((v, ct) =>
+        var compilationSource = extensionNameSpaceSource
+            .Select((arg, ct) =>
             {
-                var immutableArrayT = v.GetTypeByMetadataName("System.Collections.Immutable.ImmutableArray`1");
+                var boxlessAsReadOnlyListMockSyntaxTree = CSharpSyntaxTree.ParseText($$"""
+                    global using {{arg.extensionNameSpace}};
+                    namespace {{arg.extensionNameSpace}}
+                    {
+                        internal static partial class {{AutoGenImmutableArrayExtensionsClassName}}
+                        {
+                            public static global::System.Collections.Generic.IReadOnlyList<T> {{BoxlessAsReadOnlyListMethodName}}<T>(this global::System.Collections.Immutable.ImmutableArray<T> immutableArray)
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                    """);
 
-                if (immutableArrayT is null) return null;
+                var effectiveCompilation = arg.compilation.AddSyntaxTrees(boxlessAsReadOnlyListMockSyntaxTree);
 
-                return new Symbols(immutableArrayT);
+                var symbols = default(Symbols);
+
+                var immutableArrayT = effectiveCompilation.GetTypeByMetadataName("System.Collections.Immutable.ImmutableArray`1");
+
+                if (immutableArrayT is not null)
+                {
+                    symbols = new Symbols(immutableArrayT);
+                }
+
+                return (effectiveCompilation, symbols, arg.extensionNameSpace);
             });
 
-        var source = context.SyntaxProvider.CreateSyntaxProvider(firstPredicate, transform)
-            .Combine(symbolSource)
-            .Select((v, ct) => (v.Left.context, v.Left.operation, symbols: v.Right))
+        var source = context.SyntaxProvider.CreateSyntaxProvider(firstPredicate, (v, ct) => v)
+            .Combine(compilationSource)
+            .Select((v, ct) => (v.Left, v.Right.effectiveCompilation, v.Right.symbols, v.Right.extensionNameSpace))
+            .Select(swapCompilationAndGetInvocationOperation)
             .Where(predicate)
             .Collect()
-            .SelectMany(selector)
+            .SelectMany(extractGenerateExtensionMethodSignatures)
             .Combine(extensionNameSpaceSource)
-            .Select((v, ct) => (namespaceName: v.Left.namespaceName, defaultNameSpceName: v.Right, v.Left.methodName, v.Left.extensionMethodSources));
+            .Select((v, ct) => (compilation: v.Right.compilation, namespaceName: v.Left.namespaceName, defaultNameSpceName: v.Right.extensionNameSpace, v.Left.methodName, v.Left.extensionMethodSources));
 
         context.RegisterSourceOutput(source, generate);
 
@@ -148,18 +172,42 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             return true;
         }
 
-        static (GeneratorSyntaxContext context, IInvocationOperation? operation) transform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+        static (Compilation compilation, Symbols? symbols, string extensionNameSpace, IInvocationOperation operation) swapCompilationAndGetInvocationOperation((GeneratorSyntaxContext refereceContext, Compilation effectiveCompilation, Symbols? symbols, string extensionNameSpace) args, CancellationToken cancellationToken)
         {
-            var memberAccessExpressionSyntax = (MemberAccessExpressionSyntax)context.Node;
+            var memberAccessExpressionSyntaxOriginal = (MemberAccessExpressionSyntax)args.refereceContext.Node;
+
+            var syntaxTree = args.effectiveCompilation.SyntaxTrees.FirstOrDefault(v => v.FilePath == memberAccessExpressionSyntaxOriginal.SyntaxTree.FilePath);
+
+            if (syntaxTree is null)
+            {
+                Debug.Fail(null);
+                return default;
+            }
+
+            var memberAccessExpressionSyntax = syntaxTree.GetRoot().FindNode(memberAccessExpressionSyntaxOriginal.Span) as MemberAccessExpressionSyntax;
+
+            if (memberAccessExpressionSyntax is null)
+            {
+                Debug.Fail(null);
+                return default;
+            }
 
             var invocationExpressionSyntax = (InvocationExpressionSyntax)memberAccessExpressionSyntax.Parent!;
 
-            var operation = context.SemanticModel.GetOperation(invocationExpressionSyntax, cancellationToken) as IInvocationOperation;
+            var semanticsModel = args.effectiveCompilation.GetSemanticModel(invocationExpressionSyntax.SyntaxTree);
 
-            return (context, operation);
+            var operation = semanticsModel.GetOperation(invocationExpressionSyntax, cancellationToken) as IInvocationOperation;
+
+            if (operation is null)
+            {
+                Debug.Fail(null);
+                return default;
+            }
+
+            return (args.effectiveCompilation, args.symbols, args.extensionNameSpace, operation);
         }
 
-        static bool predicate((GeneratorSyntaxContext context, IInvocationOperation? operation, Symbols? symbols) arg)
+        static bool predicate((Compilation compilation, Symbols? symbols, string namespaceName, IInvocationOperation? operation) arg)
         {
             if (arg.operation is null) return false;
             if (arg.symbols is null) return false;
@@ -188,7 +236,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             return false;
         }
 
-        static ImmutableArray<(string? namespaceName, string methodName, ImmutableArray<ExtensionMethodSource> extensionMethodSources)> selector(ImmutableArray<(GeneratorSyntaxContext context, IInvocationOperation? operation, Symbols? symbols)> collection, CancellationToken cancellationToken)
+        static ImmutableArray<(string? namespaceName, string methodName, ImmutableArray<ExtensionMethodSource> extensionMethodSources)> extractGenerateExtensionMethodSignatures(ImmutableArray<(Compilation compilation, Symbols? symbols, string namespaceName, IInvocationOperation operation)> collection, CancellationToken cancellationToken)
         {
             var dictionary = new Dictionary<(string? namespaceName, string methodName), HashSet<ExtensionMethodSource>>();
 
@@ -261,7 +309,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             return dictionary.Select(v => (v.Key.namespaceName, v.Key.methodName, v.Value.ToImmutableArray())).ToImmutableArray();
         }
 
-        static void generate(SourceProductionContext context, (string? namespaceName, string defaultNameSpceName, string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources) arg)
+        static void generate(SourceProductionContext context, (Compilation compilation, string? namespaceName, string defaultNameSpceName, string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources) arg)
         {
             string namespaceName;
             string hintName;

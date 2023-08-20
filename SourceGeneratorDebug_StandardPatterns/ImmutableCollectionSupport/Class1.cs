@@ -18,12 +18,12 @@ namespace SourceGeneratorDebug_StandardPatterns.ImmutableCollectionSupport
 
             zz.SelectMany(v => v.BoxlessAsReadOnlyList()).ToArray();
 
-            //zz.Cast<int>().ToList();
-            //zz.Select((v, i) => v);
+            zz.Cast<int>().ToList();
+            zz.Select((v, i) => v);
 
-            //var x = ImmutableArray.Create(1, 2, 3);
+            var x = ImmutableArray.Create(1, 2, 3);
 
-            //x.IntSum();
+            x.IntSum();
         }
 
         public void Method2() => x.Add(1);
