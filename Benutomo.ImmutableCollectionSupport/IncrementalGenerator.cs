@@ -200,7 +200,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
 
             if (operation is null)
             {
-                Debug.Fail(null);
+                //Debug.Fail(null);
                 return default;
             }
 
