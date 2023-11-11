@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<Version>2.1.0.6</Version>
+		<Version>2.1.0.7</Version>
 
 		<!-- NuGet -->
 		<IncludeBuildOutput>false</IncludeBuildOutput>
@@ -12,7 +12,7 @@
 		<DevelopmentDependency>true</DevelopmentDependency>
 		<PackageId>Benutomo.EqualsGenerator</PackageId>
 		<Description>A Source Generator that automatically implements the Equals method of IEquatable&lt;T&gt;</Description>
-		<PackageVersion>1.0.0-alpha5</PackageVersion>
+		<PackageVersion>1.0.0-alpha6</PackageVersion>
 		<Authors>benutomo</Authors>
 		<Copyright>© benutomo.</Copyright>
 		<PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;iequatable;equals;gethashcode</PackageTags>
@@ -33,7 +33,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
