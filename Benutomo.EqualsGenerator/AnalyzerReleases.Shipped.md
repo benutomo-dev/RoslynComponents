@@ -10,3 +10,4 @@ Rule ID | Category | Severity | Notes
 EqualsGenerator0001  | Usage     | Warning    | EqualsGenerator
 EqualsGenerator0002  | Usage     | Warning    | EqualsGenerator
 EqualsGenerator0003  | Usage     | Warning    | EqualsGenerator
+EqualsGenerator0004  | Usage     | Warning    | EqualsGenerator

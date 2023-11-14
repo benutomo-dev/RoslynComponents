@@ -1,12 +1,11 @@
-﻿using Benutomo.SourceGeneratorCommons;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
+using System.Text;
 
 namespace Benutomo.EqualsGenerator
 {
@@ -46,11 +45,23 @@ namespace Benutomo.EqualsGenerator
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
+        /// <summary>
+        /// AutomaticEqualsImpl属性を付与したクラスがクラス定義の実装インターフェースに{0}を含んでいません。
+        /// </summary>
+        internal static DiagnosticDescriptor s_diagnosticDescriptor_EqualsGenerator0004 = new DiagnosticDescriptor(
+            "EqualsGenerator0004",
+            "型定義がIEquatable<T>を含まない",
+            "AutomaticEqualsImpl属性を付与した型が型定義の実装インターフェース宣言に{0}を含んでいません。",
+            "Usage",
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             s_diagnosticDescriptor_EqualsGenerator0001,
             s_diagnosticDescriptor_EqualsGenerator0002,
-            s_diagnosticDescriptor_EqualsGenerator0003
+            s_diagnosticDescriptor_EqualsGenerator0003,
+            s_diagnosticDescriptor_EqualsGenerator0004
             );
 
 #if DEBUG
@@ -64,9 +75,49 @@ namespace Benutomo.EqualsGenerator
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
 
+            context.RegisterSyntaxNodeAction(AnalyzeTypeDeclarationImpl, SyntaxKind.ClassDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeTypeDeclarationImpl, SyntaxKind.StructDeclaration);
             context.RegisterSyntaxNodeAction(AnalyzeEqualityMethodsImpl, SyntaxKind.MethodDeclaration);
         }
 
+
+        private static void AnalyzeTypeDeclarationImpl(SyntaxNodeAnalysisContext context)
+        {
+            if (context.Node is not TypeDeclarationSyntax typeDeclarationSyntax)
+            {
+                return;
+            }
+
+            var typeSymbol = context.SemanticModel.GetDeclaredSymbol(typeDeclarationSyntax);
+            if (typeSymbol is null || typeSymbol.GetAttributes().IsEmpty)
+            {
+                return;
+            }
+
+            var usingSymbols = new UsingSymbols(context.Compilation);
+
+            if (!typeSymbol.IsAttributedBy(usingSymbols.AutomaticEqualsImplAttribute))
+            {
+                return;
+            }
+
+            var requiredInterfaceSymbol = usingSymbols.IEquatable.Construct(typeSymbol);
+
+            if (typeSymbol.Interfaces.Contains(requiredInterfaceSymbol))
+            {
+                return;
+            }
+
+            var iEqualsTypeNameBuffer = new StringBuilder();
+            iEqualsTypeNameBuffer.AppendTypeName(requiredInterfaceSymbol);
+
+            var diagnostic = Diagnostic.Create(s_diagnosticDescriptor_EqualsGenerator0004, typeDeclarationSyntax.Identifier.GetLocation(), iEqualsTypeNameBuffer.ToString());
+            context.ReportDiagnostic(diagnostic);
+        }
+
+        /// <summary>
+        /// <see cref="IEquatable{T}.Equals(T)"/>メソッドと<see cref="object.GetHashCode"/>の実装の検証と警告。
+        /// </summary>
         private static void AnalyzeEqualityMethodsImpl(SyntaxNodeAnalysisContext context)
         {
             if (context.Node is not MethodDeclarationSyntax methodDeclarationSyntax)

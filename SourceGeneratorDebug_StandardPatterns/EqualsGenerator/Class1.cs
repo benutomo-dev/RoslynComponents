@@ -29,7 +29,7 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
     }
 
     [AutomaticEqualsImpl(AutomaticEqualsImplOptions.None)]
-    internal sealed partial class Class2 : Class1<int>
+    internal sealed partial class Class2 : Class1<int>, IEquatable<Class2>
     {
         //[EnableNotificationSupport]
         [AutoGenEqualsEqualityComparer(nameof(EqualityComparer<long>.Default))]
