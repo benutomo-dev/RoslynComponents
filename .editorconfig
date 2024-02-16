@@ -13,3 +13,6 @@ spelling_exclusion_path = .\exclusion.dic
 
 # CS0436: 型がインポートされた型と競合しています
 dotnet_diagnostic.CS0436.severity = suggestion
+
+# IDE005: 不要なusing
+dotnet_diagnostic.IDE0005.severity = warning
