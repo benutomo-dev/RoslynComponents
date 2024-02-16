@@ -231,8 +231,20 @@ internal class SourceBuilderEx : IDisposable
         AppendLine();
     }
 
+    public _IndentDisposable BeginIndent()
+    {
+        _currentIndentCount++;
 
-    public struct _BlockEndDisposable : IDisposable
+        return new _IndentDisposable(this);
+    }
+
+    private void EndIndent()
+    {
+        _currentIndentCount--;
+    }
+
+
+    public ref struct _BlockEndDisposable
     {
         private SourceBuilderEx? _sourceBuilder;
 
@@ -266,6 +278,32 @@ internal class SourceBuilderEx : IDisposable
                 for (int i = 0; i < _nestCount; i++)
                 {
                     _sourceBuilder.EndBlock();
+                }
+            }
+            _sourceBuilder = null;
+            _nestCount = 0;
+        }
+    }
+
+    public ref struct _IndentDisposable
+    {
+        private SourceBuilderEx? _sourceBuilder;
+
+        private int _nestCount;
+
+        internal _IndentDisposable(SourceBuilderEx? sourceBuilder)
+        {
+            _sourceBuilder = sourceBuilder;
+            _nestCount = 1;
+        }
+
+        public void Dispose()
+        {
+            if (_sourceBuilder is not null)
+            {
+                for (int i = 0; i < _nestCount; i++)
+                {
+                    _sourceBuilder.EndIndent();
                 }
             }
             _sourceBuilder = null;

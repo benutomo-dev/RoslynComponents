@@ -90,7 +90,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             }
 
             StringBuilder typeNameBuilder = new StringBuilder();
-            typeNameBuilder.AppendFullTypeName(propertySymbol.Type);
+            typeNameBuilder.AppendFullTypeNameWithNamespaceAlias(propertySymbol.Type);
             PropertyType = typeNameBuilder.ToString();
             PropertyTypeIsReferenceType = propertySymbol.Type.IsReferenceType;
             PropertyTypeIsSystemString = propertySymbol.Type.SpecialType == SpecialType.System_String;
@@ -249,7 +249,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         if (interfaceType is null)
                         {
                             StringBuilder sb = new StringBuilder();
-                            sb.AppendFullTypeName(explicitInterfaceImplementation.ContainingType);
+                            sb.AppendFullTypeNameWithNamespaceAlias(explicitInterfaceImplementation.ContainingType);
                             interfaceType = sb.ToString();
                         }
 

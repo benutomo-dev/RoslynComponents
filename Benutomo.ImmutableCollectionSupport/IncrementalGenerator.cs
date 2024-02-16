@@ -354,7 +354,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                         else
                         {
                             var builder = new StringBuilder();
-                            builder.AppendFullTypeName(extensionMethodSource.Method.ReturnType);
+                            builder.AppendFullTypeNameWithNamespaceAlias(extensionMethodSource.Method.ReturnType);
                             returnType = builder.ToString();
                         }
 
@@ -390,7 +390,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                                     argument.Append("out ");
                                     break;
                             }
-                            argument.AppendFullTypeName(argType);
+                            argument.AppendFullTypeNameWithNamespaceAlias(argType);
                             argument.Append(" @");
                             argument.Append(v.Name);
 
@@ -413,7 +413,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                                 {
                                     if (argType.TypeKind == TypeKind.Enum && argType.GetMembers().OfType<IFieldSymbol>().FirstOrDefault(v => v.ConstantValue == parameter.ExplicitDefaultValue) is { } enumMember)
                                     {
-                                        argument.AppendFullTypeName(argType);
+                                        argument.AppendFullTypeNameWithNamespaceAlias(argType);
                                         argument.Append(".");
                                         argument.Append(enumMember.Name);
                                     }
@@ -426,7 +426,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                                     else
                                     {
                                         argument.Append("(");
-                                        argument.AppendFullTypeName(argType);
+                                        argument.AppendFullTypeNameWithNamespaceAlias(argType);
                                         argument.Append(")");
                                         argument.Append(parameter.ExplicitDefaultValue);
                                     }
@@ -513,7 +513,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                             {
                                 sourceBuilder.Append("return ");
                             }
-                            sourceBuilder.AppendFullTypeName(extensionMethodSource.Method.ContainingType);
+                            sourceBuilder.AppendFullTypeNameWithNamespaceAlias(extensionMethodSource.Method.ContainingType);
                             sourceBuilder.Append(".");
                             sourceBuilder.Append(extensionMethodSource.Method.Name);
                             if (!string.IsNullOrEmpty(typeParameters))

@@ -110,7 +110,7 @@ namespace Benutomo.EqualsGenerator
                             var equalityComparerBuilder = new StringBuilder(256);
 
                             equalityComparerBuilder.Append("System.Collections.Generic.EqualityComparer<");
-                            equalityComparerBuilder.AppendFullTypeName(member.type);
+                            equalityComparerBuilder.AppendFullTypeNameWithNamespaceAlias(member.type);
                             equalityComparerBuilder.Append(">.Default");
 
                             equalityComparer = equalityComparerBuilder.ToString();
