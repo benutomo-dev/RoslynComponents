@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <Version>0.0.0.1</Version>
+    <Version>0.0.0.2</Version>
 
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -11,7 +11,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.Cs0436Relaxation</PackageId>
     <Description>A Relaxation Analyzer for unexpected CS0436 from provided source generator generated code.</Description>
-    <PackageVersion>1.0.0-alpha9</PackageVersion>
+    <PackageVersion>1.0.0-alpha10</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>analyzer;CS0436;relaxation</PackageTags>
@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+    <None Include="nuget.props" Pack="true" PackagePath="build/$(PackageId).props" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
+  <Import Project="..\Benutomo.Cs0436Relaxation\nuget.props"/>
+
   <ItemGroup>
     <ProjectReference Include="..\SourceGeneratorDebug_Empty\SourceGeneratorDebug_Empty.csproj" />
     <ProjectReference Include="..\SourceGeneratorDebug_Performance\SourceGeneratorDebug_Performance.csproj" />
