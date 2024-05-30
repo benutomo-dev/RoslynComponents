@@ -1,5 +1,4 @@
 ﻿using Benutomo;
-using System;
 
 // 同期的な破棄(IDisposable)を自動実装
 [AutomaticDisposeImpl]
@@ -7,11 +6,11 @@ partial class Sample1 : IDisposable
 {
     // 自動破棄するメンバにはEnableAutomaticDispose属性を付与
     [EnableAutomaticDispose]
-    IDisposable? _disposable;
+    IDisposable? _disposable = null;
 
     // 自動破棄しないメンバにはDisableAutomaticDispose属性を付与
     [DisableAutomaticDispose]
-    IDisposable Disposable => _disposable;
+    IDisposable? Disposable => _disposable;
 }
 
 // 非同期的な破棄(IAsyncDisposable)を自動実装

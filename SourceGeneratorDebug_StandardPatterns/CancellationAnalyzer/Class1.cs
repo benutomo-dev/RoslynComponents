@@ -94,6 +94,71 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
                     await DummyDispossable.CreateAsync(cancellationToken);
                 }
             }
+
+            Func<CancellationToken, Task> cancelableLambda = async cancellationToken =>
+            {
+                // NO CT0005
+                await cancelableFunc(cancellationToken);
+
+                using (Cancellation.Uncancelable)
+                {
+                    // CT0005
+                    await cancelableFunc(cancellationToken);
+
+                    await cancelableFunc(default);
+
+                    await uncancelableFunc();
+                }
+            };
+
+            async Task cancelableFunc(CancellationToken cancellationToken)
+            {
+                // NO CT0005
+                await cancelableFunc(cancellationToken);
+
+                using (Cancellation.Uncancelable)
+                {
+                    // CT0005
+                    await cancelableFunc(cancellationToken);
+
+                    await cancelableFunc(default);
+
+                    await uncancelableFunc();
+                }
+            };
+
+            Func<Task> uncancelableLambda = [Uncancelable] async () =>
+            {
+                // NO CT0005
+                await cancelableFunc(cancellationToken);
+
+                using (Cancellation.Uncancelable)
+                {
+                    // CT0005
+                    await cancelableFunc(cancellationToken);
+
+                    await cancelableFunc(default);
+
+                    await uncancelableFunc();
+                }
+            };
+
+            [Uncancelable]
+            async Task uncancelableFunc()
+            {
+                // CT0005
+                await cancelableFunc(cancellationToken);
+
+                using (Cancellation.Uncancelable)
+                {
+                    // CT0005
+                    await cancelableFunc(cancellationToken);
+
+                    await cancelableFunc(default);
+
+                    await uncancelableFunc();
+                }
+            };
         }
 
         [Uncancelable]

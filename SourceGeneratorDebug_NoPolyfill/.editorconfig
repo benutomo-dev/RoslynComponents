@@ -1,0 +1,12 @@
+﻿[*.cs]
+
+dotnet_diagnostic.CT0001.severity = suggestion
+dotnet_diagnostic.CT0002.severity = suggestion
+dotnet_diagnostic.CT0003.severity = suggestion
+dotnet_diagnostic.CT0004.severity = suggestion
+dotnet_diagnostic.CT0005.severity = suggestion
+
+dotnet_diagnostic.SG0001.severity = suggestion
+dotnet_diagnostic.SG0002.severity = suggestion
+dotnet_diagnostic.SG0003.severity = suggestion
+dotnet_diagnostic.SG0004.severity = suggestion

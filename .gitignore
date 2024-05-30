@@ -6,6 +6,9 @@
 # StrongNameSigning (include private key)
 StrongNameSigningKeyPair.snk
 
+# LaunchSettings
+launchSettings.json
+
 # User-specific files
 *.rsuser
 *.suo

@@ -3,10 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Benutomo.Cs0436Relaxation</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <OutputType>library</OutputType>
     <Version>0.0.0.1</Version>
 
     <!-- NuGet -->

@@ -11,4 +11,6 @@
   
   <!-- <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" /> -->
 
+  <Import Project="$(MSBuildThisFileFullPath).user" Condition="Exists('$(MSBuildThisFileFullPath).user')"/>
+
 </Project>

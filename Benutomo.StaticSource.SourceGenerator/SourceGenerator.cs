@@ -1,8 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
-using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
@@ -10,122 +10,232 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
     [Generator(LanguageNames.CSharp)]
     public partial class SourceGenerator : IIncrementalGenerator
     {
-#if DEBUG
-        static StreamWriter _streamWriter;
-        static SourceGenerator()
-        {
-            Directory.CreateDirectory(@"c:\var\log\StaticSource.SourceGenerator");
-            var proc = Process.GetCurrentProcess();
-            _streamWriter = new StreamWriter($@"c:\var\log\StaticSource.SourceGenerator\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
-            _streamWriter.WriteLine(proc);
-        }
-
-        [Conditional("DEBUG")]
-        static void WriteLogLine(string line)
-        {
-            lock (_streamWriter)
-            {
-                _streamWriter.WriteLine(line);
-                _streamWriter.Flush();
-            }
-        }
-#else
-        [Conditional("DEBUG")]
-        static void WriteLogLine(string line)
-        {
-        }
-#endif
-
         static Regex NamespaceRegex = new Regex(@"\bnamespace\s+([a-zA-Z0-9_.]+)\s*[;{\r\n]", RegexOptions.Compiled);
         static Regex TypeRegex = new Regex(@"\b(?:class|struct|enum)\s+([a-zA-Z0-9_]+)", RegexOptions.Compiled);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            WriteLogLine("Begin Initialize");
+            context.RegisterPostInitializationOutput(PostInitializationOutput);
 
-            // Where句を使用しない。
-            // https://github.com/dotnet/roslyn/issues/57991
-            // 今は、Where句を使用するとSource GeneratorがVSでインクリメンタルに実行されたときに
-            // 対象のコードの状態や編集内容などによって突然内部状態が壊れて機能しなくなる問題がおきる。
 
-            context.RegisterSourceOutput(context.AdditionalTextsProvider.Collect().Combine(context.AnalyzerConfigOptionsProvider), GenerateMethod);
+            var source = context.SyntaxProvider
+                .ForAttributeWithMetadataName("Benutomo.StaticSourceAttribute", predicate, transform)
+                .Collect();
 
-            WriteLogLine("End Initialize");
+            context.RegisterSourceOutput(source, GenerateMethod);
+
+            static bool predicate(SyntaxNode node, CancellationToken cancellationToken)
+            {
+                return true;
+            }
+
+            static GeneratorAttributeSyntaxContext transform(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
+            {
+                return context;
+            }
         }
 
-        void GenerateMethod(SourceProductionContext context, (ImmutableArray<AdditionalText> AdditionalTexts, AnalyzerConfigOptionsProvider AnalyzerConfigOptionsProvider) args)
+        const string UsingsKeyword = "Usings";
+        const string DirectivesKeyword = "Directives";
+        const string AttributesKeyword = "Attributes";
+
+        void PostInitializationOutput(IncrementalGeneratorPostInitializationContext context)
         {
-            var sourceBuildInputs = args.AdditionalTexts
-                .Select(additionalText =>
+            context.AddSource("StaticSourceAttribute.cs", $$"""
+            using System;
+
+            namespace Benutomo {
+                [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Interface, AllowMultiple = false, Inherited = false)]
+                internal class StaticSourceAttribute : Attribute
                 {
-                    context.CancellationToken.ThrowIfCancellationRequested();
+                    public string Namespace { get; }
 
-                    var options = args.AnalyzerConfigOptionsProvider.GetOptions(additionalText);
+                    public string[]? Usings { get; set; }
+            
+                    public string[]? Directives { get; set; }
+            
+                    public string[]? Attributes { get; set; }
 
-                    if (!options.TryGetValue("build_metadata.AdditionalFiles.StaticSource", out var staticSource))
+                    public StaticSourceAttribute(string @namespace) { Namespace = @namespace; }
+            
+                    public static string GetNamespace<T>() => GetNamespace(typeof(T));
+            
+                    public static string GetNamespace(Type type)
                     {
-                        return null!;
+                        var attribute = Attribute.GetCustomAttribute(type, typeof(StaticSourceAttribute)) as StaticSourceAttribute;
+            
+                        if (attribute is null)
+                        {
+                            throw new InvalidOperationException();
+                        }
+            
+                        return attribute.Namespace;
                     }
-
-                    if (!bool.TryParse(staticSource, out var isStaticSource) || !isStaticSource)
+            
+                    public static string GetFullyQualifiedMetadataName<T>() => GetFullyQualifiedMetadataName(typeof(T));
+            
+                    public static string GetFullyQualifiedMetadataName(Type type)
                     {
-                        return null!;
+                        var attribute = Attribute.GetCustomAttribute(type, typeof(StaticSourceAttribute)) as StaticSourceAttribute;
+            
+                        if (attribute is null)
+                        {
+                            throw new InvalidOperationException();
+                        }
+            
+                        return $"{attribute.Namespace}.{type.Name}";
                     }
-
-                    var sourceText = additionalText.GetText(context.CancellationToken);
-
-                    if (sourceText is null)
+            
+                    public static string GetAttributeName<T>()
                     {
-                        return null!;
+                        const string commonSuffix = "Attribute";
+            
+                        if (typeof(T).Name.EndsWith(commonSuffix, StringComparison.Ordinal))
+                        {
+                            return typeof(T).Name.Substring(0, typeof(T).Name.Length - commonSuffix.Length);
+                        }
+                        else
+                        {
+                            return typeof(T).Name;
+                        }
                     }
-
-                    var text = sourceText.ToString();
-
-                    var namespaceMatch = NamespaceRegex.Match(text);
-
-                    if (!namespaceMatch.Success)
-                    {
-                        return null!;
-                    }
-
-                    var typeMatch = TypeRegex.Match(text, namespaceMatch.Index + namespaceMatch.Length);
-
-                    if (!typeMatch.Success)
-                    {
-                        return null!;
-                    }
-
-                    return new MethodSourceBuildInputs(sourceText, namespaceMatch.Groups[1].Value, typeMatch.Groups[1].Value);
-                })
-                .Where(v => v is not null)
-                .ToArray();
-
-            WriteLogLine($"Begin Generate StaticSource");
-
-            try
-            {
-                Span<char> initialBuffer = stackalloc char[80000];
-
-                using var sourceBuilder = new MethodSourceBuilder(context, sourceBuildInputs, initialBuffer);
-
-                sourceBuilder.Build();
-
-                context.AddSource("StaticSources.cs", sourceBuilder.SourceText);
-
-                WriteLogLine($"End Generate StaticSource");
+                }
             }
-            catch (OperationCanceledException)
-            {
-                WriteLogLine($"Canceled Generate StaticSource");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                WriteLogLine($"Exception in Generate StaticSource");
-                WriteLogLine(ex.ToString());
-                throw;
-            }
+            """);
         }
 
+        void GenerateMethod(SourceProductionContext context, ImmutableArray<GeneratorAttributeSyntaxContext> args)
+        {
+
+            var sources = new List<(string name, string code)>(args.Length);
+
+            foreach (var arg in args)
+            {
+                var attributeData = arg.Attributes.First();
+
+                var @namespace = attributeData.ConstructorArguments[0].Value?.ToString() ?? "System";
+
+                @namespace = Regex.Replace(@namespace, @"[^a-zA-Z0-9_.]", _ => "_");
+
+                StringBuilder usingSection = new StringBuilder();
+                StringBuilder directiveSection = new StringBuilder();
+                StringBuilder attributeSection = new StringBuilder();
+
+                StringBuilder documentationCommentSection = new StringBuilder();
+
+                if (arg.TargetNode.SyntaxTree.GetRoot(context.CancellationToken) is CompilationUnitSyntax compilationUnitSyntax)
+                {
+                    foreach (var usingSyntax in compilationUnitSyntax.Usings)
+                    {
+                        usingSection.AppendLine(usingSyntax.WithoutTrivia().ToString());
+                    }
+                }
+
+                foreach (var attributeArg in attributeData.NamedArguments)
+                {
+                    if (attributeArg.Key == UsingsKeyword)
+                    {
+                        foreach (var value in attributeArg.Value.Values)
+                        {
+                            usingSection.AppendLine(value.Value?.ToString());
+                        }
+                    }
+                    else if (attributeArg.Key == DirectivesKeyword)
+                    {
+                        foreach (var value in attributeArg.Value.Values)
+                        {
+                            directiveSection.AppendLine(value.Value?.ToString());
+                        }
+                    }
+                    else if (attributeArg.Key == AttributesKeyword)
+                    {
+                        foreach (var value in attributeArg.Value.Values)
+                        {
+                            if (attributeSection.Length > 0)
+                            {
+                                attributeSection.Append("\r\n");
+                            }
+                            attributeSection.Append("    ");
+                            attributeSection.Append(value.Value?.ToString());
+                        }
+                    }
+                }
+
+                if (arg.TargetNode is BaseTypeDeclarationSyntax typeDeclarationSyntax)
+                {
+                    var attributeLists = new SyntaxList<AttributeListSyntax>();
+
+                    foreach (var attributeList in typeDeclarationSyntax.DescendantTokens().TakeWhile(v => v != typeDeclarationSyntax.Identifier))
+                    {
+                        foreach (var trivia in attributeList.LeadingTrivia.Where(v => v.IsKind(SyntaxKind.SingleLineCommentTrivia)))
+                        {
+                            var value = trivia.ToString();
+
+                            if (value.StartsWith("///", StringComparison.Ordinal))
+                            {
+                                if (documentationCommentSection.Length > 0)
+                                {
+                                    documentationCommentSection.Append("\r\n");
+                                }
+                                documentationCommentSection.Append("    ");
+                                documentationCommentSection.Append(value);
+                            }
+                        }
+                    }
+
+                    var toFullStringResult = typeDeclarationSyntax
+                        .WithAttributeLists(attributeLists)
+                        .ToFullString();
+
+                    sources.Add((arg.TargetSymbol.Name, $$"""
+                        {{usingSection}}
+                        {{directiveSection}}
+                        namespace {{@namespace}} {
+                        {{documentationCommentSection}}
+                        {{attributeSection}}
+                        {{toFullStringResult}}
+                        }
+                        """));
+                }
+                else
+                {
+                    ;
+                }
+            }
+
+            StringBuilder addSourceStatements = new StringBuilder();
+            foreach (var source in sources)
+            {
+                addSourceStatements.AppendLine($$"""""""""""
+                    context.AddSource("{{source.name}}.cs", """"""""""
+                    {{source.code}}
+                    """""""""");
+                    """"""""""");
+                addSourceStatements.AppendLine();
+            }
+
+            var staticSourceContent = $$"""
+                using System;
+                using Microsoft.CodeAnalysis;
+
+                namespace StaticSources
+                {
+                    partial class StaticSource
+                    {
+                        public static void Register(IncrementalGeneratorInitializationContext context)
+                        {
+                            context.RegisterPostInitializationOutput(RegisterCore);
+                        }
+
+                        private static void RegisterCore(IncrementalGeneratorPostInitializationContext context)
+                        {
+                            {{addSourceStatements}}
+                        }
+                    }
+                }
+                """;
+
+            context.AddSource($"StaticSource.cs", staticSourceContent);
+        }
     }
 }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using static Benutomo.NotificationAccessibility;
-using static Benutomo.ExplicitInterfaceImplementation;
 
 namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedImpl
 {
@@ -24,6 +23,25 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedIm
             set => _Texts(value);
         }
 
+        public Class3()
+        {
+            __texts = null!;
+        }
+    }
+
+    public partial class Class99<T1, T2>
+    {
+        [EnableNotificationSupport]
+        private Func<T1?, T2> Texts
+        {
+            get => _Texts();
+            set => _Texts(value);
+        }
+
+        public Class99()
+        {
+            __texts = null!;
+        }
     }
 
     public partial class Class1 : INotifyPropertyChanged, INotifyPropertyChanging, IInterface1
@@ -32,7 +50,12 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticNotifyPropertyChangedIm
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-
+        public Class1()
+        {
+            __x = null!;
+            __inner = null!;
+            __text = null!;
+        }
 
         class Class2
         {

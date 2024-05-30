@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +9,7 @@
     <ProjectReference Include="..\SourceGeneratorDebug_Performance\SourceGeneratorDebug_Performance.csproj" />
     <ProjectReference Include="..\SourceGeneratorDebug_StandardPatterns\SourceGeneratorDebug_StandardPatterns.csproj" />
 
-    <ProjectReference Include="..\Benutomo.CancellationAnalyzer.Core\Benutomo.CancellationAnalyzer.Core.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Benutomo.CancellationAnalyzer\Benutomo.CancellationAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     
     <ProjectReference Include="..\Benutomo.Cs0436Relaxation\Benutomo.Cs0436Relaxation.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>

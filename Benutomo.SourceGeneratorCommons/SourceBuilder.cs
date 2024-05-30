@@ -114,7 +114,7 @@ namespace Benutomo.SourceGeneratorCommons
 
         public void AppendLine()
         {
-            InternalAppend(Environment.NewLine.AsSpan());
+            InternalAppend("\r\n".AsSpan());
         }
 
         public void BeginTryBlock()
