@@ -15,7 +15,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.AutomaticDisposeImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements the Dispose method of IDisposable and the DisposeAsync method of IAsyncDisposable.</Description>
-    <PackageVersion>2.1.3-alpha4</PackageVersion>
+    <PackageVersion>2.1.3-alpha5</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;idisposable;iasyncdisposable;disepose;disposeasync</PackageTags>

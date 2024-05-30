@@ -39,11 +39,11 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             _isIDisposableIntafeceImplementer = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable);
 
-            _isIAsyncDisposableIntafeceImplementer = namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+            _isIAsyncDisposableIntafeceImplementer = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
 
             _isDisposableSubClass = namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IDisposable);
 
-            _isAsyncDisposableSubClass = namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IAsyncDisposable);
+            _isAsyncDisposableSubClass = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IAsyncDisposable);
 
             _isInheritalbeClass = !namedTypeSymbol.IsValueType && !namedTypeSymbol.IsSealed;
 
@@ -83,7 +83,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     if (!automaticDisposeContextChecker.IsEnableField(fieldSymbol)) continue;
 
                     var isAssignableToIDisposable = fieldSymbol.IsAssignableTo(usingSymbols.IDisposable);
-                    var isAssignableToIAsyncDisposable = fieldSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+                    var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && fieldSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
 
                     if (isAssignableToIDisposable)
                     {
@@ -110,7 +110,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     if (!automaticDisposeContextChecker.IsEnableProperty(propertySymbol)) continue;
 
                     var isAssignableToIDisposable = propertySymbol.IsAssignableTo(usingSymbols.IDisposable);
-                    var isAssignableToIAsyncDisposable = propertySymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+                    var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && propertySymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
 
                     if (isAssignableToIDisposable)
                     {
