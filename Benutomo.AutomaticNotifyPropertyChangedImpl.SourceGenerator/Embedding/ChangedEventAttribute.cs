@@ -13,7 +13,7 @@
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Property)]",
         })]
-    public class ChangedEventAttribute : Attribute
+    public sealed class ChangedEventAttribute : Attribute
     {
         public ChangedEventAttribute() { }
 

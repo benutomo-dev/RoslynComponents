@@ -13,7 +13,7 @@
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Class)]",
         })]
-    public class AutomaticDisposeImplAttribute : Attribute
+    public sealed class AutomaticDisposeImplAttribute : Attribute
     {
         /// <summary>
         /// 自動破棄実装の既定動作を設定する。

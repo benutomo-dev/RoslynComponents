@@ -6,7 +6,7 @@
             @"[AttributeUsage(AttributeTargets.Method, Inherited = true)]",
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
         })]
-    public class DisableArgumentCancellationTokenCheckAttribute : Attribute
+    public sealed class DisableArgumentCancellationTokenCheckAttribute : Attribute
     {
     }
 }

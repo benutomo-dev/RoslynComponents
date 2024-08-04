@@ -17,7 +17,7 @@
             @"[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]
-    public class RepresentingEquivalenceForAttribute : Attribute
+    public sealed class RepresentingEquivalenceForAttribute : Attribute
     {
         public RepresentingEquivalenceForAttribute(params string[] members)
         { }

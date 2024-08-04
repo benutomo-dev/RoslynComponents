@@ -17,7 +17,7 @@
             @"[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]
-    public class AutoGenEqualsEqualityComparerAttribute : Attribute
+    public sealed class AutoGenEqualsEqualityComparerAttribute : Attribute
     {
         public AutoGenEqualsEqualityComparerAttribute(string nameofIEqualityComparerMember) { }
     }

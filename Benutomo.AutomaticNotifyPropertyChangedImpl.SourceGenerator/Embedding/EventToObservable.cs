@@ -12,7 +12,7 @@
         Attributes = new[] {
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
         })]
-    public class EventToObservable<T> : IObservable<T>
+    public sealed class EventToObservable<T> : IObservable<T>
     {
         Action<EventHandler> _addHandler;
         Action<EventHandler> _removeHandler;

@@ -17,7 +17,7 @@
             @"[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]    
-    public class EqualsImplAttribute : Attribute
+    public sealed class EqualsImplAttribute : Attribute
     {
     }
 }

@@ -13,7 +13,7 @@
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]",
         })]
-    public class EnableAutomaticDisposeAttribute : Attribute
+    public sealed class EnableAutomaticDisposeAttribute : Attribute
     {
         public EnableAutomaticDisposeAttribute() { }
 

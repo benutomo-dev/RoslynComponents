@@ -17,7 +17,7 @@
             @"[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]    
-    public class GetHashCodeImplAttribute : Attribute
+    public sealed class GetHashCodeImplAttribute : Attribute
     {
     }
 }

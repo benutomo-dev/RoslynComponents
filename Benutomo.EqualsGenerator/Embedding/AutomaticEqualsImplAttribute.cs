@@ -17,7 +17,7 @@
             @"[AttributeUsage(AttributeTargets.Class|AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]
-    public class AutomaticEqualsImplAttribute : Attribute
+    public sealed class AutomaticEqualsImplAttribute : Attribute
     {
         public AutomaticEqualsImplAttribute(AutomaticEqualsImplOptions options = AutomaticEqualsImplOptions.None) { }
     }

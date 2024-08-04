@@ -13,7 +13,7 @@
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Property)]",
         })]
-    public class ChangingObservableAttribute : Attribute
+    public sealed class ChangingObservableAttribute : Attribute
     {
         public ChangingObservableAttribute() { }
 

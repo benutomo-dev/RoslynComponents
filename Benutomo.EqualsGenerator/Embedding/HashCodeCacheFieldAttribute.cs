@@ -17,7 +17,7 @@
             @"[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]",
             @"[Conditional(""CompileTimeOnly"")]",
         })]    
-    public class HashCodeCacheFieldAttribute : Attribute
+    public sealed class HashCodeCacheFieldAttribute : Attribute
     {
     }
 }

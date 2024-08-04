@@ -13,7 +13,7 @@
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Property)]",
         })]
-    public class EnableNotificationSupportAttribute : Attribute
+    public sealed class EnableNotificationSupportAttribute : Attribute
     {
         public bool EventArgsOnly { get; set; } = false;
     }

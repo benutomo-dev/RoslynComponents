@@ -13,7 +13,7 @@
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Method)]",
         })]
-    public class ManagedObjectAsyncDisposeMethodAttribute : Attribute
+    public sealed class ManagedObjectAsyncDisposeMethodAttribute : Attribute
     {
         /// <summary>
         /// <inheritdoc cref=""Benutomo.ManagedObjectAsyncDisposeMethodAttribute""/>

@@ -6,7 +6,7 @@
             @"[AttributeUsage(AttributeTargets.Method, Inherited = true)]",
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
         })]
-    internal class UncancelableAttribute : Attribute
+    internal sealed class UncancelableAttribute : Attribute
     {
     }
 }

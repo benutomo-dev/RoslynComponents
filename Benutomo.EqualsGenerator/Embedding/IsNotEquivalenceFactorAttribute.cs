@@ -18,7 +18,7 @@
             @"[Conditional(""CompileTimeOnly"")]",
         })]
     
-    public class IsNotEquivalenceFactorAttribute : Attribute
+    public sealed class IsNotEquivalenceFactorAttribute : Attribute
     {
     }
 }
