@@ -41,7 +41,7 @@ namespace System.Diagnostics.CodeAnalysis
     {
         public MemberNotNullAttribute(string member)
         {
-            Members = new[] { member };
+            Members = [member];
         }
 
         public MemberNotNullAttribute(params string[] members)
@@ -58,7 +58,7 @@ namespace System.Diagnostics.CodeAnalysis
         public MemberNotNullWhenAttribute(bool returnValue, string member)
         {
             ReturnValue = returnValue;
-            Members = new[] { member };
+            Members = [member];
         }
 
         public MemberNotNullWhenAttribute(bool returnValue, params string[] members)

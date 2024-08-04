@@ -4,11 +4,11 @@
     /// 破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを自動実装Disposeの対象とすることに関する振る舞いの指定。
     /// </summary>
     [StaticSource("Benutomo",
-        Usings = new[] { "using System;" },
-        Directives = new[] {
+        Usings = ["using System;"],
+        Directives = [
             "#pragma warning disable CS0436",
             "#nullable enable",
-        })]
+        ])]
     public enum AutomaticDisposeImplMode
     {
         /// <summary>

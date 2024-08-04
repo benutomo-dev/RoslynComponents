@@ -4,15 +4,15 @@
     /// Todo
     /// </summary>
     [StaticSource("Benutomo",
-        Usings = new[] { "using System;" },
-        Directives = new[] {
+        Usings = ["using System;"],
+        Directives = [
             "#pragma warning disable CS0436",
             "#nullable enable",
-        },
-        Attributes = new[] {
+        ],
+        Attributes = [
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Property)]",
-        })]
+        ])]
     public sealed class ChangedObservableAttribute : Attribute
     {
         public ChangedObservableAttribute() { }

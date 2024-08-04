@@ -23,7 +23,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
         {
             var stream = new FileStream("", FileMode.Open);
 
-            stream.WriteAsync(new byte[0], 0, 0);
+            stream.WriteAsync([], 0, 0);
 
             using (DummyDispossable.Create())
             {
@@ -35,7 +35,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
                 var cancellationToken = CancellationToken.None;
 
                 // CT0005
-                stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                stream.WriteAsync([], 0, 0, cancellationToken);
             }
         }
 
@@ -46,7 +46,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
 
             var stream = new FileStream("", FileMode.Open);
 
-            await stream.WriteAsync(new byte[0], 0, 0);
+            await stream.WriteAsync([], 0, 0);
 
             using (DummyDispossable.Create())
             {
@@ -59,7 +59,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             }
 
             // CT0005
-            await stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+            await stream.WriteAsync([], 0, 0, cancellationToken);
 
             // CT0005
             using (DummyDispossable.Create(cancellationToken))
@@ -78,7 +78,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             using (Cancellation.Uncancelable)
             {
                 // CT0005
-                await stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                await stream.WriteAsync([], 0, 0, cancellationToken);
 
                 // CT0005
                 using (DummyDispossable.Create(cancellationToken))
@@ -166,7 +166,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
         {
             var stream = new FileStream("", FileMode.Open);
 
-            stream.WriteAsync(new byte[0], 0, 0);
+            stream.WriteAsync([], 0, 0);
 
             using (DummyDispossable.Create())
             {
@@ -174,7 +174,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             }
 
             // CT0005
-            stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+            stream.WriteAsync([], 0, 0, cancellationToken);
 
             // CT0005
             using (DummyDispossable.Create(cancellationToken))
@@ -186,7 +186,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             using (Cancellation.Uncancelable)
             {
                 // CT0005
-                stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                stream.WriteAsync([], 0, 0, cancellationToken);
             }
         }
 
@@ -195,7 +195,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
         {
             var stream = new FileStream("", FileMode.Open);
 
-            await stream.WriteAsync(new byte[0], 0, 0);
+            await stream.WriteAsync([], 0, 0);
 
             using (DummyDispossable.Create())
             {
@@ -212,7 +212,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
                 var cancellationToken = CancellationToken.None;
 
                 // CT0005
-                await stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                await stream.WriteAsync([], 0, 0, cancellationToken);
 
                 // CT0005
                 using (DummyDispossable.Create(cancellationToken))
@@ -235,7 +235,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
         {
             var stream = new FileStream("", FileMode.Open);
 
-            stream.WriteAsync(new byte[0], 0, 0);
+            stream.WriteAsync([], 0, 0);
 
             using (DummyDispossable.Create())
             {
@@ -245,7 +245,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             using (Cancellation.Uncancelable)
             {
                 // CT0005
-                stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                stream.WriteAsync([], 0, 0, cancellationToken);
             }
         }
 
@@ -254,7 +254,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             var stream = new FileStream("", FileMode.Open);
 
             // CT0001
-            stream.WriteAsync(new byte[0], 0, 0);
+            stream.WriteAsync([], 0, 0);
 
             // CT0001
             using (DummyDispossable.Create())
@@ -266,7 +266,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             using (Cancellation.Uncancelable)
             {
                 // CT0005
-                stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                stream.WriteAsync([], 0, 0, cancellationToken);
             }
         }
 
@@ -275,7 +275,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             var stream = new FileStream("", FileMode.Open);
 
             // CT0001
-            await stream.WriteAsync(new byte[0], 0, 0);
+            await stream.WriteAsync([], 0, 0);
 
             // CT0001
             using (DummyDispossable.Create())
@@ -303,7 +303,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
                 var cancellationToken = CancellationToken.None;
 
                 // CT0005
-                await stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                await stream.WriteAsync([], 0, 0, cancellationToken);
 
                 // CT0005
                 using (DummyDispossable.Create(cancellationToken))
@@ -326,7 +326,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             var stream = new FileStream("", FileMode.Open);
 
             // CT0001
-            await stream.WriteAsync(new byte[0], 0, 0);
+            await stream.WriteAsync([], 0, 0);
 
             // CT0001
             using (DummyDispossable.Create())
@@ -352,7 +352,7 @@ namespace SourceGeneratorDebug_StandardPatterns.CancellationAnalyzer
             using (Cancellation.Uncancelable)
             {
                 // CT0005
-                await stream.WriteAsync(new byte[0], 0, 0, cancellationToken);
+                await stream.WriteAsync([], 0, 0, cancellationToken);
 
                 // CT0005
                 using (DummyDispossable.Create(cancellationToken))

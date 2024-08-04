@@ -1,17 +1,17 @@
 ﻿namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding
 {
     [StaticSource("Benutomo.Internal",
-        Usings = new[] {
+        Usings = [
             "using System;",
             "using System.Threading;",
-        },
-        Directives = new[] {
+        ],
+        Directives = [
             "#pragma warning disable CS0436",
             "#nullable enable",
-        },
-        Attributes = new[] {
+        ],
+        Attributes = [
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
-        })]
+        ])]
     public sealed class EventToObservable<T> : IObservable<T>
     {
         Action<EventHandler> _addHandler;

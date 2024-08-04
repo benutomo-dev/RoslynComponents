@@ -1,10 +1,10 @@
 ﻿namespace Benutomo.CancellationAnalyzer.Embedding
 {
     [StaticSource("Benutomo",
-        Usings = new[] { "using System;" },
-        Attributes = new[] {
+        Usings = ["using System;"],
+        Attributes = [
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
-        })]
+        ])]
     internal static class Cancellation
     {
         public static _UncancelableSection Uncancelable => _UncancelableSection.Defualt;

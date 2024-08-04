@@ -4,15 +4,15 @@
     /// このオブジェクトの破棄と同時に自動的に<see cref=""System.IDisposable.Dispose"" />メソッドまたは<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッドを呼び出します。
     /// </summary>
     [StaticSource("Benutomo",
-        Usings = new[] { "using System;" },
-        Directives = new[] {
+        Usings = ["using System;"],
+        Directives = [
             "#pragma warning disable CS0436",
             "#nullable enable",
-        },
-        Attributes = new[] {
+        ],
+        Attributes = [
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]",
-        })]
+        ])]
     public sealed class EnableAutomaticDisposeAttribute : Attribute
     {
         public EnableAutomaticDisposeAttribute() { }

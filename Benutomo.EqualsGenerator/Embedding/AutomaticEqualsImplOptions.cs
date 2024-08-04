@@ -4,16 +4,16 @@
     /// <see cref="IEquatable{T}"/>の実装のオプション
     /// </summary>
     [StaticSource("Benutomo",
-        Usings = new[] {
+        Usings = [
             "using System;",
-        },
-        Directives = new[] {
+        ],
+        Directives = [
             "#pragma warning disable CS0436",
             "#nullable enable",
-        },
-        Attributes = new[] {
+        ],
+        Attributes = [
             @"[Flags]",
-        })]
+        ])]
     [Flags]
     public enum AutomaticEqualsImplOptions
     {

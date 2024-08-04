@@ -4,15 +4,15 @@
     /// 指定したクラスに破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを破棄する<see cref=""System.IDisposable.Dispose"" />メソッドおよび<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッド(当該クラスに<see cref=""System.IAsyncDisposable"" />インターフェイスが含まれている場合のみ)を自動実装する。
     /// </summary>
     [StaticSource("Benutomo",
-        Usings = new[] { "using System;" },
-        Directives = new[] {
+        Usings = ["using System;"],
+        Directives = [
             "#pragma warning disable CS0436",
             "#nullable enable",
-        },
-        Attributes = new[] {
+        ],
+        Attributes = [
             @"[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]",
             @"[AttributeUsage(AttributeTargets.Class)]",
-        })]
+        ])]
     public sealed class AutomaticDisposeImplAttribute : Attribute
     {
         /// <summary>
