@@ -781,7 +781,7 @@ partial class A : IDisposable
 #if DEBUG
                 DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 47, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
 #else
-                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 53, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 54, 26), // 生成されるコードでシグネチャ違反によるCS7036も発生
 #endif
             };
 
@@ -898,7 +898,7 @@ partial class A : IAsyncDisposable
 #if DEBUG
                 DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 60, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
 #else
-                DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 66, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
+                DiagnosticResult.CompilerError("CS1061").WithLocation(genSourcePath, 67, 40), // 生成されるコードでConfigureAwait()未定義によるCS1061も発生
 #endif
             };
 
@@ -924,7 +924,7 @@ partial class A : IAsyncDisposable
 #if DEBUG
                 DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 60, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
 #else
-                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 66, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 67, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
 #endif
             };
 
@@ -949,7 +949,7 @@ partial class A : IAsyncDisposable
 #if DEBUG
                 DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 60, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
 #else
-                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 66, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
+                DiagnosticResult.CompilerError("CS7036").WithLocation(genSourcePath, 67, 28), // 生成されるコードでシグネチャ違反によるCS7036も発生
 #endif
             };
 
