@@ -27,9 +27,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
         [EnableAutomaticDispose]
         readonly Disposable? _disposableReadonlyFieald;
 
-        static Disposable? s_disposableFieald = null;
+        static Disposable? s_disposableFieald;
 
-        static readonly Disposable? s_disposableReadonlyFieald = null;
+        static readonly Disposable? s_disposableReadonlyFieald;
 
 
         [EnableAutomaticDispose]
@@ -64,9 +64,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl.Nest
         [EnableAutomaticDispose]
         readonly Disposable? _disposableReadonlyFieald;
 
-        static Disposable? s_disposableFieald = null;
+        static Disposable? s_disposableFieald;
 
-        static readonly Disposable? s_disposableReadonlyFieald = null;
+        static readonly Disposable? s_disposableReadonlyFieald;
 
 
         [EnableAutomaticDispose]
@@ -103,9 +103,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
             [EnableAutomaticDispose]
             readonly Disposable? _disposableReadonlyFieald;
 
-            static Disposable? s_disposableFieald = null;
+            static Disposable? s_disposableFieald;
 
-            static readonly Disposable? s_disposableReadonlyFieald = null;
+            static readonly Disposable? s_disposableReadonlyFieald;
 
 
             [EnableAutomaticDispose]

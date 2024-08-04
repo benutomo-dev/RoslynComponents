@@ -21,9 +21,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
         [EnableAutomaticDispose]
         readonly AsyncOnlyDisposable? _asyncOnlyDisposableReadonlyFieald;
 
-        static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald = null;
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald;
 
-        static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald = null;
+        static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald;
 
 
         [EnableAutomaticDispose]
@@ -58,9 +58,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl.Nest
         readonly AsyncOnlyDisposable? _asyncOnlyDisposableReadonlyFieald;
 
 
-        static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald = null;
+        static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald;
 
-        static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald = null;
+        static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald;
 
 
         [EnableAutomaticDispose]
@@ -97,9 +97,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
             [EnableAutomaticDispose]
             readonly AsyncOnlyDisposable? _asyncOnlyDisposableReadonlyFieald;
 
-            static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald = null;
+            static AsyncOnlyDisposable? s_asyncOnlyDisposableFieald;
 
-            static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald = null;
+            static readonly AsyncOnlyDisposable? s_asyncOnlyDisposableReadonlyFieald;
 
 
             [EnableAutomaticDispose]

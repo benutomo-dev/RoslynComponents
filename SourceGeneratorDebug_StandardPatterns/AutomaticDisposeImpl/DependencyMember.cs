@@ -18,13 +18,13 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
     partial class DependencyMember
     {
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
-        private IDisposable? _fieldDisposableDependencyField = null;
+        private IDisposable? _fieldDisposableDependencyField;
 
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
         private IDisposable? _fieldDisposableDependencyProperty { get; set; }
 
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
-        private IDisposable? _asyncFieldDisposableDependencyField = null;
+        private IDisposable? _asyncFieldDisposableDependencyField;
 
         // 他のメンバのdependencyMembersに指定されているので属性付与が無くともエラーとならない
         private IDisposable? _asyncFieldDisposableDependencyProperty { get; set; }

@@ -14,9 +14,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
         [EnableAutomaticDispose]
         readonly BinaryReader? _binaryReaderReadonlyFieald;
 
-        static BinaryReader? s_binaryReaderFieald = null;
+        static BinaryReader? s_binaryReaderFieald;
 
-        static readonly BinaryReader? s_binaryReaderReadonlyFieald = null;
+        static readonly BinaryReader? s_binaryReaderReadonlyFieald;
 
 
         [EnableAutomaticDispose]
@@ -51,9 +51,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl.Nest
         [EnableAutomaticDispose]
         readonly BinaryReader? _binaryReaderReadonlyFieald;
 
-        static BinaryReader? s_binaryReaderFieald = null;
+        static BinaryReader? s_binaryReaderFieald;
 
-        static readonly BinaryReader? s_binaryReaderReadonlyFieald = null;
+        static readonly BinaryReader? s_binaryReaderReadonlyFieald;
 
 
         [EnableAutomaticDispose]
@@ -90,9 +90,9 @@ namespace SourceGeneratorDebug_StandardPatterns.AutomaticDisposeImpl
             [EnableAutomaticDispose]
             readonly BinaryReader? _binaryReaderReadonlyFieald;
 
-            static BinaryReader? s_binaryReaderFieald = null;
+            static BinaryReader? s_binaryReaderFieald;
 
-            static readonly BinaryReader? s_binaryReaderReadonlyFieald = null;
+            static readonly BinaryReader? s_binaryReaderReadonlyFieald;
 
 
             [EnableAutomaticDispose]
