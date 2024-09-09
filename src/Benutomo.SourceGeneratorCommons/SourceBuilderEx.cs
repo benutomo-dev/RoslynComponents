@@ -16,7 +16,7 @@ internal sealed class SourceBuilderEx : IDisposable
 
     private char[]? _buffer;
 
-    private int _currentIndentCount = 0;
+    private int _currentIndentCount;
 
     private SourceProductionContext _context;
 

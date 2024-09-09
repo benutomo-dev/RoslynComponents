@@ -15,6 +15,6 @@
         ])]
     public sealed class EnableNotificationSupportAttribute : Attribute
     {
-        public bool EventArgsOnly { get; set; } = false;
+        public bool EventArgsOnly { get; set; }
     }
 }
