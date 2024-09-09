@@ -182,9 +182,8 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                 return default;
             }
 
-            var memberAccessExpressionSyntax = syntaxTree.GetRoot(cancellationToken).FindNode(memberAccessExpressionSyntaxOriginal.Span) as MemberAccessExpressionSyntax;
 
-            if (memberAccessExpressionSyntax is null)
+            if (syntaxTree.GetRoot(cancellationToken).FindNode(memberAccessExpressionSyntaxOriginal.Span) is not MemberAccessExpressionSyntax memberAccessExpressionSyntax)
             {
                 Debug.Fail(null);
                 return default;
@@ -194,9 +193,8 @@ public partial class IncrementalGenerator : IIncrementalGenerator
 
             var semanticsModel = args.effectiveCompilation.GetSemanticModel(invocationExpressionSyntax.SyntaxTree);
 
-            var operation = semanticsModel.GetOperation(invocationExpressionSyntax, cancellationToken) as IInvocationOperation;
 
-            if (operation is null)
+            if (semanticsModel.GetOperation(invocationExpressionSyntax, cancellationToken) is not IInvocationOperation operation)
             {
                 //Debug.Fail(null);
                 return default;

@@ -568,9 +568,7 @@ namespace Benutomo.CancellationAnalyzer
 
         private static bool IsCancellationTokenNone(SyntaxNode node)
         {
-            var memberAccessExpressionSyntax = node as MemberAccessExpressionSyntax;
-
-            if (memberAccessExpressionSyntax is null) return false;
+            if (node is not MemberAccessExpressionSyntax memberAccessExpressionSyntax) return false;
 
             if (memberAccessExpressionSyntax.Name.Identifier.ValueText != nameof(CancellationToken.None)) return false;
 
