@@ -51,3 +51,6 @@ dotnet_diagnostic.IDE0005.severity = warning
 
 # IDE0079: 不要な抑制を削除します
 #dotnet_diagnostic.IDE0079.severity = silent
+
+# IDE0290: プライマリ コンストラクターの使用
+csharp_style_prefer_primary_constructors = false
