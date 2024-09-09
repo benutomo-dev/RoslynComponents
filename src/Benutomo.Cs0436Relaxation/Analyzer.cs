@@ -154,7 +154,7 @@ namespace Benutomo.Cs0436Relaxation
                 return false;
             }
 
-            var node = semanticModel.SyntaxTree.GetRoot().FindNode(diagnostic.Location.SourceSpan);
+            var node = semanticModel.SyntaxTree.GetRoot(cancellationToken).FindNode(diagnostic.Location.SourceSpan);
 
             if (node is null)
             {

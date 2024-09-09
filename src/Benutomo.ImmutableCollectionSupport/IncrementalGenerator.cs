@@ -126,7 +126,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                             }
                         }
                     }
-                    """);
+                    """, cancellationToken: ct);
 
                 var effectiveCompilation = arg.compilation.AddSyntaxTrees(boxlessAsReadOnlyListMockSyntaxTree);
 
@@ -182,7 +182,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                 return default;
             }
 
-            var memberAccessExpressionSyntax = syntaxTree.GetRoot().FindNode(memberAccessExpressionSyntaxOriginal.Span) as MemberAccessExpressionSyntax;
+            var memberAccessExpressionSyntax = syntaxTree.GetRoot(cancellationToken).FindNode(memberAccessExpressionSyntaxOriginal.Span) as MemberAccessExpressionSyntax;
 
             if (memberAccessExpressionSyntax is null)
             {

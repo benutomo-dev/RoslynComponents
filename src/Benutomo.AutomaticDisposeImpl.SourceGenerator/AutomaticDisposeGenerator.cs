@@ -1,64 +1,19 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Diagnostics;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
     [Generator(LanguageNames.CSharp)]
     public partial class AutomaticDisposeGenerator : IIncrementalGenerator
     {
-#if DEBUG
-        static StreamWriter s_streamWriter;
-        static AutomaticDisposeGenerator()
-        {
-            Directory.CreateDirectory(@"c:\var\log\AutomaticDisposeGenerator");
-            var proc = Process.GetCurrentProcess();
-            s_streamWriter = new StreamWriter($@"c:\var\log\AutomaticDisposeGenerator\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
-            s_streamWriter.WriteLine(proc);
-        }
-
-        [Conditional("DEBUG")]
-        static void WriteLogLine(string line)
-        {
-            lock (s_streamWriter)
-            {
-                s_streamWriter.WriteLine(line);
-                s_streamWriter.Flush();
-            }
-        }
-#else
-        [Conditional("DEBUG")]
-        static void WriteLogLine(string line)
-        {
-        }
-#endif
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            WriteLogLine("Begin Initialize");
-
             StaticSources.StaticSource.Register(context);
 
             var usingSymbols = context.CompilationProvider
                 .Select((compilation, cancellationToken) =>
                 {
-                    WriteLogLine("Begin GetTypeByMetadataName");
-
-                    try
-                    {
-                        return UsingSymbols.CreateFrom(compilation);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        WriteLogLine("Canceled GetTypeByMetadataName");
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteLogLine("Exception GetTypeByMetadataName");
-                        WriteLogLine(ex.ToString());
-                        throw;
-                    }
+                    return UsingSymbols.CreateFrom(compilation);
                 });
 
             // Where句を使用しない。
@@ -74,14 +29,10 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 ;//.Where(v => v is not null);
 
             context.RegisterSourceOutput(anotatedClasses, Generate);
-
-            WriteLogLine("End Initialize");
         }
 
         bool Predicate(SyntaxNode node, CancellationToken cancellationToken)
         {
-            //WriteLogLine("Predicate");
-
             return node is ClassDeclarationSyntax
             {
                 AttributeLists.Count: > 0
@@ -90,7 +41,6 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         INamedTypeSymbol? Transform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
         {
-            WriteLogLine("Begin Transform");
             try
             {
                 var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
@@ -102,13 +52,10 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 var namedTypeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, cancellationToken) as INamedTypeSymbol;
 
-                WriteLogLine($"End Transform ({namedTypeSymbol?.ContainingType?.Name}.{namedTypeSymbol?.Name})");
-
                 return namedTypeSymbol;
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled Transform");
                 throw;
             }
         }
@@ -119,8 +66,6 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             var usingSymbols = v.Right;
 
             if (namedTypeSymbol is null) return null;
-
-            WriteLogLine($"Begin PostTransform ({namedTypeSymbol.Name})");
 
             try
             {
@@ -137,19 +82,14 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                 var result = new MethodSourceBuilderInputs(namedTypeSymbol, usingSymbols, automaticDisposeImplAttributeData);
 
-                WriteLogLine($"End PostTransform ({namedTypeSymbol.Name})");
-
                 return result;
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled PostTransform ({namedTypeSymbol.Name})");
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                WriteLogLine($"Exception PostTransform ({namedTypeSymbol.Name})");
-                WriteLogLine(ex.ToString());
                 throw;
             }
         }
@@ -157,8 +97,6 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         void Generate(SourceProductionContext context, MethodSourceBuilderInputs? sourceBuildInputs)
         {
             if (sourceBuildInputs is null) return;
-
-            WriteLogLine($"Begin Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
 
             try
             {
@@ -169,18 +107,13 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                 sourceBuilder.Build();
 
                 context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
-
-                WriteLogLine($"End Generate ({sourceBuildInputs.TargetTypeInfo.Name}) => {sourceBuilder.HintName}");
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                WriteLogLine($"Exception in Generate ({sourceBuildInputs.TargetTypeInfo.Name})");
-                WriteLogLine(ex.ToString());
                 throw;
             }
         }

@@ -6,6 +6,8 @@
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<Version>1.0.0.0</Version>
 
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
 		<!-- NuGet -->
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>

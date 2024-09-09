@@ -1,65 +1,20 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Diagnostics;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
     [Generator(LanguageNames.CSharp)]
     public partial class SourceGenerator : IIncrementalGenerator
     {
-#if DEBUG
-        static StreamWriter s_streamWriter;
-        static SourceGenerator()
-        {
-            Directory.CreateDirectory(@"c:\var\log\AutomaticNotifyPropertyChangedImpl");
-            var proc = Process.GetCurrentProcess();
-            s_streamWriter = new StreamWriter($@"c:\var\log\AutomaticNotifyPropertyChangedImpl\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
-            s_streamWriter.WriteLine(proc);
-        }
-
-        [Conditional("DEBUG")]
-        static void WriteLogLine(string line)
-        {
-            lock (s_streamWriter)
-            {
-                s_streamWriter.WriteLine(line);
-                s_streamWriter.Flush();
-            }
-        }
-#else
-        [Conditional("DEBUG")]
-        static void WriteLogLine(string line)
-        {
-        }
-#endif
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            WriteLogLine("Begin Initialize");
-
             StaticSources.StaticSource.Register(context);
 
             var enableNotificationSupportAttributeSymbol = context.CompilationProvider
                 .Select((compilation, cancellationToken) =>
                 {
-                    WriteLogLine("Begin GetTypeByMetadataName");
-                    
-                    try
-                    {
-                        return UsingSymbols.CreateFrom(compilation);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        WriteLogLine("Canceled GetTypeByMetadataName");
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteLogLine("Exception GetTypeByMetadataName");
-                        WriteLogLine(ex.ToString());
-                        throw;
-                    }
+                    return UsingSymbols.CreateFrom(compilation);
                 });
 
             // Where句を使用しない。
@@ -80,8 +35,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 .SelectMany(toPropertyInputArgs);
 
             context.RegisterSourceOutput(propertyNameInputArgs, GenerateEventArg);
-
-            WriteLogLine("End Initialize");
 
             IEnumerable<EventArgSourceBuilderInputs> toPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
             {
@@ -120,20 +73,16 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         IPropertySymbol? ToPropertySymbol(GeneratorSyntaxContext context, CancellationToken cancellationToken)
         {
-            WriteLogLine("Begin Transform");
             try
             {
                 var propertyDeclarationSyntax = (PropertyDeclarationSyntax)context.Node;
 
                 var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax, cancellationToken) as IPropertySymbol;
 
-                WriteLogLine($"End Transform ({propertySymbol?.ContainingType?.Name}.{propertySymbol?.Name})");
-
                 return propertySymbol;
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled Transform");
                 throw;
             }
         }
@@ -145,8 +94,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             if (propertySymbol is null) return null;
 
-            WriteLogLine($"Begin PostTransform ({propertySymbol.ContainingType?.Name}.{propertySymbol.Name})");
-
             try
             {
                 var enableNotificationSupportAttributeData = propertySymbol.GetAttributes().FirstOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, usingSymbols.EnableNotificationSupportAttribute));
@@ -157,19 +104,14 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
                 var result = new MethodSourceBuildInputs(propertySymbol, usingSymbols, enableNotificationSupportAttributeData);
 
-                WriteLogLine($"End PostTransform ({propertySymbol.ContainingType?.Name}.{propertySymbol.Name})");
-
                 return result;
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled PostTransform ({propertySymbol.ContainingType?.Name}.{propertySymbol.Name})");
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                WriteLogLine($"Exception PostTransform ({propertySymbol.ContainingType?.Name}.{propertySymbol.Name})");
-                WriteLogLine(ex.ToString());
                 throw;
             }
         }
@@ -180,9 +122,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             if (sourceBuildInputs.IsEventArgsOnly) return;
 
-
-            WriteLogLine($"Begin Generate ({sourceBuildInputs.ContainingTypeInfo.Name}.{sourceBuildInputs.InternalPropertyName})");
-
             try
             {
                 Span<char> initialBuffer = stackalloc char[80000];
@@ -192,26 +131,19 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 sourceBuilder.Build();
 
                 context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
-
-                WriteLogLine($"End Generate ({sourceBuildInputs.ContainingTypeInfo.Name}.{sourceBuildInputs.InternalPropertyName}) => {sourceBuilder.HintName}");
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled Generate ({sourceBuildInputs.ContainingTypeInfo.Name}.{sourceBuildInputs.InternalPropertyName})");
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                WriteLogLine($"Exception in Generate ({sourceBuildInputs.ContainingTypeInfo.Name}.{sourceBuildInputs.InternalPropertyName})");
-                WriteLogLine(ex.ToString());
                 throw;
             }
         }
 
         void GenerateEventArg(SourceProductionContext context, EventArgSourceBuilderInputs args)
         {
-            WriteLogLine($"Begin Generate {args.ContainingTypeInfo.Name} EventArgs");
-
             try
             {
                 Span<char> initialBuffer = stackalloc char[80000];
@@ -221,18 +153,13 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 sourceBuilder.Build();
 
                 context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
-
-                WriteLogLine($"End Generate {args.ContainingTypeInfo.Name} EventArgs => {sourceBuilder.HintName}");
             }
             catch (OperationCanceledException)
             {
-                WriteLogLine($"Canceled Generate {args.ContainingTypeInfo.Name} EventArgs");
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                WriteLogLine($"Exception in Generate {args.ContainingTypeInfo.Name} EventArgs");
-                WriteLogLine(ex.ToString());
                 throw;
             }
         }

@@ -5,6 +5,8 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <Version>2.1.0.8</Version>
 
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
     <!-- NuGet -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
