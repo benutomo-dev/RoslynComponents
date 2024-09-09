@@ -1,21 +1,9 @@
 ﻿root = true
 
-[*]
-
-# スペルチェック
-spelling_languages = en-us,ja-jp
-spelling_checkable_types = strings,identifiers,comments
-#spelling_error_severity = warning
-spelling_error_severity = hint
-spelling_exclusion_path = .\exclusion.dic
-
 [*.cs]
 
 # CS0436: 型がインポートされた型と競合しています
 dotnet_diagnostic.CS0436.severity = suggestion
-
-# IDE005: 不要なusing
-dotnet_diagnostic.IDE0005.severity = warning
 
 # Default severity for analyzer diagnostics with category 'Naming'
 dotnet_analyzer_diagnostic.category-Naming.severity = suggestion
