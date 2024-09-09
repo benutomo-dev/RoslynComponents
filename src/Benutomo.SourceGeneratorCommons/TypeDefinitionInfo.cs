@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
 

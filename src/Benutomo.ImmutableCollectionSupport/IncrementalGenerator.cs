@@ -4,9 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using System.Threading;
 
 namespace Benutomo.ImmutableCollectionSupport;
 

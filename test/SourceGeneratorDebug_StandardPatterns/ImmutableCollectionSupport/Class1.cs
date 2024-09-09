@@ -1,8 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using System.Collections.Generic;
-using System;
-using SourceGeneratorDebug_StandardPatterns;
 
 namespace SourceGeneratorDebug_StandardPatterns.ImmutableCollectionSupport
 {

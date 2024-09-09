@@ -1,9 +1,4 @@
-﻿using Benutomo.SourceGeneratorCommons;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Immutable;
-using System.Text;
+﻿using Microsoft.CodeAnalysis;
 
 namespace Benutomo.EqualsGenerator
 {

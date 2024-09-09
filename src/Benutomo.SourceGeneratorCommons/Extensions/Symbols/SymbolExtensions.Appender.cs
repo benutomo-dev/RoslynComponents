@@ -1,6 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Text;
 
 namespace Benutomo.SourceGeneratorCommons;
