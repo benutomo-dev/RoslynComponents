@@ -1,4 +1,4 @@
 ﻿namespace System.Runtime.CompilerServices
 {
-    internal class IsExternalInit : Attribute { }
+    internal sealed class IsExternalInit : Attribute { }
 }

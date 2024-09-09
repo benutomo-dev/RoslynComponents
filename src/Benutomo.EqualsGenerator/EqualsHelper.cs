@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Benutomo.EqualsGenerator
 {
-    internal class EqualsHelper
+    internal sealed class EqualsHelper
     {
         public static IEnumerable<(ISymbol symbol, ITypeSymbol type, bool isHashCodeCache)> EnumerateValidMembers(ITypeSymbol typeSymbol, UsingSymbols usingSymbols, SemanticModel semanticModel, CancellationToken cancellationToken)
         {

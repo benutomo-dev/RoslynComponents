@@ -55,7 +55,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
         }
     }
 
-    private record Symbols(INamedTypeSymbol ImmutableArrayT);
+    private sealed record Symbols(INamedTypeSymbol ImmutableArrayT);
 
     internal const string AutoGenImmutableArrayExtensionsClassName = "AuteGenImmutableArrayExtensions";
 

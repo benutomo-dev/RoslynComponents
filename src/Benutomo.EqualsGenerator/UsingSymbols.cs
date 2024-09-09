@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Benutomo.EqualsGenerator
 {
-    internal class UsingSymbols : IEquatable<UsingSymbols?>
+    internal sealed class UsingSymbols : IEquatable<UsingSymbols?>
     {
         public INamedTypeSymbol AutomaticEqualsImplAttribute { get; init; }
         public INamedTypeSymbol IsNotEquivalenceFactorAttribute { get; init; }

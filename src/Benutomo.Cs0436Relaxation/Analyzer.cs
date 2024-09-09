@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Benutomo.Cs0436Relaxation
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class Analyzer : DiagnosticAnalyzer
+    internal sealed class Analyzer : DiagnosticAnalyzer
     {
         /// <summary>
         /// editorconfigファイルの編集が必要。

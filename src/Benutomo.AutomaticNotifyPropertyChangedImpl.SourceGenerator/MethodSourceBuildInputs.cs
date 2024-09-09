@@ -13,7 +13,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
     record struct ExplicitImplementationArgs(string InterfaceType, ExplicitImplementationEventType EventType, string InterfaceEventName);
 
-    class MethodSourceBuildInputs : IEquatable<MethodSourceBuildInputs?>
+    sealed class MethodSourceBuildInputs : IEquatable<MethodSourceBuildInputs?>
     {
         public const string DefferedNotificationMethodSuffix = "WithDefferedNotification";
 

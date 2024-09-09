@@ -29,7 +29,7 @@
 
         public IDisposable Subscribe(IObserver<T> observer) => new Proxy(_addHandler, _removeHandler, _valueGetter, observer, _pushValueAtSubscribed);
 
-        private class Proxy : IDisposable
+        private sealed class Proxy : IDisposable
         {
             Action<EventHandler>? _removeHandler;
             Func<T> _valueGetter;

@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Benutomo.CancellationAnalyzer
 {
-    internal record UsingSymbols(
+    internal sealed record UsingSymbols(
         INamedTypeSymbol CancellationToken,
         INamedTypeSymbol UncancelableAttribute,
         INamedTypeSymbol DisableArgumentCancellationTokenCheckAttribute,
@@ -17,7 +17,7 @@ namespace Benutomo.CancellationAnalyzer
         );
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class Analyzer : DiagnosticAnalyzer
+    internal sealed class Analyzer : DiagnosticAnalyzer
     {
         /// <summary>
         /// 引数のCancellatoinTokenを引き渡し可能なオーバーロードが存在

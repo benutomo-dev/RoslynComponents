@@ -2,7 +2,7 @@
 
 namespace Benutomo.SourceGeneratorCommons;
 
-internal class DebuggingRun
+internal sealed class DebuggingRun
 {
     [Conditional("DEBUG")]
     public static void Assert(bool condition)

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
-    record UsingSymbols(
+    sealed record UsingSymbols(
         INamedTypeSymbol EnableNotificationSupportAttribute,
         INamedTypeSymbol ChangedEventAttribute,
         INamedTypeSymbol ChangingEventAttribute,
@@ -46,7 +46,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             );
         }
 
-        public virtual bool Equals(UsingSymbols other)
+        public bool Equals(UsingSymbols other)
         {
             var result =
                 SymbolEqualityComparer.Default.Equals(EnableNotificationSupportAttribute, other.EnableNotificationSupportAttribute) &&

@@ -1,6 +1,6 @@
 ﻿namespace Benutomo.SourceGeneratorCommons
 {
-    class NameSpaceInfo : ITypeContainer, IEquatable<NameSpaceInfo?>
+    sealed class NameSpaceInfo : ITypeContainer, IEquatable<NameSpaceInfo?>
     {
         public string Name { get; }
 

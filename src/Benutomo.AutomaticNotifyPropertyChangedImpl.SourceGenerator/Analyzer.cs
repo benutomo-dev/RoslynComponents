@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class Analyzer : DiagnosticAnalyzer
+    internal sealed class Analyzer : DiagnosticAnalyzer
     {
         /// <summary>
         /// AutomaticDisposeImpl属性を付与した型の定義はpartialである必要があります。

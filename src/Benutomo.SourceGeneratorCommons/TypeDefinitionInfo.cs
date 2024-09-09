@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Benutomo.SourceGeneratorCommons
 {
-    class TypeDefinitionInfo : ITypeContainer, IEquatable<TypeDefinitionInfo?>
+    sealed class TypeDefinitionInfo : ITypeContainer, IEquatable<TypeDefinitionInfo?>
     {
         public ITypeContainer Container { get; }
 

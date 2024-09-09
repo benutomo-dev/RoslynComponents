@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Benutomo.SourceGeneratorCommons;
 
-internal class SourceBuilderEx : IDisposable
+internal sealed class SourceBuilderEx : IDisposable
 {
     public string SourceText => _chachedSourceText ??= _buffer?.AsSpan(0, _length).ToString() ?? "";
 
