@@ -2,6 +2,9 @@
 
 [*.cs]
 
+# ターゲット型の new 式を使用しない
+csharp_style_implicit_object_creation_when_type_is_apparent = false
+
 # CS0436: 型がインポートされた型と競合しています
 dotnet_diagnostic.CS0436.severity = suggestion
 
