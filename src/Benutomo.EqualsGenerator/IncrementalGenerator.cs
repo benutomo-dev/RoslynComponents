@@ -268,6 +268,22 @@ namespace Benutomo.EqualsGenerator
                 {
                     using (builder.BeginBlock($@"public static bool operator ==({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} left, {typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} right)"))
                     {
+                        if (!typeDefinitionInfo.IsValueType)
+                        {
+                            using (builder.BeginBlock("if (left is null || right is null)"))
+                            {
+                                using (builder.BeginBlock("if (left is null == right is null)"))
+                                {
+                                    builder.PutIndentSpace();
+                                    builder.AppendLine($@"return true;");
+                                }
+                                using (builder.BeginBlock("else"))
+                                {
+                                    builder.PutIndentSpace();
+                                    builder.AppendLine($@"return false;");
+                                }
+                            }
+                        }
                         builder.PutIndentSpace();
                         builder.AppendLine($@"return System.Collections.Generic.EqualityComparer<{typeDefinitionInfo.NameWithGenericArgs}>.Default.Equals(left, right);");
                     }
@@ -275,7 +291,7 @@ namespace Benutomo.EqualsGenerator
                     using (builder.BeginBlock($@"public static bool operator !=({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} left, {typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} right)"))
                     {
                         builder.PutIndentSpace();
-                        builder.AppendLine($@"return !System.Collections.Generic.EqualityComparer<{typeDefinitionInfo.NameWithGenericArgs}>.Default.Equals(left, right);");
+                        builder.AppendLine($@"return !(left == right);");
                     }
                 }
             }
