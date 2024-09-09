@@ -314,11 +314,16 @@ namespace Benutomo.EqualsGenerator
                 {
                     using (builder.BeginBlock($@"public static bool operator ==({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} left, {typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} right)"))
                     {
-                        if (!typeDefinitionInfo.IsValueType)
+                        if (typeDefinitionInfo.IsValueType)
                         {
-                            using (builder.BeginBlock("if (left is null || right is null)"))
+                            builder.PutIndentSpace();
+                            builder.AppendLine($@"return left.Equals(right);");
+                        }
+                        else
+                        {
+                            using (builder.BeginBlock("if (left is null)"))
                             {
-                                using (builder.BeginBlock("if (left is null == right is null)"))
+                                using (builder.BeginBlock("if (right is null)"))
                                 {
                                     builder.PutIndentSpace();
                                     builder.AppendLine($@"return true;");
@@ -329,9 +334,12 @@ namespace Benutomo.EqualsGenerator
                                     builder.AppendLine($@"return false;");
                                 }
                             }
+                            using (builder.BeginBlock("else"))
+                            {
+                                builder.PutIndentSpace();
+                                builder.AppendLine($@"return left.Equals(right);");
+                            }
                         }
-                        builder.PutIndentSpace();
-                        builder.AppendLine($@"return System.Collections.Generic.EqualityComparer<{typeDefinitionInfo.NameWithGenericArgs}>.Default.Equals(left, right);");
                     }
 
                     using (builder.BeginBlock($@"public static bool operator !=({typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} left, {typeDefinitionInfo.NameWithGenericArgs}{(generateArgs.targetSymbol.IsValueType ? "" : "?")} right)"))
