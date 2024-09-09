@@ -158,7 +158,7 @@ internal static partial class SymbolExtensions
 
         public Appender(SourceBuilderEx sourceBuilderEx) { _instance = sourceBuilderEx; }
 
-        public void Append(string value)
+        public readonly void Append(string value)
         {
             if (_instance is StringBuilder stringBuilder)
             {

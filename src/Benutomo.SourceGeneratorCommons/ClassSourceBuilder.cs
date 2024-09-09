@@ -9,9 +9,9 @@ namespace Benutomo.SourceGeneratorCommons
 
         TypeDefinitionInfo ContainingTypeInfo { get; }
 
-        public string NameSpace => _nameSpace;
+        public readonly string NameSpace => _nameSpace;
 
-        public List<string> HintingTypeNames => _hintingTypeNames;
+        public readonly List<string> HintingTypeNames => _hintingTypeNames;
 
         string _nameSpace = "";
 
@@ -30,7 +30,7 @@ namespace Benutomo.SourceGeneratorCommons
         }
 
         #region _sourceBuilder Methods
-        public SourceProductionContext Context => _sourceBuilder.Context;
+        public readonly SourceProductionContext Context => _sourceBuilder.Context;
         public string SourceText => _sourceBuilder.SourceText;
         public void PutIndentSpace() => _sourceBuilder.PutIndentSpace();
         public void Clear() => _sourceBuilder.Clear();

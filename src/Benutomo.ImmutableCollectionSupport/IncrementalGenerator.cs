@@ -31,19 +31,19 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             }
         }
 
-        public override bool Equals(object? obj)
+        public override readonly bool Equals(object? obj)
         {
             return obj is ExtensionMethodSource source && Equals(source);
         }
 
-        public bool Equals(ExtensionMethodSource other)
+        public readonly bool Equals(ExtensionMethodSource other)
         {
             return SymbolEqualityComparer.Default.Equals(Method, other.Method) &&
                    ModifyArgFlags.Cast<ISymbol>().SequenceEqual(other.ModifyArgFlags, SymbolEqualityComparer.Default) &&
                    SymbolEqualityComparer.Default.Equals(ImmutableArrayTSymbol, other.ImmutableArrayTSymbol);
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             int hashCode = -808452536;
             hashCode = hashCode * -1521134295 + SymbolEqualityComparer.Default.GetHashCode(Method);

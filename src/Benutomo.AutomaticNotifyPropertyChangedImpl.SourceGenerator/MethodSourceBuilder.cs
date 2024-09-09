@@ -8,7 +8,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         delegate void MethodSourceBuilderAction(ref MethodSourceBuilder builder);
         delegate void MethodSourceBuilderAction<T1>(ref MethodSourceBuilder builder, T1 arg1);
 
-        public string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}.{_sourceBuildInputs.InternalPropertyName}_{_sourceBuilder.NameSpace}.cs";
+        public readonly string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}.{_sourceBuildInputs.InternalPropertyName}_{_sourceBuilder.NameSpace}.cs";
 
         ClassSourceBuilder _sourceBuilder;
 
@@ -27,7 +27,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         }
 
         #region _sourceBuilder Methods
-        public SourceProductionContext Context => _sourceBuilder.Context;
+        public readonly SourceProductionContext Context => _sourceBuilder.Context;
         public string SourceText => _sourceBuilder.SourceText;
         public void PutIndentSpace() => _sourceBuilder.PutIndentSpace();
         public void Clear() => _sourceBuilder.Clear();

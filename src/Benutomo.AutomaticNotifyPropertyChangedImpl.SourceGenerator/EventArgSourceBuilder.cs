@@ -5,7 +5,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
     ref struct EventArgSourceBuilder
     {
-        public string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}.EventArgDeclarations_{_sourceBuilder.NameSpace}.cs";
+        public readonly string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}.EventArgDeclarations_{_sourceBuilder.NameSpace}.cs";
 
         ClassSourceBuilder _sourceBuilder;
 
@@ -24,7 +24,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         }
 
         #region _sourceBuilder Methods
-        public SourceProductionContext Context => _sourceBuilder.Context;
+        public readonly SourceProductionContext Context => _sourceBuilder.Context;
         public string SourceText => _sourceBuilder.SourceText;
         public void PutIndentSpace() => _sourceBuilder.PutIndentSpace();
         public void Clear() => _sourceBuilder.Clear();

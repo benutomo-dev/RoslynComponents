@@ -4,9 +4,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
     ref struct MethodSourceBuilder
     {
-        public string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}_{_sourceBuilder.NameSpace}_AutomaticDisposeImpl.cs";
+        public readonly string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}_{_sourceBuilder.NameSpace}_AutomaticDisposeImpl.cs";
 
-        private bool IsEnabledFinalize => _sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName is not null;
+        private readonly bool IsEnabledFinalize => _sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName is not null;
 
         readonly MethodSourceBuilderInputs _sourceBuildInputs;
 
@@ -24,7 +24,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         }
 
         #region _sourceBuilder Methods
-        public SourceProductionContext Context => _sourceBuilder.Context;
+        public readonly SourceProductionContext Context => _sourceBuilder.Context;
         public string SourceText => _sourceBuilder.SourceText;
         public void PutIndentSpace() => _sourceBuilder.PutIndentSpace();
         public void Clear() => _sourceBuilder.Clear();
