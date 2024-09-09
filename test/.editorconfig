@@ -6,6 +6,8 @@ dotnet_diagnostic.CA1861.severity = silent
 # CA2211: 非定数フィールドは表示されません
 dotnet_diagnostic.CA2211.severity = silent
 
+dotnet_diagnostic.CS0649.severity = silent
+
 # FAA0001: Simplify Assertion
 dotnet_diagnostic.FAA0001.severity = silent
 
