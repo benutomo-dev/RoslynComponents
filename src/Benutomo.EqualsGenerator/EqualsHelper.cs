@@ -11,7 +11,7 @@ namespace Benutomo.EqualsGenerator
                 .SelectMany(v => v.GetAttributes())
                 .Where(v => SymbolEqualityComparer.Default.Equals(v.AttributeClass, usingSymbols.RepresentingEquivalenceForAttribute))
                 .SelectMany(v => v.ConstructorArguments)
-                .SelectMany(v => v.Kind == TypedConstantKind.Array ? v.Values.Select(v => v.Value) : new[] { v.Value } )
+                .SelectMany(v => v.Kind == TypedConstantKind.Array ? v.Values.Select(v => v.Value) : [v.Value] )
                 .Select(v => v?.ToString())
                 .Where(v => v is not null).Select(v => v!);
 

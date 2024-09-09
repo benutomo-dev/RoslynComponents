@@ -37,7 +37,7 @@ namespace Benutomo.SourceGeneratorCommons
             if (_arrayPoolBuffer is not null)
             {
                 _length = 0;
-                _buffer = Span<char>.Empty;
+                _buffer = [];
                 ArrayPool<char>.Shared.Return(_arrayPoolBuffer);
                 _arrayPoolBuffer = null;
             }

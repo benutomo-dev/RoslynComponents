@@ -204,8 +204,8 @@ namespace Benutomo.EqualsGenerator
 
                 if (readAccessMembers.SetEquals(equalityFacterMembers))
                 {
-                    unusedEqualityFactorMembers = Array.Empty<string>();
-                    usedNotEqualityFactorMembers = Array.Empty<IdentifierNameSyntax>();
+                    unusedEqualityFactorMembers = [];
+                    usedNotEqualityFactorMembers = [];
                 }
                 else
                 {
