@@ -19,7 +19,7 @@
 
         public EnableAutomaticDisposeAttribute()
         {
-            _dependencyMembers = Array.Empty<string>();
+            _dependencyMembers = [];
         }
 
         /// <summary>
