@@ -11,7 +11,15 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [AutoGenEqualsEqualityComparer(nameof(StringComparer.Ordinal), useDefaultEqualityComparerIfNull: true)]
-        string? Tx { get; set; }
+        string? T1 { get; set; }
+
+        [AutoGenEqualsEqualityComparer(nameof(StringComparer.Ordinal), useDefaultEqualityComparerIfNull: false)]
+        string? T2 { get; set; }
+
+        [AutoGenEqualsEqualityComparer(nameof(StringComparer.Ordinal))]
+        string? T3 { get; set; }
+
+        string? T4 { get; set; }
 
         public int Y { get; set; }
 

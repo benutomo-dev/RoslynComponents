@@ -169,7 +169,7 @@ namespace Benutomo.EqualsGenerator
                     }
                 }
 
-                IEnumerable<ITypeSymbol> enumerableBaseTypeEqualsMethodTypes(INamedTypeSymbol? baseType)
+                static IEnumerable<ITypeSymbol> enumerableBaseTypeEqualsMethodTypes(INamedTypeSymbol? baseType)
                 {
                     while (baseType is not null)
                     {
@@ -288,20 +288,29 @@ namespace Benutomo.EqualsGenerator
                             builder.Append(member.symbol.Name);
                             builder.Append(" is null ? ");
                             builder.Append(member.nullFallbackEqualityComparer);
-                            builder.Append(" : ");
+                            builder.Append(".Equals(this.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(", other.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(") : ");
                             builder.Append(member.equalityComparer);
-                            builder.Append(")");
+                            builder.Append(".Equals(this.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(", other.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append("))");
+                            builder.AppendLine();
                         }
                         else
                         {
                             builder.Append(member.equalityComparer);
+                            builder.Append(".Equals(this.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(", other.");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(")");
+                            builder.AppendLine();
                         }
-                        builder.Append(".Equals(this.");
-                        builder.Append(member.symbol.Name);
-                        builder.Append(", other.");
-                        builder.Append(member.symbol.Name);
-                        builder.Append(")");
-                        builder.AppendLine();
                     }
 
                     builder.PutIndentSpace();
