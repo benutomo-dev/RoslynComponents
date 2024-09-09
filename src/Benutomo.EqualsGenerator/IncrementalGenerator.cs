@@ -77,6 +77,7 @@ namespace Benutomo.EqualsGenerator
                             .FirstOrDefault(v => SymbolEqualityComparer.Default.Equals(v.AttributeClass, generateArgs.usingSymbols.EqualityComparerAttribute));
 
                         string equalityComparer;
+                        string? nullFallbackEqualityComparer = null;
 
                         if (equalityComparerAttribute is not null)
                         {
@@ -87,8 +88,8 @@ namespace Benutomo.EqualsGenerator
                             var syntaxNode = equalityComparerAttributeSyntaxReference?.GetSyntax();
 
                             if (syntaxNode is AttributeSyntax attributeSyntax
-                                && attributeSyntax.ArgumentList is { Arguments.Count: 1 } attributreArgListSyntax
-                                && attributreArgListSyntax.Arguments[0].Expression is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } invocationExpressionSyntax
+                                && attributeSyntax.ArgumentList is { Arguments.Count: >= 1 } attributreArgListSyntax
+                                && attributreArgListSyntax.Arguments[0].Expression is InvocationExpressionSyntax { ArgumentList.Arguments.Count: >= 1 } invocationExpressionSyntax
                                 && invocationExpressionSyntax.Expression is IdentifierNameSyntax { Identifier.ValueText: "nameof" }
                                 )
                             {
@@ -103,19 +104,40 @@ namespace Benutomo.EqualsGenerator
                                     equalityComparer = symbolInfo.Symbol.ToString();
                                 }
                             }
+
+                            if (equalityComparerAttribute.ConstructorArguments.Length >= 2)
+                            {
+                                if (equalityComparerAttribute.AttributeConstructor!.Parameters[1].Name != "useDefaultEqualityComparerIfNull")
+                                {
+                                    if (Debugger.IsAttached)
+                                        Debug.Fail(null);
+
+                                    builder.AppendLine(@$"// {generateArgs.usingSymbols.EqualityComparerAttribute.Name}のコンストラクタパラメータが想定外");
+                                }
+
+                                if (equalityComparerAttribute.ConstructorArguments[1].Value is true)
+                                {
+                                    nullFallbackEqualityComparer = getDefaultEqualityComparer(member.type);
+                                }
+                            }
                         }
                         else
+                        {
+                            equalityComparer = getDefaultEqualityComparer(member.type);
+                        }
+
+                        static string getDefaultEqualityComparer(ITypeSymbol type)
                         {
                             var equalityComparerBuilder = new StringBuilder(256);
 
                             equalityComparerBuilder.Append("System.Collections.Generic.EqualityComparer<");
-                            equalityComparerBuilder.AppendFullTypeNameWithNamespaceAlias(member.type);
+                            equalityComparerBuilder.AppendFullTypeNameWithNamespaceAlias(type);
                             equalityComparerBuilder.Append(">.Default");
 
-                            equalityComparer = equalityComparerBuilder.ToString();
+                            return equalityComparerBuilder.ToString();
                         }
 
-                        return (member.symbol, member.type, member.isHashCodeCache, equalityComparer);
+                        return (member.symbol, member.type, member.isHashCodeCache, equalityComparer, nullFallbackEqualityComparer);
                     })
                     .ToArray();
 
@@ -189,7 +211,18 @@ namespace Benutomo.EqualsGenerator
                             builder.Append("hashCode.Add(this.");
                             builder.Append(member.symbol.Name);
                             builder.Append(", ");
-                            builder.Append(member.equalityComparer);
+                            if (member.nullFallbackEqualityComparer is not null)
+                            {
+                                builder.Append(member.symbol.Name);
+                                builder.Append(" is null ? ");
+                                builder.Append(member.nullFallbackEqualityComparer);
+                                builder.Append(" : ");
+                                builder.Append(member.equalityComparer);
+                            }
+                            else
+                            {
+                                builder.Append(member.equalityComparer);
+                            }
                             builder.Append(");");
                             builder.AppendLine();
                         }
@@ -249,7 +282,20 @@ namespace Benutomo.EqualsGenerator
                     {
                         builder.PutIndentSpace();
                         builder.Append("  && ");
-                        builder.Append(member.equalityComparer);
+                        if (member.nullFallbackEqualityComparer is not null)
+                        {
+                            builder.Append("(");
+                            builder.Append(member.symbol.Name);
+                            builder.Append(" is null ? ");
+                            builder.Append(member.nullFallbackEqualityComparer);
+                            builder.Append(" : ");
+                            builder.Append(member.equalityComparer);
+                            builder.Append(")");
+                        }
+                        else
+                        {
+                            builder.Append(member.equalityComparer);
+                        }
                         builder.Append(".Equals(this.");
                         builder.Append(member.symbol.Name);
                         builder.Append(", other.");

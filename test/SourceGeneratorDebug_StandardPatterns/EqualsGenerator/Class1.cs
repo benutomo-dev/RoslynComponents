@@ -10,6 +10,9 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        [AutoGenEqualsEqualityComparer(nameof(StringComparer.Ordinal), useDefaultEqualityComparerIfNull: true)]
+        string? Tx { get; set; }
+
         public int Y { get; set; }
 
 
@@ -45,7 +48,7 @@ namespace SourceGeneratorDebug_StandardPatterns.EqualsGenerator
         int x;
     }
 
-    internal sealed partial class Class3
+    internal sealed partial class Class3 : IEquatable<Class3>
     {
         event EventHandler? Event;
 

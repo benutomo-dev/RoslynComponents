@@ -23,7 +23,7 @@ namespace Benutomo.EqualsGenerator.Embedding
         ])]
     public sealed class AutoGenEqualsEqualityComparerAttribute : Attribute
     {
-        public AutoGenEqualsEqualityComparerAttribute(string nameofIEqualityComparerMember) { }
+        public AutoGenEqualsEqualityComparerAttribute(string nameofIEqualityComparerMember, bool useDefaultEqualityComparerIfNull = false) { }
     }
 }
 
