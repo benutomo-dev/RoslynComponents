@@ -1,6 +1,7 @@
 ﻿[*.cs]
 
 dotnet_analyzer_diagnostic.category-Style.severity = none
+dotnet_analyzer_diagnostic.category-Naming.severity = none
 
 # CA1861: 引数として定数配列を使用しない
 dotnet_diagnostic.CA1861.severity = silent
@@ -15,6 +16,9 @@ dotnet_diagnostic.FAA0001.severity = silent
 
 # FAA0002: Replace Xunit assertion with Fluent Assertions equivalent
 dotnet_diagnostic.FAA0002.severity = silent
+
+# IDE0051: 使用されていない非公開メンバーを削除する
+dotnet_diagnostic.IDE0051.severity = none
 
 # IDE1006: 命名スタイル
 dotnet_diagnostic.IDE1006.severity = silent
