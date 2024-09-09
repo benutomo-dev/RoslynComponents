@@ -152,7 +152,7 @@ internal static partial class SymbolExtensions
 
     struct Appender
     {
-        object _instance;
+        readonly object _instance;
 
         public Appender(StringBuilder stringBuilder) { _instance = stringBuilder; }
 

@@ -18,13 +18,13 @@ internal sealed class SourceBuilderEx : IDisposable
 
     private int _currentIndentCount;
 
-    private SourceProductionContext _context;
+    private readonly SourceProductionContext _context;
 
-    private string _hintName;
+    private readonly string _hintName;
 
     private const string IndentText = "    ";
 
-    private static ConcurrentDictionary<string, int> s_initialBufferSizeDictionary = new ConcurrentDictionary<string, int>();
+    private static readonly ConcurrentDictionary<string, int> s_initialBufferSizeDictionary = new ConcurrentDictionary<string, int>();
 
     public SourceBuilderEx(SourceProductionContext context, string hintName)
     {

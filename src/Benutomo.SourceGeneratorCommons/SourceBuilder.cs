@@ -4,23 +4,19 @@ using System.Diagnostics;
 
 namespace Benutomo.SourceGeneratorCommons
 {
-    ref struct SourceBuilder
+    internal ref struct SourceBuilder
     {
         public string SourceText => _chachedSourceText ??= _buffer.Slice(0, _length).ToString();
 
-        string? _chachedSourceText;
-
-        Span<char> _buffer;
-
-        int _length;
-
-        char[]? _arrayPoolBuffer;
+        private string? _chachedSourceText;
+        private Span<char> _buffer;
+        private int _length;
+        private char[]? _arrayPoolBuffer;
 
         public SourceProductionContext Context { get; }
 
-        int _currentIndentCount = 0;
-
-        const string IndentText = "    ";
+        private int _currentIndentCount = 0;
+        private const string IndentText = "    ";
 
         public SourceBuilder(SourceProductionContext context, Span<char> initialBuffer)
         {
@@ -43,7 +39,7 @@ namespace Benutomo.SourceGeneratorCommons
             }
         }
 
-        void ExpandBuffer(int requiredSize)
+        private void ExpandBuffer(int requiredSize)
         {
             Debug.Assert(_buffer.Length < _length + requiredSize);
 
@@ -60,7 +56,7 @@ namespace Benutomo.SourceGeneratorCommons
             _arrayPoolBuffer = nextBuffer;
         }
 
-        void InternalClear()
+        private void InternalClear()
         {
             if (_length != 0)
             {
@@ -69,7 +65,7 @@ namespace Benutomo.SourceGeneratorCommons
             }
         }
 
-        void InternalAppend(ReadOnlySpan<char> text)
+        private void InternalAppend(ReadOnlySpan<char> text)
         {
             if (text.Length <= 0) return;
 

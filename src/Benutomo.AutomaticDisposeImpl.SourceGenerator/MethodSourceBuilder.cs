@@ -8,7 +8,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         private bool IsEnabledFinalize => _sourceBuildInputs._userDefinedUnmanagedResourceReleaseMethodName is not null;
 
-        MethodSourceBuilderInputs _sourceBuildInputs;
+        readonly MethodSourceBuilderInputs _sourceBuildInputs;
 
         ClassSourceBuilder _sourceBuilder;
 

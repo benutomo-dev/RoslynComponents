@@ -14,10 +14,10 @@
         ])]
     public sealed class EventToObservable<T> : IObservable<T>
     {
-        Action<EventHandler> _addHandler;
-        Action<EventHandler> _removeHandler;
-        Func<T> _valueGetter;
-        bool _pushValueAtSubscribed;
+        readonly Action<EventHandler> _addHandler;
+        readonly Action<EventHandler> _removeHandler;
+        readonly Func<T> _valueGetter;
+        readonly bool _pushValueAtSubscribed;
 
         public EventToObservable(Action<EventHandler> addHandler, Action<EventHandler> removeHandler, Func<T> valueGetter, bool pushValueAtSubscribed)
         {
@@ -32,7 +32,7 @@
         private sealed class Proxy : IDisposable
         {
             Action<EventHandler>? _removeHandler;
-            Func<T> _valueGetter;
+            readonly Func<T> _valueGetter;
             IObserver<T>? _observer;
 
             public Proxy(Action<EventHandler> addHandler, Action<EventHandler> removeHandler, Func<T> valueGetter, IObserver<T> observer, bool pushValueAtSubscribed)
