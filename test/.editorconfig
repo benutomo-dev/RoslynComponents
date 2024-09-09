@@ -1,5 +1,7 @@
 ﻿[*.cs]
 
+dotnet_analyzer_diagnostic.category-Style.severity = none
+
 # CA1861: 引数として定数配列を使用しない
 dotnet_diagnostic.CA1861.severity = silent
 
