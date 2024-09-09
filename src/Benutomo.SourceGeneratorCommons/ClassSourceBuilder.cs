@@ -94,9 +94,9 @@ namespace Benutomo.SourceGeneratorCommons
                 var hintingTypeNameBuilder = new StringBuilder();
 
                 hintingTypeNameBuilder.Append(namedTypeSymbol.Name);
-                hintingTypeNameBuilder.Append("{");
+                hintingTypeNameBuilder.Append('{');
                 hintingTypeNameBuilder.Append(string.Join("_", namedTypeSymbol.GenericTypeArgs));
-                hintingTypeNameBuilder.Append("}");
+                hintingTypeNameBuilder.Append('}');
 
                 _hintingTypeNames.Add(hintingTypeNameBuilder.ToString());
             }

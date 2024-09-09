@@ -61,7 +61,7 @@ namespace Benutomo.SourceGeneratorCommons
                     if (typeDefinitionInfo.Container is not null)
                     {
                         append(builder, typeDefinitionInfo.Container);
-                        builder.Append(".");
+                        builder.Append('.');
                     }
 
                     builder.Append(typeDefinitionInfo.Name);

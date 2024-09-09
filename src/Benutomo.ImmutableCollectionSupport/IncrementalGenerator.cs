@@ -414,20 +414,20 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                                     if (argType.TypeKind == TypeKind.Enum && argType.GetMembers().OfType<IFieldSymbol>().FirstOrDefault(v => v.ConstantValue == parameter.ExplicitDefaultValue) is { } enumMember)
                                     {
                                         argument.AppendFullTypeNameWithNamespaceAlias(argType);
-                                        argument.Append(".");
+                                        argument.Append('.');
                                         argument.Append(enumMember.Name);
                                     }
                                     else if (parameter.ExplicitDefaultValue is string stringDefaultValue)
                                     {
-                                        argument.Append("\"");
+                                        argument.Append('"');
                                         argument.Append(stringDefaultValue);
-                                        argument.Append("\"");
+                                        argument.Append('"');
                                     }
                                     else
                                     {
-                                        argument.Append("(");
+                                        argument.Append('(');
                                         argument.AppendFullTypeNameWithNamespaceAlias(argType);
-                                        argument.Append(")");
+                                        argument.Append(')');
                                         argument.Append(parameter.ExplicitDefaultValue);
                                     }
                                 }
@@ -454,17 +454,17 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                             {
                                 argValue.Append("global::");
                                 argValue.Append(arg.defaultNameSpceName);
-                                argValue.Append(".");
+                                argValue.Append('.');
                                 argValue.Append(AutoGenImmutableArrayExtensionsClassName);
-                                argValue.Append(".");
+                                argValue.Append('.');
                                 argValue.Append(BoxlessAsReadOnlyListMethodName);
                                 argValue.Append("(@");
                                 argValue.Append(v.Name);
-                                argValue.Append(")");
+                                argValue.Append(')');
                             }
                             else
                             {
-                                argValue.Append("@");
+                                argValue.Append('@');
                                 argValue.Append(v.Name);
                             }
 
