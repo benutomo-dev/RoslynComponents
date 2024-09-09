@@ -262,7 +262,7 @@ namespace Benutomo.CancellationAnalyzer
 
                         var isInterfaceImplementationMethod = methodSymbol.ContainingType.AllInterfaces
                             .SelectMany(interfaceSymbol =>
-                                interfaceSymbol.GetMembers().OfType<IMethodSymbol>().Where(candidateMethodSymbol => IsSameSignatureMethods(methodSymbol, candidateMethodSymbol))
+                                interfaceSymbol.GetMembers().OfType<IMethodSymbol>().Where(candidateMethodSymbol => isSameSignatureMethods(methodSymbol, candidateMethodSymbol))
                             )
                             .Select(interfaceMemberMethodSymbol => methodSymbol.ContainingType.FindImplementationForInterfaceMember(interfaceMemberMethodSymbol))
                             .Where(implementationMethodSymbol => SymbolEqualityComparer.Default.Equals(methodSymbol, implementationMethodSymbol))
@@ -273,7 +273,7 @@ namespace Benutomo.CancellationAnalyzer
                             context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_CT0003, reportLocation));
                         }
 
-                        static bool IsSameSignatureMethods(IMethodSymbol a, IMethodSymbol b)
+                        static bool isSameSignatureMethods(IMethodSymbol a, IMethodSymbol b)
                         {
                             if (a.Arity != b.Arity) return false;
                             if (a.Parameters.Length != b.Parameters.Length) return false;

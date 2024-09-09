@@ -10,8 +10,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
     [Generator(LanguageNames.CSharp)]
     public partial class SourceGenerator : IIncrementalGenerator
     {
-        static Regex NamespaceRegex = new Regex(@"\bnamespace\s+([a-zA-Z0-9_.]+)\s*[;{\r\n]", RegexOptions.Compiled);
-        static Regex TypeRegex = new Regex(@"\b(?:class|struct|enum)\s+([a-zA-Z0-9_]+)", RegexOptions.Compiled);
+        static Regex s_namespaceRegex = new Regex(@"\bnamespace\s+([a-zA-Z0-9_.]+)\s*[;{\r\n]", RegexOptions.Compiled);
+        static Regex s_typeRegex = new Regex(@"\b(?:class|struct|enum)\s+([a-zA-Z0-9_]+)", RegexOptions.Compiled);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {

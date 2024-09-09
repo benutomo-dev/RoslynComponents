@@ -172,10 +172,10 @@ internal static partial class SymbolExtensions
             }
             else
             {
-                Throw();
+                throwInvalidOperationException();
             }
 
-            static void Throw() => throw new InvalidOperationException();
+            static void throwInvalidOperationException() => throw new InvalidOperationException();
         }
     }
 }

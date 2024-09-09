@@ -25,7 +25,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             {
                 if (isAssignableToIDisposable)
                 {
-                    if (!IsValidMethodForManagedObjectDisposeMethodAttribute(member))
+                    if (!isValidMethodForManagedObjectDisposeMethodAttribute(member))
                     {
                         foreach (var location in member.Locations)
                         {
@@ -33,7 +33,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         }
                     }
 
-                    static bool IsValidMethodForManagedObjectDisposeMethodAttribute(ISymbol? member)
+                    static bool isValidMethodForManagedObjectDisposeMethodAttribute(ISymbol? member)
                     {
                         if (member is not IMethodSymbol methodSymbol) return false;
 
@@ -59,7 +59,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             {
                 if (isAssignableToIAsyncDisposable)
                 {
-                    if (!IsValidMethodForManagedObjectAsyncDisposeMethodAttribute(member, usingSymbols))
+                    if (!isValidMethodForManagedObjectAsyncDisposeMethodAttribute(member, usingSymbols))
                     {
                         foreach (var location in member.Locations)
                         {
@@ -67,7 +67,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                         }
                     }
 
-                    static bool IsValidMethodForManagedObjectAsyncDisposeMethodAttribute(ISymbol? member, UsingSymbols usingSymbols)
+                    static bool isValidMethodForManagedObjectAsyncDisposeMethodAttribute(ISymbol? member, UsingSymbols usingSymbols)
                     {
                         if (member is not IMethodSymbol methodSymbol) return false;
 

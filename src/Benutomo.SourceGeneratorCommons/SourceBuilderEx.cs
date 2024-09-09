@@ -24,14 +24,14 @@ internal sealed class SourceBuilderEx : IDisposable
 
     private const string IndentText = "    ";
 
-    private static ConcurrentDictionary<string, int> _initialBufferSizeDictionary = new ConcurrentDictionary<string, int>();
+    private static ConcurrentDictionary<string, int> s_initialBufferSizeDictionary = new ConcurrentDictionary<string, int>();
 
     public SourceBuilderEx(SourceProductionContext context, string hintName)
     {
         _context = context;
         _hintName = hintName;
 
-        if (!_initialBufferSizeDictionary.TryGetValue(hintName, out var initialMinimumCapacityLength))
+        if (!s_initialBufferSizeDictionary.TryGetValue(hintName, out var initialMinimumCapacityLength))
         {
             initialMinimumCapacityLength = 1024;
         }
@@ -53,7 +53,7 @@ internal sealed class SourceBuilderEx : IDisposable
     {
         _context.AddSource(_hintName, SourceText);
 
-        _initialBufferSizeDictionary.AddOrUpdate(_hintName, _length, (_, _) => _length);
+        s_initialBufferSizeDictionary.AddOrUpdate(_hintName, _length, (_, _) => _length);
 
         Dispose();
     }

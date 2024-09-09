@@ -8,22 +8,22 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
     public partial class AutomaticDisposeGenerator : IIncrementalGenerator
     {
 #if DEBUG
-        static StreamWriter _streamWriter;
+        static StreamWriter s_streamWriter;
         static AutomaticDisposeGenerator()
         {
             Directory.CreateDirectory(@"c:\var\log\AutomaticDisposeGenerator");
             var proc = Process.GetCurrentProcess();
-            _streamWriter = new StreamWriter($@"c:\var\log\AutomaticDisposeGenerator\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
-            _streamWriter.WriteLine(proc);
+            s_streamWriter = new StreamWriter($@"c:\var\log\AutomaticDisposeGenerator\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
+            s_streamWriter.WriteLine(proc);
         }
 
         [Conditional("DEBUG")]
         static void WriteLogLine(string line)
         {
-            lock (_streamWriter)
+            lock (s_streamWriter)
             {
-                _streamWriter.WriteLine(line);
-                _streamWriter.Flush();
+                s_streamWriter.WriteLine(line);
+                s_streamWriter.Flush();
             }
         }
 #else

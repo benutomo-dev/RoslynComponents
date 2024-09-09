@@ -417,7 +417,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         private static void AnalyzeAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData attributeData)
         {
-            var classDeclarationSyntaxes = EnumerateAllDeclarationSyntaxes(namedTypeSymbol, context.CancellationToken).ToArray();
+            var classDeclarationSyntaxes = enumerateAllDeclarationSyntaxes(namedTypeSymbol, context.CancellationToken).ToArray();
 
             foreach (var nonParcialDeclaration in classDeclarationSyntaxes.Where(IsNotParcialDeclaration))
             {
@@ -551,7 +551,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             return;
 
-            static IEnumerable<ClassDeclarationSyntax> EnumerateAllDeclarationSyntaxes(INamedTypeSymbol namedTypeSymbol, CancellationToken cancellationToken)
+            static IEnumerable<ClassDeclarationSyntax> enumerateAllDeclarationSyntaxes(INamedTypeSymbol namedTypeSymbol, CancellationToken cancellationToken)
             {
                 foreach (var location in namedTypeSymbol.Locations)
                 {

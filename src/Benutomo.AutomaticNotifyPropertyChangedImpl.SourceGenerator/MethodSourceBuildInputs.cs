@@ -129,7 +129,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
                 if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedEventAttribute))
                 {
-                    (ChangedEventAccessibility, var enabledxplicitInterfaceImplementations) = ResolveGenerateMemberAccessibility(
+                    (ChangedEventAccessibility, var enabledxplicitInterfaceImplementations) = resolveGenerateMemberAccessibility(
                         usingSymbols,
                         attributeData,
                         defaultAccessibility,
@@ -138,7 +138,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
                     if (enabledxplicitInterfaceImplementations)
                     {
-                        CollectExplicitImplimentaionEvents(
+                        collectExplicitImplimentaionEvents(
                             ref explicitImplementationsBuilder,
                             propertySymbol,
                             usingSymbols,
@@ -149,7 +149,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 }
                 else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangingEventAttribute))
                 {
-                    (ChangingEventAccessibility, var enabledxplicitInterfaceImplementations) = ResolveGenerateMemberAccessibility(
+                    (ChangingEventAccessibility, var enabledxplicitInterfaceImplementations) = resolveGenerateMemberAccessibility(
                         usingSymbols,
                         attributeData,
                         defaultAccessibility,
@@ -158,7 +158,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
                     if (enabledxplicitInterfaceImplementations)
                     {
-                        CollectExplicitImplimentaionEvents(
+                        collectExplicitImplimentaionEvents(
                             ref explicitImplementationsBuilder,
                             propertySymbol,
                             usingSymbols,
@@ -169,7 +169,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 }
                 else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedObservableAttribute))
                 {
-                    (ChangedObservableAccesibility, _) = ResolveGenerateMemberAccessibility(
+                    (ChangedObservableAccesibility, _) = resolveGenerateMemberAccessibility(
                         usingSymbols,
                         attributeData,
                         defaultAccessibility,
@@ -178,7 +178,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 }
                 else if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChantingObservableAttribute))
                 {
-                    (ChangingObservableAccesibility, _) = ResolveGenerateMemberAccessibility(
+                    (ChangingObservableAccesibility, _) = resolveGenerateMemberAccessibility(
                         usingSymbols,
                         attributeData,
                         defaultAccessibility,
@@ -218,7 +218,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             return;
 
 
-            static void CollectExplicitImplimentaionEvents(
+            static void collectExplicitImplimentaionEvents(
                 ref ImmutableArray<ExplicitImplementationArgs>.Builder? explicitImplementationsBuilder,
                 IPropertySymbol propertySymbol,
                 UsingSymbols usingSymbols,
@@ -234,7 +234,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
                     foreach (var interfaceEvent in explicitInterfaceImplementation.ContainingType.GetMembers().OfType<IEventSymbol>())
                     {
-                        if (!IsMatch(interfaceEvent.Name, eventSourcePropertyName, postfix))
+                        if (!isMatch(interfaceEvent.Name, eventSourcePropertyName, postfix))
                         {
                             continue;
                         }
@@ -258,7 +258,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 }
                 return;
 
-                static bool IsMatch(string memberName, string propertyName, string postfix)
+                static bool isMatch(string memberName, string propertyName, string postfix)
                 {
                     return true
                         && memberName.Length == propertyName.Length + postfix.Length
@@ -268,7 +268,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 }
             }
 
-            static (GenerateMemberAccessibility, bool) ResolveGenerateMemberAccessibility(
+            static (GenerateMemberAccessibility, bool) resolveGenerateMemberAccessibility(
                 UsingSymbols usingSymbols,
                 AttributeData attributeData,
                 GenerateMemberAccessibility defaultAccessibility,
@@ -291,11 +291,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 {
                     if (SymbolEqualityComparer.Default.Equals(attributeData.ConstructorArguments[0].Type, usingSymbols.NotificationAccessibility))
                     {
-                        return (ResolveGenerateMemberAccessibilityCore(attributeData.ConstructorArguments[0].Value, defaultAccessibility), defaultEnableExplicitInterfaceImplementations);
+                        return (resolveGenerateMemberAccessibilityCore(attributeData.ConstructorArguments[0].Value, defaultAccessibility), defaultEnableExplicitInterfaceImplementations);
                     }
                     else if (SymbolEqualityComparer.Default.Equals(attributeData.ConstructorArguments[0].Type, usingSymbols.ExplicitInterfaceImplementation))
                     {
-                        return (GenerateMemberAccessibility.None, ResolveExplicitInterfaceImplementationCore(attributeData.ConstructorArguments[0].Value));
+                        return (GenerateMemberAccessibility.None, resolveExplicitInterfaceImplementationCore(attributeData.ConstructorArguments[0].Value));
                     }
                     else
                     {
@@ -305,8 +305,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 else if (attributeData.ConstructorArguments.Length == 2)
                 {
                     return (
-                        ResolveGenerateMemberAccessibilityCore(attributeData.ConstructorArguments[0].Value, defaultAccessibility),
-                        ResolveExplicitInterfaceImplementationCore(attributeData.ConstructorArguments[1].Value)
+                        resolveGenerateMemberAccessibilityCore(attributeData.ConstructorArguments[0].Value, defaultAccessibility),
+                        resolveExplicitInterfaceImplementationCore(attributeData.ConstructorArguments[1].Value)
                         );
                 }
                 else
@@ -315,7 +315,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 }
             }
 
-            static GenerateMemberAccessibility ResolveGenerateMemberAccessibilityCore(object? value, GenerateMemberAccessibility defaultAccessibility)
+            static GenerateMemberAccessibility resolveGenerateMemberAccessibilityCore(object? value, GenerateMemberAccessibility defaultAccessibility)
             {
                 return value switch
                 {
@@ -329,7 +329,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 };
             }
 
-            static bool ResolveExplicitInterfaceImplementationCore(object? value)
+            static bool resolveExplicitInterfaceImplementationCore(object? value)
             {
                 return value switch
                 {

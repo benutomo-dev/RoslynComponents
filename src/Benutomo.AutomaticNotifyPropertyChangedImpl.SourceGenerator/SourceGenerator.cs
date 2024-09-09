@@ -9,22 +9,22 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
     public partial class SourceGenerator : IIncrementalGenerator
     {
 #if DEBUG
-        static StreamWriter _streamWriter;
+        static StreamWriter s_streamWriter;
         static SourceGenerator()
         {
             Directory.CreateDirectory(@"c:\var\log\AutomaticNotifyPropertyChangedImpl");
             var proc = Process.GetCurrentProcess();
-            _streamWriter = new StreamWriter($@"c:\var\log\AutomaticNotifyPropertyChangedImpl\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
-            _streamWriter.WriteLine(proc);
+            s_streamWriter = new StreamWriter($@"c:\var\log\AutomaticNotifyPropertyChangedImpl\{DateTime.Now:yyyyMMddHHmmss}_{proc.Id}.txt");
+            s_streamWriter.WriteLine(proc);
         }
 
         [Conditional("DEBUG")]
         static void WriteLogLine(string line)
         {
-            lock (_streamWriter)
+            lock (s_streamWriter)
             {
-                _streamWriter.WriteLine(line);
-                _streamWriter.Flush();
+                s_streamWriter.WriteLine(line);
+                s_streamWriter.Flush();
             }
         }
 #else
@@ -77,13 +77,13 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             var propertyNameInputArgs = methodSourceBuildInputArgs
                 .Collect()
-                .SelectMany(ToPropertyInputArgs);
+                .SelectMany(toPropertyInputArgs);
 
             context.RegisterSourceOutput(propertyNameInputArgs, GenerateEventArg);
 
             WriteLogLine("End Initialize");
 
-            IEnumerable<EventArgSourceBuilderInputs> ToPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
+            IEnumerable<EventArgSourceBuilderInputs> toPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
             {
                 foreach (var propertiesInClass in sourceBuildInputs.Where(v => !cancellationToken.IsCancellationRequested && v is not null).ToLookup(v => v!.ContainingTypeInfo))
                 {
