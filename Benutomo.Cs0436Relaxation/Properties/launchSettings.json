@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "プロファイル 1": {
-      "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\SourceGeneratorDebug_CS0436\\SourceGeneratorDebug_CS0436.csproj"
-    }
-  }
-}

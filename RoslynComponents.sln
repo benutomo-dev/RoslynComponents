@@ -3,33 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.SourceGenerator", "Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.csproj", "{0382D9C3-23A4-4736-B9A1-C0C04F1CEFFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.SourceGenerator", "src\Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.csproj", "{0382D9C3-23A4-4736-B9A1-C0C04F1CEFFB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGeneratorDebugProjects", "SourceGeneratorDebugProjects", "{39AD62C8-4E53-493A-8E5D-D88C52A0785A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Empty", "test\SourceGeneratorDebug_Empty\SourceGeneratorDebug_Empty.csproj", "{961CFFBD-1DB9-47CF-892F-23B108C660A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Empty", "SourceGeneratorDebug_Empty\SourceGeneratorDebug_Empty.csproj", "{961CFFBD-1DB9-47CF-892F-23B108C660A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_StandardPatterns", "test\SourceGeneratorDebug_StandardPatterns\SourceGeneratorDebug_StandardPatterns.csproj", "{5C436AF3-0173-47B7-B98F-DC02EF1F8EAC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_StandardPatterns", "SourceGeneratorDebug_StandardPatterns\SourceGeneratorDebug_StandardPatterns.csproj", "{5C436AF3-0173-47B7-B98F-DC02EF1F8EAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.Test", "test\Benutomo.AutomaticDisposeImpl.Test\Benutomo.AutomaticDisposeImpl.Test.csproj", "{2BE78319-7D53-43F8-BEC3-8B147E8386DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.Test", "Benutomo.AutomaticDisposeImpl.Test\Benutomo.AutomaticDisposeImpl.Test.csproj", "{2BE78319-7D53-43F8-BEC3-8B147E8386DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleCode", "test\SampleCode\SampleCode.csproj", "{92D9A086-A0B2-4F1B-BB09-D832594DEA9B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleCode", "SampleCode\SampleCode.csproj", "{92D9A086-A0B2-4F1B-BB09-D832594DEA9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Performance", "test\SourceGeneratorDebug_Performance\SourceGeneratorDebug_Performance.csproj", "{773AB529-CDE8-4A8C-BB20-E78EEC6573B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator", "Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.csproj", "{1D1226CB-1216-4C7B-A02E-A01E2816C598}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Benutomo.SourceGeneratorCommons", "src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.shproj", "{8E985642-5B69-4538-9F8F-552D538A0CE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Performance", "SourceGeneratorDebug_Performance\SourceGeneratorDebug_Performance.csproj", "{773AB529-CDE8-4A8C-BB20-E78EEC6573B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.StaticSource.SourceGenerator", "src\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj", "{C153D720-7B1E-4AD0-8F92-A410B2068F33}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Benutomo.SourceGeneratorCommons", "Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.shproj", "{8E985642-5B69-4538-9F8F-552D538A0CE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.CancellationAnalyzer", "src\Benutomo.CancellationAnalyzer\Benutomo.CancellationAnalyzer.csproj", "{92B23A45-4507-498B-969A-72784B3B19BA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.StaticSource.SourceGenerator", "Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj", "{C153D720-7B1E-4AD0-8F92-A410B2068F33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.Analyzer.Test", "test\Benutomo.AutomaticDisposeImpl.Analyzer.Test\Benutomo.AutomaticDisposeImpl.Analyzer.Test.csproj", "{0A180AA8-E498-4AC8-AD68-9BD3591066D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.CancellationAnalyzer", "Benutomo.CancellationAnalyzer\Benutomo.CancellationAnalyzer.csproj", "{92B23A45-4507-498B-969A-72784B3B19BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.Cs0436Relaxation", "src\Benutomo.Cs0436Relaxation\Benutomo.Cs0436Relaxation.csproj", "{FBAEA42E-BC13-4AE1-ACA6-B36484692D03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticDisposeImpl.Analyzer.Test", "Benutomo.AutomaticDisposeImpl.Analyzer.Test\Benutomo.AutomaticDisposeImpl.Analyzer.Test.csproj", "{0A180AA8-E498-4AC8-AD68-9BD3591066D3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.Cs0436Relaxation", "Benutomo.Cs0436Relaxation\Benutomo.Cs0436Relaxation.csproj", "{FBAEA42E-BC13-4AE1-ACA6-B36484692D03}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_CS0436", "SourceGeneratorDebug_CS0436\SourceGeneratorDebug_CS0436.csproj", "{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_CS0436", "test\SourceGeneratorDebug_CS0436\SourceGeneratorDebug_CS0436.csproj", "{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9713E0AB-700C-4E6C-8B3D-F3B21655B80B}"
 	ProjectSection(SolutionItems) = preProject
@@ -38,25 +34,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.build.targets = Directory.build.targets
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_NoPolyfill", "SourceGeneratorDebug_NoPolyfill\SourceGeneratorDebug_NoPolyfill.csproj", "{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_NoPolyfill", "test\SourceGeneratorDebug_NoPolyfill\SourceGeneratorDebug_NoPolyfill.csproj", "{B522DC12-9B98-4C28-AD09-CD1EB9836F3D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomaticDisposeImpl", "AutomaticDisposeImpl", "{C581C0F6-4835-43A0-8BBC-FE1850D664C9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C581C0F6-4835-43A0-8BBC-FE1850D664C9}"
+	ProjectSection(SolutionItems) = preProject
+		test\.editorconfig = test\.editorconfig
+		test\Directory.build.props = test\Directory.build.props
+		test\Directory.build.targets = test\Directory.build.targets
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomaticNotifyPropertyChangedImpl", "AutomaticNotifyPropertyChangedImpl", "{7D456179-17CD-446B-9A5D-EEC8C042F0FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.EqualsGenerator", "src\Benutomo.EqualsGenerator\Benutomo.EqualsGenerator.csproj", "{705BACF2-4E7C-4F03-998C-C4E7FC70DEEC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CancellationAnalyzer", "CancellationAnalyzer", "{F7B9AA33-EDB1-462F-BC6D-C705CFB6A1DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.ImmutableCollectionSupport", "src\Benutomo.ImmutableCollectionSupport\Benutomo.ImmutableCollectionSupport.csproj", "{3A0B1E2F-19F1-40C8-90C6-BA6F075199C6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cs0436Relaxation", "Cs0436Relaxation", "{0DD68B39-8368-4393-BE50-D86345663668}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Temp", "test\SourceGeneratorDebug_Temp\SourceGeneratorDebug_Temp.csproj", "{610CDDA6-D8FA-4949-B609-49C6FE28B3BB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EqualsGenerator", "EqualsGenerator", "{ACA8D5D7-2934-4E62-9C86-5E0BA292C7EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator", "src\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator\Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.csproj", "{EB2696C6-3185-4DC7-8D15-30DD6673C054}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.EqualsGenerator", "Benutomo.EqualsGenerator\Benutomo.EqualsGenerator.csproj", "{705BACF2-4E7C-4F03-998C-C4E7FC70DEEC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ImmutableCollectionSupport", "ImmutableCollectionSupport", "{A5E83802-1A6C-4E2E-9C41-7B259548AD0C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.ImmutableCollectionSupport", "Benutomo.ImmutableCollectionSupport\Benutomo.ImmutableCollectionSupport.csproj", "{3A0B1E2F-19F1-40C8-90C6-BA6F075199C6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Temp", "SourceGeneratorDebug_Temp\SourceGeneratorDebug_Temp.csproj", "{610CDDA6-D8FA-4949-B609-49C6FE28B3BB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F16A5693-CC29-40BE-8F33-FEE88326BFF0}"
+	ProjectSection(SolutionItems) = preProject
+		src\.editorconfig = src\.editorconfig
+		src\Directory.build.props = src\Directory.build.props
+		src\Directory.build.targets = src\Directory.build.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,10 +84,6 @@ Global
 		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1D1226CB-1216-4C7B-A02E-A01E2816C598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D1226CB-1216-4C7B-A02E-A01E2816C598}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D1226CB-1216-4C7B-A02E-A01E2816C598}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D1226CB-1216-4C7B-A02E-A01E2816C598}.Release|Any CPU.Build.0 = Release|Any CPU
 		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -128,37 +124,43 @@ Global
 		{610CDDA6-D8FA-4949-B609-49C6FE28B3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{610CDDA6-D8FA-4949-B609-49C6FE28B3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{610CDDA6-D8FA-4949-B609-49C6FE28B3BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB2696C6-3185-4DC7-8D15-30DD6673C054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB2696C6-3185-4DC7-8D15-30DD6673C054}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB2696C6-3185-4DC7-8D15-30DD6673C054}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB2696C6-3185-4DC7-8D15-30DD6673C054}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0382D9C3-23A4-4736-B9A1-C0C04F1CEFFB} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
-		{961CFFBD-1DB9-47CF-892F-23B108C660A7} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
-		{5C436AF3-0173-47B7-B98F-DC02EF1F8EAC} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
+		{0382D9C3-23A4-4736-B9A1-C0C04F1CEFFB} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{961CFFBD-1DB9-47CF-892F-23B108C660A7} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
+		{5C436AF3-0173-47B7-B98F-DC02EF1F8EAC} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
 		{2BE78319-7D53-43F8-BEC3-8B147E8386DD} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
-		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
-		{1D1226CB-1216-4C7B-A02E-A01E2816C598} = {7D456179-17CD-446B-9A5D-EEC8C042F0FF}
-		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
-		{92B23A45-4507-498B-969A-72784B3B19BA} = {F7B9AA33-EDB1-462F-BC6D-C705CFB6A1DF}
+		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
+		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
+		{8E985642-5B69-4538-9F8F-552D538A0CE4} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{C153D720-7B1E-4AD0-8F92-A410B2068F33} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{92B23A45-4507-498B-969A-72784B3B19BA} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 		{0A180AA8-E498-4AC8-AD68-9BD3591066D3} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
-		{FBAEA42E-BC13-4AE1-ACA6-B36484692D03} = {0DD68B39-8368-4393-BE50-D86345663668}
-		{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
-		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
-		{705BACF2-4E7C-4F03-998C-C4E7FC70DEEC} = {ACA8D5D7-2934-4E62-9C86-5E0BA292C7EE}
-		{3A0B1E2F-19F1-40C8-90C6-BA6F075199C6} = {A5E83802-1A6C-4E2E-9C41-7B259548AD0C}
-		{610CDDA6-D8FA-4949-B609-49C6FE28B3BB} = {39AD62C8-4E53-493A-8E5D-D88C52A0785A}
+		{FBAEA42E-BC13-4AE1-ACA6-B36484692D03} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{BB87BAD9-BB4F-4DA8-A6FA-D2DA41FAF4AD} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
+		{B522DC12-9B98-4C28-AD09-CD1EB9836F3D} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
+		{705BACF2-4E7C-4F03-998C-C4E7FC70DEEC} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{3A0B1E2F-19F1-40C8-90C6-BA6F075199C6} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{610CDDA6-D8FA-4949-B609-49C6FE28B3BB} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
+		{EB2696C6-3185-4DC7-8D15-30DD6673C054} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AE10D511-0B11-446C-A9EC-1B47E6A85530}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{0382d9c3-23a4-4736-b9a1-c0c04f1ceffb}*SharedItemsImports = 5
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{1d1226cb-1216-4c7b-a02e-a01e2816c598}*SharedItemsImports = 5
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{3a0b1e2f-19f1-40c8-90c6-ba6f075199c6}*SharedItemsImports = 5
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{705bacf2-4e7c-4f03-998c-c4e7fc70deec}*SharedItemsImports = 5
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{8e985642-5b69-4538-9f8f-552d538a0ce4}*SharedItemsImports = 13
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5
-		Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{0382d9c3-23a4-4736-b9a1-c0c04f1ceffb}*SharedItemsImports = 5
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{3a0b1e2f-19f1-40c8-90c6-ba6f075199c6}*SharedItemsImports = 5
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{705bacf2-4e7c-4f03-998c-c4e7fc70deec}*SharedItemsImports = 5
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{8e985642-5b69-4538-9f8f-552d538a0ce4}*SharedItemsImports = 13
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
+		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{eb2696c6-3185-4dc7-8d15-30dd6673c054}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

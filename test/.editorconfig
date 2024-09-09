@@ -1,0 +1,16 @@
+﻿[*.cs]
+
+# CA1861: 引数として定数配列を使用しない
+dotnet_diagnostic.CA1861.severity = silent
+
+# CA2211: 非定数フィールドは表示されません
+dotnet_diagnostic.CA2211.severity = silent
+
+# FAA0001: Simplify Assertion
+dotnet_diagnostic.FAA0001.severity = silent
+
+# FAA0002: Replace Xunit assertion with Fluent Assertions equivalent
+dotnet_diagnostic.FAA0002.severity = silent
+
+# IDE1006: 命名スタイル
+dotnet_diagnostic.IDE1006.severity = silent

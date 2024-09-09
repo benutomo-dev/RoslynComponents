@@ -38,9 +38,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Deterministic>true</Deterministic>
-
-    <AnalysisMode>Recommended</AnalysisMode>
-    <!--<AnalysisMode>All</AnalysisMode>-->
   </PropertyGroup>
 
 </Project>

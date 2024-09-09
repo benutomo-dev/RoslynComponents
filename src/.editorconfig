@@ -1,0 +1,42 @@
+﻿[*.cs]
+# 非staticプライベートフィールドの命名規則
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols  = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style    = private_field_style
+dotnet_naming_symbols.private_fields.applicable_kinds           = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.private_field_style.capitalization  = camel_case
+dotnet_naming_style.private_field_style.required_prefix = _
+
+# staticプライベートフィールドの命名規則
+dotnet_naming_rule.static_private_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.static_private_fields_should_be_camel_case.symbols  = static_private_fields
+dotnet_naming_rule.static_private_fields_should_be_camel_case.style    = static_private_field_style
+dotnet_naming_symbols.static_private_fields.applicable_kinds           = field
+dotnet_naming_symbols.static_private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.static_private_fields.required_modifiers         = static
+dotnet_naming_style.static_private_field_style.capitalization  = camel_case
+dotnet_naming_style.static_private_field_style.required_prefix = s_
+
+# 定数の命名規則
+dotnet_naming_rule.constants_should_be_pascal_case.severity = warning
+dotnet_naming_rule.constants_should_be_pascal_case.symbols  = constants
+dotnet_naming_rule.constants_should_be_pascal_case.style    = const_style
+dotnet_naming_symbols.constants.applicable_kinds            = field, local
+dotnet_naming_symbols.constants.required_modifiers          = const
+dotnet_naming_style.const_style.capitalization              = pascal_case
+
+# ローカル関数
+dotnet_naming_rule.local_functions_should_be_camel_case.severity = warning
+dotnet_naming_rule.local_functions_should_be_camel_case.symbols  = local_functions
+dotnet_naming_rule.local_functions_should_be_camel_case.style    = local_function_style
+dotnet_naming_symbols.local_functions.applicable_kinds           = local_function
+dotnet_naming_style.local_function_style.capitalization          = camel_case
+
+dotnet_diagnostic.CA1812.severity = none
+
+dotnet_analyzer_diagnostic.category-Performance.severity = warning
+dotnet_analyzer_diagnostic.category-Reliability.severity = warning
+
+# IDE0079: 不要な抑制を削除します
+dotnet_diagnostic.IDE0079.severity = silent

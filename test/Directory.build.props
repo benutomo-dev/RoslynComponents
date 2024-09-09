@@ -1,0 +1,10 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <AnalysisMode>Default</AnalysisMode>
+  </PropertyGroup>
+
+  <!-- Directory.Build.propsの探索はここで終了 -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('$(MSBuildThisFile)', '$(MSBuildThisFileDirectory)../'))" />
+
+</Project>
