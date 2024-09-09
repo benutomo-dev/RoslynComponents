@@ -297,7 +297,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
 
                 if (!dictionary.TryGetValue(dictionaryKey, out var sources))
                 {
-                    sources = new HashSet<ExtensionMethodSource>();
+                    sources = [];
                     dictionary.Add(dictionaryKey, sources);
                 }
 

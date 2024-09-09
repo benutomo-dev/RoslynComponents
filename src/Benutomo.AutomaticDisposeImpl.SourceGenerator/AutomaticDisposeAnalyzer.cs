@@ -431,12 +431,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             var isAssignableToIDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable);
             var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
 
-            List<ISymbol> unmanagedResourceReleaseMethodAttributeedMembers = new();
-            List<ISymbol> managedObjectDisposeMethodAttributeedMembers = new();
-            List<ISymbol> managedObjectAsyncDisposeMethodAttributeedMembers = new();
+            List<ISymbol> unmanagedResourceReleaseMethodAttributeedMembers = [];
+            List<ISymbol> managedObjectDisposeMethodAttributeedMembers = [];
+            List<ISymbol> managedObjectAsyncDisposeMethodAttributeedMembers = [];
 
 
-            HashSet<string> dependencyMemberRegisteredSet = new HashSet<string>();
+            HashSet<string> dependencyMemberRegisteredSet = [];
 
             foreach (var member in namedTypeSymbol.GetMembers())
             {

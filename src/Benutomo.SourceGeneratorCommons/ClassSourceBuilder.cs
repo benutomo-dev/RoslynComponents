@@ -15,7 +15,7 @@ namespace Benutomo.SourceGeneratorCommons
 
         string _nameSpace = "";
 
-        readonly List<string> _hintingTypeNames = new List<string>();
+        readonly List<string> _hintingTypeNames = [];
 
 
         public ClassSourceBuilder(SourceProductionContext context, TypeDefinitionInfo containingTypeInfo, Span<char> initialBuffer)

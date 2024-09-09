@@ -45,9 +45,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             _isInheritalbeClass = !namedTypeSymbol.IsValueType && !namedTypeSymbol.IsSealed;
 
-            SyncDisposeMembersInDisposeMethod = new();
-            SyncDisposeMembersInAsyncDisposeMethod = new();
-            AsyncDisposeMembersInAsyncDisposeMethod = new();
+            SyncDisposeMembersInDisposeMethod = [];
+            SyncDisposeMembersInAsyncDisposeMethod = [];
+            AsyncDisposeMembersInAsyncDisposeMethod = [];
 
             foreach (var member in namedTypeSymbol.GetMembers())
             {
