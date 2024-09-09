@@ -183,7 +183,7 @@ namespace Benutomo.EqualsGenerator
                             builder.AppendLine("hashCode.Add(base.GetHashCode());");
                         }
 
-                        foreach (var member in members)
+                        foreach (var member in members.Where(v => !v.isHashCodeCache))
                         {
                             builder.PutIndentSpace();
                             builder.Append("hashCode.Add(this.");
@@ -245,7 +245,7 @@ namespace Benutomo.EqualsGenerator
                         builder.AppendLine("  && base.Equals(other)");
                     }
 
-                    foreach (var member in members)
+                    foreach (var member in members.Where(v => !v.isHashCodeCache))
                     {
                         builder.PutIndentSpace();
                         builder.Append("  && ");
