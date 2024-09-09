@@ -288,7 +288,7 @@ namespace Benutomo.CancellationAnalyzer
             }
         }
 
-        private bool IsDirectMemberAccessInExpressionOfUsingStatement(SyntaxNode syntaxNode)
+        private static bool IsDirectMemberAccessInExpressionOfUsingStatement(SyntaxNode syntaxNode)
         {
             if (syntaxNode.Parent is MemberAccessExpressionSyntax)
             {
@@ -445,7 +445,7 @@ namespace Benutomo.CancellationAnalyzer
             }
         }
 
-        private void ReportCancelingProhibitionDiagnosticIfNeeds(SemanticModelAnalysisContext context, UsingSymbols usingSymbols, InvocationExpressionSyntax invocationExpressionSyntax)
+        private static void ReportCancelingProhibitionDiagnosticIfNeeds(SemanticModelAnalysisContext context, UsingSymbols usingSymbols, InvocationExpressionSyntax invocationExpressionSyntax)
         {
             foreach (var arg in invocationExpressionSyntax.ArgumentList.Arguments)
             {
@@ -478,7 +478,7 @@ namespace Benutomo.CancellationAnalyzer
             }
         }
 
-        private void ReportCancellationDiagnosticIfNeeds(SemanticModelAnalysisContext context, UsingSymbols usingSymbols, InvocationExpressionSyntax invocationExpressionSyntax, out bool isReportedCT0001OrCT0002)
+        private static void ReportCancellationDiagnosticIfNeeds(SemanticModelAnalysisContext context, UsingSymbols usingSymbols, InvocationExpressionSyntax invocationExpressionSyntax, out bool isReportedCT0001OrCT0002)
         {
             var symbolInfo = context.SemanticModel.GetSymbolInfo(invocationExpressionSyntax.Expression, context.CancellationToken);
 
