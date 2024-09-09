@@ -1,4 +1,7 @@
-﻿namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding
+﻿#pragma warning disable CA1018 // 属性を AttributeUsageAttribute に設定します
+#pragma warning disable IDE0060 // 未使用のパラメーターを削除します
+
+namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding
 {
     /// <summary>
     /// Todo
@@ -7,6 +10,7 @@
         Usings = ["using System;"],
         Directives = [
             "#pragma warning disable CS0436",
+            "#pragma warning disable IDE0060",
             "#nullable enable",
         ],
         Attributes = [
@@ -15,25 +19,12 @@
         ])]
     public sealed class ChangingEventAttribute : Attribute
     {
-        private readonly NotificationAccessibility _accessibility;
-        private readonly ExplicitInterfaceImplementation _enableExplicitInterfaceImplementation;
-
         public ChangingEventAttribute() { }
 
-        public ChangingEventAttribute(NotificationAccessibility accessibility)
-        {
-            _accessibility = accessibility;
-        }
+        public ChangingEventAttribute(NotificationAccessibility accessibility) { }
 
-        public ChangingEventAttribute(ExplicitInterfaceImplementation enableExplicitInterfaceImplementation)
-        {
-            _enableExplicitInterfaceImplementation = enableExplicitInterfaceImplementation;
-        }
+        public ChangingEventAttribute(ExplicitInterfaceImplementation enableExplicitInterfaceImplementation) { }
 
-        public ChangingEventAttribute(NotificationAccessibility accessibility, ExplicitInterfaceImplementation enableExplicitInterfaceImplementation)
-        {
-            _accessibility = accessibility;
-            _enableExplicitInterfaceImplementation = enableExplicitInterfaceImplementation;
-        }
+        public ChangingEventAttribute(NotificationAccessibility accessibility, ExplicitInterfaceImplementation enableExplicitInterfaceImplementation) { }
     }
 }

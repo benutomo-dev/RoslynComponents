@@ -1,4 +1,6 @@
-﻿namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding
+﻿#pragma warning disable CA1018 // 属性を AttributeUsageAttribute に設定します
+
+namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding
 {
     /// <summary>
     /// Todo

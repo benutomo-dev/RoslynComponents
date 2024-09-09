@@ -1,4 +1,6 @@
-﻿namespace Benutomo.AutomaticDisposeImpl.SourceGenerator.Embedding
+﻿#pragma warning disable CA1018 // 属性を AttributeUsageAttribute に設定します
+
+namespace Benutomo.AutomaticDisposeImpl.SourceGenerator.Embedding
 {
     /// <summary>
     /// 指定したクラスに破棄(<see cref=""System.IDisposable"" />,<see cref=""System.IAsyncDisposable"" />)をサポートするメンバを破棄する<see cref=""System.IDisposable.Dispose"" />メソッドおよび<see cref=""System.IAsyncDisposable.DisposeAsync"" />メソッド(当該クラスに<see cref=""System.IAsyncDisposable"" />インターフェイスが含まれている場合のみ)を自動実装する。

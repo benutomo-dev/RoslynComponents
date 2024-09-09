@@ -1,4 +1,7 @@
-﻿namespace Benutomo.EqualsGenerator.Embedding
+﻿#pragma warning disable CA1018 // 属性を AttributeUsageAttribute に設定します
+#pragma warning disable IDE0060 // 未使用のパラメーターを削除します
+
+namespace Benutomo.EqualsGenerator.Embedding
 {
     /// <summary>
     /// 指定したクラスに<see cref="IEquatable{T}"/>のメンバを自動実装する。
@@ -10,6 +13,7 @@
         ],
         Directives = [
             "#pragma warning disable CS0436",
+            "#pragma warning disable IDE0060",
             "#nullable enable",
         ],
         Attributes = [
@@ -19,11 +23,6 @@
         ])]
     public sealed class AutomaticEqualsImplAttribute : Attribute
     {
-        public AutomaticEqualsImplOptions Options { get; }
-
-        public AutomaticEqualsImplAttribute(AutomaticEqualsImplOptions options = AutomaticEqualsImplOptions.None)
-        {
-            Options = options;
-        }
+        public AutomaticEqualsImplAttribute(AutomaticEqualsImplOptions options = AutomaticEqualsImplOptions.None) { }
     }
 }

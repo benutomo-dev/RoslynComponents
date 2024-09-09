@@ -1,4 +1,6 @@
-﻿namespace Benutomo.EqualsGenerator.Embedding
+﻿#pragma warning disable CA1018 // 属性を AttributeUsageAttribute に設定します
+
+namespace Benutomo.EqualsGenerator.Embedding
 {
     /// <summary>
     /// Equalsメソッドの自動実装で等価性を判定するメンバーから除外する。
