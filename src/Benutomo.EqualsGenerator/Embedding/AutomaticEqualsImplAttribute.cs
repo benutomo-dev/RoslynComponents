@@ -19,6 +19,11 @@
         ])]
     public sealed class AutomaticEqualsImplAttribute : Attribute
     {
-        public AutomaticEqualsImplAttribute(AutomaticEqualsImplOptions options = AutomaticEqualsImplOptions.None) { }
+        public AutomaticEqualsImplOptions Options { get; }
+
+        public AutomaticEqualsImplAttribute(AutomaticEqualsImplOptions options = AutomaticEqualsImplOptions.None)
+        {
+            Options = options;
+        }
     }
 }

@@ -15,8 +15,13 @@
         ])]
     public sealed class ChangedObservableAttribute : Attribute
     {
+        public NotificationAccessibility Accessibility { get; }
+
         public ChangedObservableAttribute() { }
 
-        public ChangedObservableAttribute(NotificationAccessibility Accessibility) { }
+        public ChangedObservableAttribute(NotificationAccessibility accessibility)
+        {
+            Accessibility = accessibility;
+        }
     }
 }

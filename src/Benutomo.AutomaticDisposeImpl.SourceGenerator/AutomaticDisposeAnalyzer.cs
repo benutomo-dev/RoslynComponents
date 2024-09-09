@@ -525,7 +525,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             if (isAssignableToIAsyncDisposable && isAssignableToIDisposable && managedObjectAsyncDisposeMethodAttributeedMembers.Count > 0 && managedObjectDisposeMethodAttributeedMembers.Count == 0)
             {
-                if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
+                if (TryGetAttributeAttachedClassDeclarationSyntax(classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0015, classDeclarationSyntax.Identifier.GetLocation(), managedObjectAsyncDisposeMethodAttributeedMembers[0].Name));
                 }
@@ -539,7 +539,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             {
                 // 自動実装対象として指定されたクラスがIDisposableもIAsyncDisposableも実装していない
 
-                if (TryGetAttributeAttachedClassDeclarationSyntax(namedTypeSymbol, classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
+                if (TryGetAttributeAttachedClassDeclarationSyntax(classDeclarationSyntaxes, out var classDeclarationSyntax, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(s_diagnosticDescriptor_SG0002, classDeclarationSyntax.Identifier.GetLocation()));
                 }
@@ -574,7 +574,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
         static bool IsNotParcialDeclaration(ClassDeclarationSyntax classDeclarationSyntax) => classDeclarationSyntax.Modifiers.All(modifier => modifier.Text != "partial");
 
-        static bool TryGetAttributeAttachedClassDeclarationSyntax(INamedTypeSymbol namedTypeSymbol, IEnumerable<ClassDeclarationSyntax> classDeclarationSyntaxes, out ClassDeclarationSyntax classDeclarationSyntax, CancellationToken cancellationToken)
+        static bool TryGetAttributeAttachedClassDeclarationSyntax(IEnumerable<ClassDeclarationSyntax> classDeclarationSyntaxes, out ClassDeclarationSyntax classDeclarationSyntax, CancellationToken cancellationToken)
         {
             foreach (var candidateClassDeclarationSyntax in classDeclarationSyntaxes)
             {

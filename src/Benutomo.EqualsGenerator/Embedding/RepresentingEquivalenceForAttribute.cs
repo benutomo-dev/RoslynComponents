@@ -19,8 +19,12 @@
         ])]
     public sealed class RepresentingEquivalenceForAttribute : Attribute
     {
+        private readonly string[] _members;
+
         public RepresentingEquivalenceForAttribute(params string[] members)
-        { }
+        {
+            _members = members;
+        }
     }
 }
 

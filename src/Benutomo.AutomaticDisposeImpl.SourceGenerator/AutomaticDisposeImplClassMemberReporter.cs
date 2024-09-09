@@ -137,7 +137,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             if (member.IsStatic)
             {
-                DoReportForFieldOrProptertyStaticMember(isAssignableToIDisposableMember, isAssignableToIAsyncDisposableMember, isEnableAutomaticDisposeMember);
+                DoReportForFieldOrProptertyStaticMember();
             }
             else
             {
@@ -145,11 +145,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             }
         }
 
-        void DoReportForFieldOrProptertyStaticMember(
-                    bool isAssignableToIDisposableMember,
-                    bool isAssignableToIAsyncDisposableMember,
-                    bool isEnableAutomaticDisposeMember
-                    )
+        void DoReportForFieldOrProptertyStaticMember()
         {
             if (isEnableAutomaticDisposeAttributedMember)
             {

@@ -19,7 +19,12 @@
         ])]
     public sealed class AutoGenEqualsEqualityComparerAttribute : Attribute
     {
-        public AutoGenEqualsEqualityComparerAttribute(string nameofIEqualityComparerMember) { }
+        public string NameofIEqualityComparerMember { get; }
+
+        public AutoGenEqualsEqualityComparerAttribute(string nameofIEqualityComparerMember)
+        {
+            NameofIEqualityComparerMember = nameofIEqualityComparerMember;
+        }
     }
 }
 

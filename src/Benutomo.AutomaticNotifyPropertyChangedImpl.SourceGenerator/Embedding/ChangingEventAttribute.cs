@@ -15,12 +15,25 @@
         ])]
     public sealed class ChangingEventAttribute : Attribute
     {
+        private readonly NotificationAccessibility _accessibility;
+        private readonly ExplicitInterfaceImplementation _enableExplicitInterfaceImplementation;
+
         public ChangingEventAttribute() { }
 
-        public ChangingEventAttribute(NotificationAccessibility accessibility) { }
+        public ChangingEventAttribute(NotificationAccessibility accessibility)
+        {
+            _accessibility = accessibility;
+        }
 
-        public ChangingEventAttribute(ExplicitInterfaceImplementation enableExplicitInterfaceImplementation) { }
+        public ChangingEventAttribute(ExplicitInterfaceImplementation enableExplicitInterfaceImplementation)
+        {
+            _enableExplicitInterfaceImplementation = enableExplicitInterfaceImplementation;
+        }
 
-        public ChangingEventAttribute(NotificationAccessibility accessibility, ExplicitInterfaceImplementation enableExplicitInterfaceImplementation) { }
+        public ChangingEventAttribute(NotificationAccessibility accessibility, ExplicitInterfaceImplementation enableExplicitInterfaceImplementation)
+        {
+            _accessibility = accessibility;
+            _enableExplicitInterfaceImplementation = enableExplicitInterfaceImplementation;
+        }
     }
 }
