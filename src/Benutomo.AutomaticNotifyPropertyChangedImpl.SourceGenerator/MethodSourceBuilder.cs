@@ -1,24 +1,30 @@
 ﻿using Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding;
 using Microsoft.CodeAnalysis;
+using static SourceGeneratorCommons.SourceBuilder;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
-    ref struct MethodSourceBuilder
+    class MethodSourceBuilder : IDisposable
     {
-        delegate void MethodSourceBuilderAction(ref MethodSourceBuilder builder);
-        delegate void MethodSourceBuilderAction<T1>(ref MethodSourceBuilder builder, T1 arg1);
+        delegate void MethodSourceBuilderAction(MethodSourceBuilder builder);
+        delegate void MethodSourceBuilderAction<T1>(MethodSourceBuilder builder, T1 arg1);
 
-        public readonly string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}.{_sourceBuildInputs.InternalPropertyName}_{_sourceBuilder.NameSpace}.cs";
+        SourceProductionContext _context;
 
-        ClassSourceBuilder _sourceBuilder;
+        SourceBuilder _sourceBuilder;
 
-        readonly MethodSourceBuildInputs _sourceBuildInputs;
+        MethodSourceBuildInputs _sourceBuildInputs;
 
 
-        public MethodSourceBuilder(SourceProductionContext context, MethodSourceBuildInputs sourceBuildInputs, Span<char> initialBuffer)
+        public MethodSourceBuilder(SourceProductionContext context, MethodSourceBuildInputs sourceBuildInputs)
         {
             _sourceBuildInputs = sourceBuildInputs;
-            _sourceBuilder = new ClassSourceBuilder(context, sourceBuildInputs.ContainingTypeInfo, initialBuffer);
+            _sourceBuilder = new SourceBuilder(context, $"{sourceBuildInputs.ContainingType.MakeStandardHintName()}.EventMethods.{_sourceBuildInputs.InternalPropertyName}");
+        }
+
+        public void Commit()
+        {
+            _sourceBuilder.Commit();
         }
 
         public void Dispose()
@@ -27,7 +33,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         }
 
         #region _sourceBuilder Methods
-        public readonly SourceProductionContext Context => _sourceBuilder.Context;
+        public SourceProductionContext Context => _context;
         public string SourceText => _sourceBuilder.SourceText;
         public void PutIndentSpace() => _sourceBuilder.PutIndentSpace();
         public void Clear() => _sourceBuilder.Clear();
@@ -36,14 +42,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public void AppendLine(string text) => _sourceBuilder.AppendLine(text);
         public void AppendLine(ReadOnlySpan<char> text) => _sourceBuilder.AppendLine(text);
         public void AppendLine() => _sourceBuilder.AppendLine();
-        public void BeginTryBlock() => _sourceBuilder.BeginTryBlock();
-        public void BeginFinallyBlock() => _sourceBuilder.BeginFinallyBlock();
-        public void BeginBlock(string blockHeadLine) => _sourceBuilder.BeginBlock(blockHeadLine);
-        public void BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
-        public void BeginBlock() => _sourceBuilder.BeginBlock();
-        public void EndBlock() => _sourceBuilder.EndBlock();
-        public void WriteTypeDeclarationStart(string? classDecralationLineComment) => _sourceBuilder.WriteTypeDeclarationStart(classDecralationLineComment);
-        public void WriteTypeDeclarationEnd() => _sourceBuilder.WriteTypeDeclarationEnd();
+        public _BlockEndDisposable BeginBlock(string blockHeadLine) => _sourceBuilder.BeginBlock(blockHeadLine);
+        public _BlockEndDisposable BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
+        public _BlockEndDisposable BeginBlock() => _sourceBuilder.BeginBlock();
+        public _BlockEndDisposable BeginTypeDeclaration(string? classDecralationLineComment) => _sourceBuilder.BeginTypeDefinitionBlock(_sourceBuildInputs.ContainingType, classDecralationLineComment);
         #endregion
 
         public void Build()
@@ -61,11 +63,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             AppendLine("#pragma warning disable CS0619 // Obsolete属性でマークされたメソッドの呼び出しに対するエラーを抑止");
             AppendLine("#pragma warning disable CS0436");
 
-            WriteTypeDeclarationStart("This is implementation class by AutomaticNotifyPropertyChangedImpl.");
-
-            WriteBody();
-
-            WriteTypeDeclarationEnd();
+            using (BeginTypeDeclaration(" // This is implementation class by AutomaticNotifyPropertyChangedImpl."))
+            {
+                WriteBody();
+            }
         }
 
         void WriteBody()
@@ -279,22 +280,22 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         void RenderDefferedNotificationStruct(string changedEventBaseName)
         {
             RenderExcludeFromCodeCoverageAttribute();
-            BeginBlock($"public ref struct {_sourceBuildInputs.DefferedNotificationDisposableName}");
+            using (BeginBlock($"public ref struct {_sourceBuildInputs.DefferedNotificationDisposableName}"))
             {
                 PutIndentSpace();
                 Append("private ");
-                Append(_sourceBuildInputs.ContainingTypeInfo.Name);
-                if (_sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length > 0)
+                Append(_sourceBuildInputs.ContainingType.Name);
+                if (_sourceBuildInputs.ContainingType is CsGenericDefinableTypeDeclaration { GenericTypeParams : { IsDefaultOrEmpty: false } genericTypeParams1 })
                 {
                     Append("<");
 
-                    for (int i = 0; i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length; i++)
+                    for (int i = 0; i < genericTypeParams1.Length; i++)
                     {
-                        var genericTypeArg = _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs[i];
+                        var genericTypeArg = genericTypeParams1[i];
 
-                        Append(genericTypeArg);
+                        Append(genericTypeArg.Name);
 
-                        if (i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length - 1)
+                        if (i < genericTypeParams1.Length - 1)
                         {
                             Append(", ");
                         }
@@ -306,18 +307,18 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
                 AppendLine();
 
-                Append($"internal {_sourceBuildInputs.DefferedNotificationDisposableName}({_sourceBuildInputs.ContainingTypeInfo.Name}");
-                if (_sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length > 0)
+                Append($"internal {_sourceBuildInputs.DefferedNotificationDisposableName}({_sourceBuildInputs.ContainingType.Name}");
+                if (_sourceBuildInputs.ContainingType is CsGenericDefinableTypeDeclaration { GenericTypeParams: { IsDefaultOrEmpty: false } genericTypeParams2 })
                 {
                     Append("<");
 
-                    for (int i = 0; i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length; i++)
+                    for (int i = 0; i < genericTypeParams2.Length; i++)
                     {
-                        var genericTypeArg = _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs[i];
+                        var genericTypeArg = genericTypeParams2[i];
 
-                        Append(genericTypeArg);
+                        Append(genericTypeArg.Name);
 
-                        if (i < _sourceBuildInputs.ContainingTypeInfo.GenericTypeArgs.Length - 1)
+                        if (i < genericTypeParams2.Length - 1)
                         {
                             Append(", ");
                         }
@@ -326,29 +327,25 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     Append(">");
                 }
                 Append($"? source)");
-                BeginBlock();
+                using (BeginBlock())
                 {
                     PutIndentSpace();
                     AppendLine("_source = source;");
                 }
-                EndBlock();
 
                 AppendLine();
 
-                BeginBlock("public void Dispose()");
+                using (BeginBlock("public void Dispose()"))
                 {
-                    BeginBlock("if (_source is not null)");
+                    using (BeginBlock("if (_source is not null)"))
                     {
                         RenderChangedNotificationSection("_source", changedEventBaseName);
 
                         PutIndentSpace();
                         AppendLine("_source = null;");
                     }
-                    EndBlock();
                 }
-                EndBlock();
             }
-            EndBlock();
         }
 
         void RenderInternalField()
@@ -542,13 +539,13 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             AppendLine(" = value;");
         }
 
-        static void RenderHasNotChangedBooleanReturnStatement(ref MethodSourceBuilder builder)
+        static void RenderHasNotChangedBooleanReturnStatement(MethodSourceBuilder builder)
         {
             // false(変更無し)を返却して終了
             builder.AppendLine("return false;");
         }
 
-        static void RenderBooleanReturnAfterChangedPart(ref MethodSourceBuilder builder, string changedEventBaseName)
+        static void RenderBooleanReturnAfterChangedPart(MethodSourceBuilder builder, string changedEventBaseName)
         {
             // 通常版は直接変更の通知を実施
             builder.RenderChangedNotificationSection("this", changedEventBaseName);
@@ -558,7 +555,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             builder.AppendLine("return true;");
         }
 
-        static void RenderHasNotChangedDefferedNotificationReturnStatement(ref MethodSourceBuilder builder)
+        static void RenderHasNotChangedDefferedNotificationReturnStatement(MethodSourceBuilder builder)
         {
             // 変更通知の発生しないオブジェクトを返却して終了
             builder.Append("return new ");
@@ -566,7 +563,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             builder.AppendLine("(null);");
         }
 
-        static void RenderDefferedNotificationAfterChangedPart(ref MethodSourceBuilder builder, string changedEventBaseName)
+        static void RenderDefferedNotificationAfterChangedPart(MethodSourceBuilder builder, string changedEventBaseName)
         {
             // Dispose時に変更通知を発生させるオブジェクトを返却して終了
             builder.PutIndentSpace();
@@ -583,10 +580,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             )
         {
             AppendLine(")");
-            BeginBlock();
+            using (BeginBlock())
             {
                 RenderDefaultSetterMethodImplCommonPrefixPart();
-                renderHasNotChangedReturnStatement(ref this);
+                renderHasNotChangedReturnStatement(this);
 
                 AppendLine();
 
@@ -595,9 +592,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 RenderFieldChangeSection();
 
                 // フィールドの変更後の処理
-                renderAfterChangedPart(ref this, changedEventBaseName);
+                renderAfterChangedPart(this, changedEventBaseName);
             }
-            EndBlock();
         }
 
         void RenderDefaultSetterMethod(string changedEventBaseName, string changingEventBaseName)
@@ -671,7 +667,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 Append(_sourceBuildInputs.PropertyType);
             }
             AppendLine(" prevValue)");
-            BeginBlock();
+            using (BeginBlock())
             {
                 if (_sourceBuildInputs.PropertyTypeIsReferenceType)
                 {
@@ -708,12 +704,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                             Append(_sourceBuildInputs.FieldName);
                             AppendLine("!), value))");
                         }
-                        BeginBlock();
+                        using (BeginBlock())
                         {
                             PutIndentSpace(); AppendLine("prevValue = default;");
                             PutIndentSpace(); AppendLine("return false;");
                         }
-                        EndBlock();
                     }
                 }
                 else
@@ -726,12 +721,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         Append("if (global::System.Threading.Volatile.Read(ref ");
                         Append(_sourceBuildInputs.FieldName);
                         AppendLine(") == value)");
-                        BeginBlock();
+                        using (BeginBlock())
                         {
                             PutIndentSpace(); AppendLine("prevValue = default;");
                             PutIndentSpace(); AppendLine("return false;");
                         }
-                        EndBlock();
                     }
                 }
 
@@ -771,23 +765,21 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         PutIndentSpace();
                         AppendLine("if (object.ReferenceEquals(prevValue, value))");
                     }
-                    BeginBlock();
+                    using (BeginBlock())
                     {
                         PutIndentSpace(); AppendLine("prevValue = default;");
                         PutIndentSpace(); AppendLine("return false;");
                     }
-                    EndBlock();
                 }
                 else
                 {
                     PutIndentSpace();
                     AppendLine("if (prevValue == value)");
-                    BeginBlock();
+                    using (BeginBlock())
                     {
                         PutIndentSpace(); AppendLine("prevValue = default;");
                         PutIndentSpace(); AppendLine("return false;");
                     }
-                    EndBlock();
                 }
 
                 RenderChangedNotificationSection("this", changedEventBaseName);
@@ -795,7 +787,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 PutIndentSpace();
                 AppendLine("return true;");
             }
-            EndBlock();
         }
 
         void RenderCustomEqualsSetterMethodMainPart(
@@ -808,14 +799,14 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             Append(", global::System.Collections.Generic.IEqualityComparer<");
             Append(_sourceBuildInputs.PropertyType);
             AppendLine("> equalityComparer)");
-            BeginBlock();
+            using (BeginBlock())
             {
                 AppendLine("#pragma warning disable CS8604,CS8618,CS8774");
                 PutIndentSpace();
                 Append("if (equalityComparer.Equals(");
                 Append(_sourceBuildInputs.FieldName);
                 Append(", value)) ");
-                renderHasNotChangedReturnStatement(ref this);
+                renderHasNotChangedReturnStatement(this);
                 AppendLine("#pragma warning restore CS8604,CS8618,CS8774");
 
                 AppendLine();
@@ -825,9 +816,8 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 RenderFieldChangeSection();
 
                 // フィールドの変更後の処理
-                renderAfterChangedPart(ref this, changedEventBaseName);
+                renderAfterChangedPart(this, changedEventBaseName);
             }
-            EndBlock();
         }
 
         void RenderCustomEqualsSetterMethod(string changedEventBaseName, string changingEventBaseName)

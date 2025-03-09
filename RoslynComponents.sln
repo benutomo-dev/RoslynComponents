@@ -166,6 +166,6 @@ Global
 		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{b387fc44-dfaf-4d1c-b8ff-5e8c5f0bb990}*SharedItemsImports = 13
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
-		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{eb2696c6-3185-4dc7-8d15-30dd6673c054}*SharedItemsImports = 5
+		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{eb2696c6-3185-4dc7-8d15-30dd6673c054}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

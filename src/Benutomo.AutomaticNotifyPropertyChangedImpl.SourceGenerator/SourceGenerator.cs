@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceGeneratorCommons.CSharp.Declarations;
 using System.Collections.Immutable;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
@@ -17,15 +18,14 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     return UsingSymbols.CreateFrom(compilation);
                 });
 
-            // Where句を使用しない。
-            // https://github.com/dotnet/roslyn/issues/57991
-            // 今は、Where句を使用するとSource GeneratorがVSでインクリメンタルに実行されたときに
-            // 対象のコードの状態や編集内容などによって突然内部状態が壊れて機能しなくなる問題がおきる。
+            var csDeclarationProvider = context.CreateCsDeclarationProvider();
 
             var anotatedProperties = context.SyntaxProvider.CreateSyntaxProvider(IsAttributeAttachedPropertyDeclarationSystax, ToPropertySymbol);
 
             var methodSourceBuildInputArgs = anotatedProperties
                 .Combine(enableNotificationSupportAttributeSymbol)
+                .Combine(csDeclarationProvider)
+                .Select((v, _) => (propertySymbol: v.Left.Left, usingSymbols: v.Left.Right, csDeclarationProvider: v.Right))
                 .Select(ToMethodSourceBuildInputArgs);
 
             context.RegisterSourceOutput(methodSourceBuildInputArgs, GenerateMethod);
@@ -38,7 +38,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             IEnumerable<EventArgSourceBuilderInputs> toPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
             {
-                foreach (var propertiesInClass in sourceBuildInputs.Where(v => !cancellationToken.IsCancellationRequested && v is not null).ToLookup(v => v!.ContainingTypeInfo))
+                foreach (var propertiesInClass in sourceBuildInputs.Where(v => !cancellationToken.IsCancellationRequested && v is not null).ToLookup(v => v!.ContainingType))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -87,10 +87,9 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             }
         }
 
-        MethodSourceBuildInputs? ToMethodSourceBuildInputArgs((IPropertySymbol? Left, UsingSymbols Right) v, CancellationToken ct)
+        MethodSourceBuildInputs? ToMethodSourceBuildInputArgs((IPropertySymbol? propertySymbol, UsingSymbols usingSymbols, CsDeclarationProvider csDeclarationProvider) v, CancellationToken ct)
         {
-            var propertySymbol = v.Left;
-            var usingSymbols = v.Right;
+            var (propertySymbol, usingSymbols, csDeclarationProvider) = v;
 
             if (propertySymbol is null) return null;
 
@@ -102,7 +101,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                     return null;
                 }
 
-                var result = new MethodSourceBuildInputs(propertySymbol, usingSymbols, enableNotificationSupportAttributeData);
+                var result = new MethodSourceBuildInputs(propertySymbol, usingSymbols, enableNotificationSupportAttributeData, csDeclarationProvider);
 
                 return result;
             }
@@ -124,13 +123,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             try
             {
-                Span<char> initialBuffer = stackalloc char[80000];
-
-                using var sourceBuilder = new MethodSourceBuilder(context, sourceBuildInputs, initialBuffer);
+                using var sourceBuilder = new MethodSourceBuilder(context, sourceBuildInputs);
 
                 sourceBuilder.Build();
 
-                context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
+                sourceBuilder.Commit();
             }
             catch (OperationCanceledException)
             {
@@ -146,13 +143,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         {
             try
             {
-                Span<char> initialBuffer = stackalloc char[80000];
-
-                using var sourceBuilder = new EventArgSourceBuilder(context, args, initialBuffer);
+                using var sourceBuilder = new EventArgSourceBuilder(context, args);
 
                 sourceBuilder.Build();
 
-                context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
+                sourceBuilder.Commit();
             }
             catch (OperationCanceledException)
             {

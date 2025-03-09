@@ -17,7 +17,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
     {
         public const string DefferedNotificationMethodSuffix = "WithDefferedNotification";
 
-        public TypeDefinitionInfo ContainingTypeInfo;
+        public CsTypeDeclaration ContainingType;
 
         public string InternalPropertyName;
 
@@ -61,9 +61,9 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public GenerateMemberAccessibility ChangingObservableAccesibility = GenerateMemberAccessibility.None;
 
-        public MethodSourceBuildInputs(IPropertySymbol propertySymbol, UsingSymbols usingSymbols, AttributeData enableNotificationSupportAttributeData)
+        public MethodSourceBuildInputs(IPropertySymbol propertySymbol, UsingSymbols usingSymbols, AttributeData enableNotificationSupportAttributeData, CsDeclarationProvider csDeclarationProvider)
         {
-            ContainingTypeInfo = propertySymbol.ContainingType.BuildTypeDefinitionInfo();
+            ContainingType = csDeclarationProvider.GetTypeDeclaration(propertySymbol.ContainingType);
 
             InternalPropertyName = propertySymbol.Name;
             if (propertySymbol.ExplicitInterfaceImplementations.Length > 0)
@@ -94,7 +94,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             PropertyType = typeNameBuilder.ToString();
             PropertyTypeIsReferenceType = propertySymbol.Type.IsReferenceType;
             PropertyTypeIsSystemString = propertySymbol.Type.SpecialType == SpecialType.System_String;
-            PropertyTypeIsInterlockExchangeable = propertySymbol.Type.IsInterlockedExchangable();
+            PropertyTypeIsInterlockExchangeable = propertySymbol.Type.IsInterlockedExchangeable();
             PropertyTypeNullableAnnotation = propertySymbol.Type.NullableAnnotation;
 
             PropertyDeclaringSyntaxReferences = propertySymbol.DeclaringSyntaxReferences;
@@ -348,7 +348,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public bool Equals(MethodSourceBuildInputs? other)
         {
             var result = other is not null &&
-                   EqualityComparer<TypeDefinitionInfo>.Default.Equals(ContainingTypeInfo, other.ContainingTypeInfo) &&
+                   EqualityComparer<CsTypeDeclaration>.Default.Equals(ContainingType, other.ContainingType) &&
                    PropertyEventArgNames.SequenceEqual(other.PropertyEventArgNames) &&
                    PropertyType == other.PropertyType &&
                    PropertyTypeIsReferenceType == other.PropertyTypeIsReferenceType &&
@@ -368,7 +368,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public override int GetHashCode()
         {
             int hashCode = 126218788;
-            hashCode = hashCode * -1521134295 + EqualityComparer<TypeDefinitionInfo>.Default.GetHashCode(ContainingTypeInfo);
+            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeDeclaration>.Default.GetHashCode(ContainingType);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PropertyEventArgNames[0]);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PropertyType);
             hashCode = hashCode * -1521134295 + PropertyTypeIsReferenceType.GetHashCode();

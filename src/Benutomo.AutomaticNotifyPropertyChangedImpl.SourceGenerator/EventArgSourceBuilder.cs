@@ -1,21 +1,25 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Diagnostics;
+using static SourceGeneratorCommons.SourceBuilder;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 {
-    ref struct EventArgSourceBuilder
+    ref struct EventArgSourceBuilder : IDisposable
     {
-        public readonly string HintName => $"gen_{string.Join(".", _sourceBuilder.HintingTypeNames)}.EventArgDeclarations_{_sourceBuilder.NameSpace}.cs";
-
-        ClassSourceBuilder _sourceBuilder;
+        SourceBuilder _sourceBuilder;
 
         readonly EventArgSourceBuilderInputs _sourceBuildInputs;
 
 
-        public EventArgSourceBuilder(SourceProductionContext context, EventArgSourceBuilderInputs sourceBuildInputs, Span<char> initialBuffer)
+        public EventArgSourceBuilder(SourceProductionContext context, EventArgSourceBuilderInputs sourceBuildInputs)
         {
             _sourceBuildInputs = sourceBuildInputs;
-            _sourceBuilder = new ClassSourceBuilder(context, sourceBuildInputs.ContainingTypeInfo, initialBuffer);
+            _sourceBuilder = new SourceBuilder(context, $"{sourceBuildInputs.ContainingType.MakeStandardHintName()}.EventArgs");
+        }
+
+        public void Commit()
+        {
+            _sourceBuilder.Commit();
         }
 
         public void Dispose()
@@ -24,7 +28,6 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         }
 
         #region _sourceBuilder Methods
-        public readonly SourceProductionContext Context => _sourceBuilder.Context;
         public string SourceText => _sourceBuilder.SourceText;
         public void PutIndentSpace() => _sourceBuilder.PutIndentSpace();
         public void Clear() => _sourceBuilder.Clear();
@@ -33,14 +36,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public void AppendLine(string text) => _sourceBuilder.AppendLine(text);
         public void AppendLine() => _sourceBuilder.AppendLine();
         public void AppendLine(ReadOnlySpan<char> text) => _sourceBuilder.AppendLine(text);
-        public void BeginTryBlock() => _sourceBuilder.BeginTryBlock();
-        public void BeginFinallyBlock() => _sourceBuilder.BeginFinallyBlock();
-        public void BeginBlock(string blockHeadLine) => _sourceBuilder.BeginBlock(blockHeadLine);
-        public void BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
-        public void BeginBlock() => _sourceBuilder.BeginBlock();
-        public void EndBlock() => _sourceBuilder.EndBlock();
-        public void WriteTypeDeclarationStart(string? classDecralationLineComment) => _sourceBuilder.WriteTypeDeclarationStart(classDecralationLineComment);
-        public void WriteTypeDeclarationEnd() => _sourceBuilder.WriteTypeDeclarationEnd();
+        public _BlockEndDisposable BeginBlock(string blockHeadLine) => _sourceBuilder.BeginBlock(blockHeadLine);
+        public _BlockEndDisposable BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
+        public _BlockEndDisposable BeginBlock() => _sourceBuilder.BeginBlock();
+        public _BlockEndDisposable BeginTypeDeclaration(string? classDecralationLineComment) => _sourceBuilder.BeginTypeDefinitionBlock(_sourceBuildInputs.ContainingType, classDecralationLineComment);
         #endregion
 
         public void Build()
@@ -58,16 +57,15 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             AppendLine("#pragma warning disable CS0619 // Obsolete属性でマークされたメソッドの呼び出しに対するエラーを抑止");
             AppendLine("#pragma warning disable CS0436");
 
-            WriteTypeDeclarationStart("This is implementation class by AutomaticNotifyPropertyChangedImpl.");
-
-            WriteBody();
-
-            WriteTypeDeclarationEnd();
+            using (BeginTypeDeclaration(" // This is implementation class by AutomaticNotifyPropertyChangedImpl."))
+            {
+                WriteBody();
+            }
         }
 
         void WriteBody()
         {
-            foreach (var property in _sourceBuildInputs.Properties)
+            foreach (var property in _sourceBuildInputs.Properties.Values)
             {
                 if (property.EventArgClass == PropertyEventArgClass.Changed)
                 {
