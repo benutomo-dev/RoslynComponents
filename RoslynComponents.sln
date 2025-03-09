@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleCode", "test\SampleCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorDebug_Performance", "test\SourceGeneratorDebug_Performance\SourceGeneratorDebug_Performance.csproj", "{773AB529-CDE8-4A8C-BB20-E78EEC6573B3}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Benutomo.SourceGeneratorCommons", "src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.shproj", "{8E985642-5B69-4538-9F8F-552D538A0CE4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.StaticSource.SourceGenerator", "src\Benutomo.StaticSource.SourceGenerator\Benutomo.StaticSource.SourceGenerator.csproj", "{C153D720-7B1E-4AD0-8F92-A410B2068F33}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benutomo.CancellationAnalyzer", "src\Benutomo.CancellationAnalyzer\Benutomo.CancellationAnalyzer.csproj", "{92B23A45-4507-498B-969A-72784B3B19BA}"
@@ -142,7 +140,6 @@ Global
 		{2BE78319-7D53-43F8-BEC3-8B147E8386DD} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
 		{92D9A086-A0B2-4F1B-BB09-D832594DEA9B} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
 		{773AB529-CDE8-4A8C-BB20-E78EEC6573B3} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
-		{8E985642-5B69-4538-9F8F-552D538A0CE4} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 		{C153D720-7B1E-4AD0-8F92-A410B2068F33} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 		{92B23A45-4507-498B-969A-72784B3B19BA} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 		{0A180AA8-E498-4AC8-AD68-9BD3591066D3} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
@@ -162,7 +159,6 @@ Global
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{0382d9c3-23a4-4736-b9a1-c0c04f1ceffb}*SharedItemsImports = 5
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{3a0b1e2f-19f1-40c8-90c6-ba6f075199c6}*SharedItemsImports = 5
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{705bacf2-4e7c-4f03-998c-c4e7fc70deec}*SharedItemsImports = 5
-		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{8e985642-5b69-4538-9f8f-552d538a0ce4}*SharedItemsImports = 13
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{b387fc44-dfaf-4d1c-b8ff-5e8c5f0bb990}*SharedItemsImports = 13
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
