@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F16A5693-CC2
 		src\Directory.build.targets = src\Directory.build.targets
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SourceGeneratorCommons", "src\SourceGeneratorCommons\SourceGeneratorCommons.shproj", "{B387FC44-DFAF-4D1C-B8FF-5E8C5F0BB990}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,7 @@ Global
 		{3A0B1E2F-19F1-40C8-90C6-BA6F075199C6} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 		{610CDDA6-D8FA-4949-B609-49C6FE28B3BB} = {C581C0F6-4835-43A0-8BBC-FE1850D664C9}
 		{EB2696C6-3185-4DC7-8D15-30DD6673C054} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
+		{B387FC44-DFAF-4D1C-B8FF-5E8C5F0BB990} = {F16A5693-CC29-40BE-8F33-FEE88326BFF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AE10D511-0B11-446C-A9EC-1B47E6A85530}
@@ -161,7 +164,8 @@ Global
 		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{705bacf2-4e7c-4f03-998c-c4e7fc70deec}*SharedItemsImports = 5
 		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{8e985642-5b69-4538-9f8f-552d538a0ce4}*SharedItemsImports = 13
 		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5
-		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
+		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{b387fc44-dfaf-4d1c-b8ff-5e8c5f0bb990}*SharedItemsImports = 13
+		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{c153d720-7b1e-4ad0-8f92-a410b2068f33}*SharedItemsImports = 5
 		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{eb2696c6-3185-4dc7-8d15-30dd6673c054}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
