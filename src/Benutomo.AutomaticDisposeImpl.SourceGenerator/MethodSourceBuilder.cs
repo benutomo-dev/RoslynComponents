@@ -13,9 +13,6 @@ class MethodSourceBuilder : IDisposable
 
     public MethodSourceBuilder(SourceProductionContext context, MethodSourceBuilderInputs sourceBuildInputs)
     {
-        if (sourceBuildInputs.TargetType.MakeStandardHintName() == @"Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests.IDisposable実装型のフィールドを含むIDisposable実装クラス.ExclusivityTestClass")
-            ;
-
         _sourceBuildInputs = sourceBuildInputs;
         _sourceBuilder = new SourceBuilder(context, sourceBuildInputs.TargetType.MakeStandardHintName());
     }
