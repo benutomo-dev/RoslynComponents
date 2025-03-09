@@ -131,7 +131,7 @@ public class ImmutableCollectionSupportAnalyzer : DiagnosticAnalyzer
         var reboundGenericImmutableArrayTypeSymbol = immutableArrayTypeSymbol.Construct(instanceType.TypeArguments[0]);
 
         var immutableArrayExtensionMethodSymbols = invocationOperation.SemanticModel
-            .LookupExtensionMethods(invocationOperation.Syntax.SpanStart, name: parentInvocationOperation.TargetMethod.Name, recieverType: reboundGenericImmutableArrayTypeSymbol, context.CancellationToken);
+            .LookupExtensionMethods(invocationOperation.Syntax.SpanStart, name: parentInvocationOperation.TargetMethod.Name, receiverType: reboundGenericImmutableArrayTypeSymbol, context.CancellationToken);
 
         bool hasImmutableArrayVersionMethod = false;
         foreach (var extensionMethodSymbol in immutableArrayExtensionMethodSymbols)
@@ -165,7 +165,7 @@ public class ImmutableCollectionSupportAnalyzer : DiagnosticAnalyzer
                     { }  argValue => argValue.Type
                 };
 
-                if (!argValueType.IsAssignableTo(extensionMethodSymbol.Parameters[i].Type))
+                if (!argValueType.IsAssignableTo(extensionMethodSymbol.Parameters[i].Type, context.Compilation))
                 {
                     canCallSignature = false;
                     break;

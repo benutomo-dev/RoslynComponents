@@ -160,7 +160,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{0382d9c3-23a4-4736-b9a1-c0c04f1ceffb}*SharedItemsImports = 5
-		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{3a0b1e2f-19f1-40c8-90c6-ba6f075199c6}*SharedItemsImports = 5
+		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{3a0b1e2f-19f1-40c8-90c6-ba6f075199c6}*SharedItemsImports = 5
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{705bacf2-4e7c-4f03-998c-c4e7fc70deec}*SharedItemsImports = 5
 		src\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems*{8e985642-5b69-4538-9f8f-552d538a0ce4}*SharedItemsImports = 13
 		src\SourceGeneratorCommons\SourceGeneratorCommons.projitems*{92b23a45-4507-498b-969a-72784b3b19ba}*SharedItemsImports = 5

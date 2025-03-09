@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using SourceGeneratorCommons.CSharp.Declarations;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
@@ -63,10 +64,10 @@ public partial class IncrementalGenerator : IIncrementalGenerator
     {
         StaticSources.StaticSource.Register(context);
 
-        var extensionNameSpaceSource = context.CompilationProvider
+        var extensionNameSpaceSource = context.CreateCsDeclarationProvider()
             .Combine(context.AnalyzerConfigOptionsProvider)
-            .Select((v, ct) => (compilation: v.Left, configOptions: v.Right))
-            .Select((v, ct) => (v.compilation, extensionNameSpace: $"Benutomo.ImmutableArraySupport.AutoGenExtensions.{v.compilation.AssemblyName}"));
+            .Select((v, ct) => (csDeclarationProvider: v.Left, configOptions: v.Right))
+            .Select((v, ct) => (v.csDeclarationProvider, extensionNameSpace: $"Benutomo.ImmutableArraySupport.AutoGenExtensions.{v.csDeclarationProvider.Compilation.AssemblyName}"));
 
         context.RegisterSourceOutput(extensionNameSpaceSource, (context, args) =>
         {
@@ -128,7 +129,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                     }
                     """, cancellationToken: ct);
 
-                var effectiveCompilation = arg.compilation.AddSyntaxTrees(boxlessAsReadOnlyListMockSyntaxTree);
+                var effectiveCompilation = arg.csDeclarationProvider.Compilation.AddSyntaxTrees(boxlessAsReadOnlyListMockSyntaxTree);
 
                 var symbols = default(Symbols);
 
@@ -150,7 +151,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             .Collect()
             .SelectMany(extractGenerateExtensionMethodSignatures)
             .Combine(extensionNameSpaceSource)
-            .Select((v, ct) => (compilation: v.Right.compilation, namespaceName: v.Left.namespaceName, defaultNameSpceName: v.Right.extensionNameSpace, v.Left.methodName, v.Left.extensionMethodSources));
+            .Select((v, ct) => (v.Right.csDeclarationProvider, v.Left.namespaceName, defaultNameSpceName: v.Right.extensionNameSpace, v.Left.methodName, v.Left.extensionMethodSources));
 
         context.RegisterSourceOutput(source, generate);
 
@@ -305,7 +306,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
             return dictionary.Select(v => (v.Key.namespaceName, v.Key.methodName, v.Value.ToImmutableArray())).ToImmutableArray();
         }
 
-        static void generate(SourceProductionContext context, (Compilation compilation, string? namespaceName, string defaultNameSpceName, string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources) arg)
+        static void generate(SourceProductionContext context, (CsDeclarationProvider csDeclarationProvider, string? namespaceName, string defaultNameSpceName, string name, ImmutableArray<ExtensionMethodSource> extensionMethodSources) arg)
         {
             string namespaceName;
             string hintName;
@@ -324,7 +325,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                 extensionOfSelfDefinedMethod = true;
             }
 
-            using var sourceBuilder = new SourceBuilderEx(context, hintName);
+            using var sourceBuilder = new SourceBuilder(context, hintName);
 
             using (sourceBuilder.BeginBlock($"namespace {namespaceName}"))
             {
@@ -470,9 +471,14 @@ public partial class IncrementalGenerator : IIncrementalGenerator
 
                         /// <inheritdoc cref="System.Linq.Enumerable.Select{TSource, TResult}(IEnumerable{TSource}, Func{TSource, int, TResult})"/>
 
+                        var methodContainingTypeReference = arg.csDeclarationProvider.GetTypeReference(extensionMethodSource.Method.ContainingType);
+                        var methodDecralation = arg.csDeclarationProvider.GetMethodDeclaration(extensionMethodSource.Method);
+
                         sourceBuilder.PutIndentSpace();
                         sourceBuilder.Append("/// <inheritdoc cref=\"");
-                        sourceBuilder.AppendCref(extensionMethodSource.Method);
+                        sourceBuilder.Append(methodContainingTypeReference.Cref);
+                        sourceBuilder.Append(".");
+                        sourceBuilder.Append(methodDecralation.Cref);
                         sourceBuilder.AppendLine("\"/>");
 
                         string methodAccessibility;
@@ -509,7 +515,7 @@ public partial class IncrementalGenerator : IIncrementalGenerator
                             {
                                 sourceBuilder.Append("return ");
                             }
-                            sourceBuilder.AppendFullTypeNameWithNamespaceAlias(extensionMethodSource.Method.ContainingType);
+                            sourceBuilder.Append(methodContainingTypeReference.GlobalReference);
                             sourceBuilder.Append(".");
                             sourceBuilder.Append(extensionMethodSource.Method.Name);
                             if (!string.IsNullOrEmpty(typeParameters))
