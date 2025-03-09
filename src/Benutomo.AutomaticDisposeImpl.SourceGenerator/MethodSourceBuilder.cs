@@ -32,7 +32,7 @@ class MethodSourceBuilder : IDisposable
     public _BlockEndDisposable BeginBlock(string blockHeadLine) => _sourceBuilder.BeginBlock(blockHeadLine);
     public _BlockEndDisposable BeginBlock(ReadOnlySpan<char> text) => _sourceBuilder.BeginBlock(text);
     public _BlockEndDisposable BeginBlock() => _sourceBuilder.BeginBlock();
-    public _BlockEndDisposable BeginTypeDeclaration(string? classDecralationLineComment) => _sourceBuilder.BeginTypeDefinitionBlock(_sourceBuildInputs.TargetType, classDecralationLineComment);
+    public _BlockEndDisposable BeginTypeDeclaration(string? classDecralationLineComment) => _sourceBuilder.BeginTypeDefinitionBlock(_sourceBuildInputs.TargetType, TypeDefinitionBlockOptions.Simple with { TypeDeclarationLineTail = classDecralationLineComment });
     #endregion
 
     public void Commit()

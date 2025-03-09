@@ -49,7 +49,7 @@ namespace Benutomo.EqualsGenerator
 
                         if (!propertySymbol.IsAttributedBy(usingSymbols.RepresentingEquivalenceForAttribute))
                         {
-                            var isAutoImplementedProperty = propertySymbol.IsAutoImplimenedProperty(cancellationToken);
+                            var isAutoImplementedProperty = propertySymbol.IsAutoImplementedProperty(cancellationToken);
                             if (!isAutoImplementedProperty) continue;
                         }
 

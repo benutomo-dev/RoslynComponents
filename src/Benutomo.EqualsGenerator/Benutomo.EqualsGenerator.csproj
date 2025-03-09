@@ -29,12 +29,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
+    <PackageReference Include="Polyfill" Version="7.21.0" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -42,9 +39,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Using Include="Benutomo.SourceGeneratorCommons" />
+    <Using Include="SourceGeneratorCommons" />
+    <Using Include="SourceGeneratorCommons.Collections.Generic" />
+    <Using Include="SourceGeneratorCommons.CSharp.Declarations" />
 	</ItemGroup>
 
-	<Import Project="..\Benutomo.SourceGeneratorCommons\Benutomo.SourceGeneratorCommons.projitems" Label="Shared" />
+	<Import Project="..\SourceGeneratorCommons\SourceGeneratorCommons.projitems" Label="Shared" />
 
 </Project>
