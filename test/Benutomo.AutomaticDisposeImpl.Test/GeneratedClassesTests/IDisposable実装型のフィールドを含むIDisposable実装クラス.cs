@@ -1,11 +1,11 @@
-using Benutomo.AutomaticDisposeImpl.Test.TestUtils;
+ï»¿using Benutomo.AutomaticDisposeImpl.Test.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
+namespace Benutomo.AutomaticDisposeImpl.Test.GeneratedClassesTests
 {
-    public partial class IDisposableÀ‘•Œ^‚ÌƒtƒB[ƒ‹ƒh‚ğŠÜ‚ŞIDisposableÀ‘•ƒNƒ‰ƒX
+    public partial class IDisposableå®Ÿè£…å‹ã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã‚’å«ã‚€IDisposableå®Ÿè£…ã‚¯ãƒ©ã‚¹
     {
         [AutomaticDisposeImpl]
         partial class NullFieldClass : IDisposable
@@ -115,14 +115,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
         }
 
         [Fact]
-        public void ƒtƒB[ƒ‹ƒh‚ªnull’l‚Æ‚È‚Á‚Ä‚¢‚éê‡‚Å‚àDispose‚Å—áŠO‚Í”­¶‚µ‚È‚¢()
+        public void ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ãŒnullå€¤ã¨ãªã£ã¦ã„ã‚‹å ´åˆã§ã‚‚Disposeã§ä¾‹å¤–ã¯ç™ºç”Ÿã—ãªã„()
         {
             var testeeObject = new NullFieldClass();
             testeeObject.Dispose();
         }
 
         [Fact]
-        public void Dispose‚ª•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉŒÄ‚Ño‚³‚ê‚Ä‚àÅ‰‚ÌŒÄ‚Ño‚µ‚Ì‚İ‚ª”r‘¼“I‚É—LŒø‚Æ‚È‚é()
+        public void DisposeãŒè¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«å‘¼ã³å‡ºã•ã‚Œã¦ã‚‚æœ€åˆã®å‘¼ã³å‡ºã—ã®ã¿ãŒæ’ä»–çš„ã«æœ‰åŠ¹ã¨ãªã‚‹()
         {
             const int millisecondsTimeout = 1000;
 
@@ -130,7 +130,7 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
 
             for (int i = 0; i < testIterationCount; i++)
             {
-                // ”O‚Ì‚½‚ßA“¯Às”‚ğ•ÏX‚µ‚È‚ª‚ç•¡”‰ñ”½•œ‚µ‚Äƒ`ƒFƒbƒN‚·‚é
+                // å¿µã®ãŸã‚ã€åŒæ™‚å®Ÿè¡Œæ•°ã‚’å¤‰æ›´ã—ãªãŒã‚‰è¤‡æ•°å›åå¾©ã—ã¦ãƒã‚§ãƒƒã‚¯ã™ã‚‹
                 var disposeCallThreadCount = 1 + i;
 
 
@@ -146,8 +146,8 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
                 {
                     if (!disposeBlockEvent.IsSet)
                     {
-                        // eƒNƒ‰ƒX‚Ìƒƒ“ƒo[‚Ì”jŠü‚Í”h¶ƒNƒ‰ƒX‚Ìƒƒ“ƒo[‚Ì”jŠü‚æ‚è‚àŒã‚És‚í‚ê‚é‚½‚ß
-                        // ³‚µ‚¢À‘•‚É‚¨‚¢‚ÄA‚±‚Ìƒ^ƒCƒ~ƒ“ƒO‚ÅdisposeBlockEvent.IsSet‚ª‹U‚Æ‚È‚é‚±‚Æ‚Í‚È‚¢‚Í‚¸B
+                        // è¦ªã‚¯ãƒ©ã‚¹ã®ãƒ¡ãƒ³ãƒãƒ¼ã®ç ´æ£„ã¯æ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã®ãƒ¡ãƒ³ãƒãƒ¼ã®ç ´æ£„ã‚ˆã‚Šã‚‚å¾Œã«è¡Œã‚ã‚Œã‚‹ãŸã‚
+                        // æ­£ã—ã„å®Ÿè£…ã«ãŠã„ã¦ã€ã“ã®ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã§disposeBlockEvent.IsSetãŒå½ã¨ãªã‚‹ã“ã¨ã¯ãªã„ã¯ãšã€‚
                         Interlocked.Increment(ref unsetCountAtBaseDisposableMemberDisposeCalling);
                     }
                 };
@@ -169,52 +169,52 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
                     thread.Start();
                 }
 
-                testeeObject.BaseImplDisposeCallCount.Should().Be(0, "‚Ü‚¾disposeStartEvent‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅADispose‚ÍŒÄ‚Î‚ê‚Ä‚¢‚È‚¢‚Í‚¸B");
-                testeeObject.SelfImplDisposeCallCount.Should().Be(0, "‚Ü‚¾disposeStartEvent‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅADispose‚ÍŒÄ‚Î‚ê‚Ä‚¢‚È‚¢‚Í‚¸B");
+                testeeObject.BaseImplDisposeCallCount.Should().Be(0, "ã¾ã disposeStartEventãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ãªã„ã®ã§ã€Disposeã¯å‘¼ã°ã‚Œã¦ã„ãªã„ã¯ãšã€‚");
+                testeeObject.SelfImplDisposeCallCount.Should().Be(0, "ã¾ã disposeStartEventãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ãªã„ã®ã§ã€Disposeã¯å‘¼ã°ã‚Œã¦ã„ãªã„ã¯ãšã€‚");
 
-                testeeObject.baseDisposable.ManagedContextDisposeCount.Should().Be(0, "‚Ü‚¾disposeStartEvent‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅADispose‚ÍŒÄ‚Î‚ê‚Ä‚¢‚È‚¢‚Í‚¸B");
-                testeeObject.selfDisposable.ManagedContextDisposeCount.Should().Be(0, "‚Ü‚¾disposeStartEvent‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅADispose‚ÍŒÄ‚Î‚ê‚Ä‚¢‚È‚¢‚Í‚¸B");
+                testeeObject.baseDisposable.ManagedContextDisposeCount.Should().Be(0, "ã¾ã disposeStartEventãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ãªã„ã®ã§ã€Disposeã¯å‘¼ã°ã‚Œã¦ã„ãªã„ã¯ãšã€‚");
+                testeeObject.selfDisposable.ManagedContextDisposeCount.Should().Be(0, "ã¾ã disposeStartEventãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ãªã„ã®ã§ã€Disposeã¯å‘¼ã°ã‚Œã¦ã„ãªã„ã¯ãšã€‚");
 
-                testeeObject.IsDisposed.Should().BeFalse("‚Ü‚¾disposeStartEvent‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅADispose‚ÍŒÄ‚Î‚ê‚Ä‚¢‚È‚¢‚Í‚¸B");
+                testeeObject.IsDisposed.Should().BeFalse("ã¾ã disposeStartEventãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ãªã„ã®ã§ã€Disposeã¯å‘¼ã°ã‚Œã¦ã„ãªã„ã¯ãšã€‚");
 
                 disposeStartEvent.Set();
-                // •¡”ƒXƒŒƒbƒh‚ª“¯‚ÉDispose‚ğŠJn
+                // è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ãŒåŒæ™‚ã«Disposeã‚’é–‹å§‹
 
                 disposeEnteredEvent.Wait(millisecondsTimeout);
-                // ‚¢‚¸‚ê‚©‚ÌƒXƒŒƒbƒh‚©‚ç‚ÌŒÄ‚Ño‚µ‚ªƒƒ“ƒo‚ÌDispose‚É“’B
+                // ã„ãšã‚Œã‹ã®ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰ã®å‘¼ã³å‡ºã—ãŒãƒ¡ãƒ³ãƒã®Disposeã«åˆ°é”
 
-                testeeObject.BaseImplDisposeCallCount.Should().Be(0, "‚Ü‚¾ƒƒ“ƒo‚ÌDispose‚Ì’†‚Å”jŠü‚Ìis‚ªƒuƒƒbƒN‚³‚ê‚Ä‚¢‚é‚Ì‚ÅƒJƒEƒ“ƒg‚Í•Ï‰»‚µ‚È‚¢‚Í‚¸B");
-                testeeObject.SelfImplDisposeCallCount.Should().Be(0, "‚Ü‚¾ƒƒ“ƒo‚ÌDispose‚Ì’†‚Å”jŠü‚Ìis‚ªƒuƒƒbƒN‚³‚ê‚Ä‚¢‚é‚Ì‚ÅƒJƒEƒ“ƒg‚Í•Ï‰»‚µ‚È‚¢‚Í‚¸B");
+                testeeObject.BaseImplDisposeCallCount.Should().Be(0, "ã¾ã ãƒ¡ãƒ³ãƒã®Disposeã®ä¸­ã§ç ´æ£„ã®é€²è¡ŒãŒãƒ–ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ã„ã‚‹ã®ã§ã‚«ã‚¦ãƒ³ãƒˆã¯å¤‰åŒ–ã—ãªã„ã¯ãšã€‚");
+                testeeObject.SelfImplDisposeCallCount.Should().Be(0, "ã¾ã ãƒ¡ãƒ³ãƒã®Disposeã®ä¸­ã§ç ´æ£„ã®é€²è¡ŒãŒãƒ–ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ã„ã‚‹ã®ã§ã‚«ã‚¦ãƒ³ãƒˆã¯å¤‰åŒ–ã—ãªã„ã¯ãšã€‚");
 
-                testeeObject.selfDisposable.ManagedContextDisposeCount.Should().Be(0, "‚Ü‚¾Dispose‚Ì“üŒû‚ÅƒuƒƒbƒN‚³‚ê‚Ä‚¢‚é‚Ì‚ÅƒJƒEƒ“ƒg‚Í•Ï‰»‚µ‚È‚¢‚Í‚¸B");
-                testeeObject.IsDisposed.Should().BeTrue("“à•”‚ÅŠù‚É”r‘¼“I‚ÈDispose‚ªŠJn‚³‚ê‚½“_‚ÅDisposeŠ®—¹‘O‚É^‚Æ‚È‚é‚Í‚¸B");
+                testeeObject.selfDisposable.ManagedContextDisposeCount.Should().Be(0, "ã¾ã Disposeã®å…¥å£ã§ãƒ–ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ã„ã‚‹ã®ã§ã‚«ã‚¦ãƒ³ãƒˆã¯å¤‰åŒ–ã—ãªã„ã¯ãšã€‚");
+                testeeObject.IsDisposed.Should().BeTrue("å†…éƒ¨ã§æ—¢ã«æ’ä»–çš„ãªDisposeãŒé–‹å§‹ã•ã‚ŒãŸæ™‚ç‚¹ã§Disposeå®Œäº†å‰ã«çœŸã¨ãªã‚‹ã¯ãšã€‚");
 
                 disposeBlockEvent.Set();
-                // ƒƒ“ƒo‚ÌDispose‚ÌƒuƒƒbƒN‚ğ‰ğœ
+                // ãƒ¡ãƒ³ãƒã®Disposeã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’è§£é™¤
 
                 foreach (var thread in threads)
                 {
                     thread.Join(millisecondsTimeout);
                 }
 
-                testeeObject.BaseImplDisposeCallCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àÀ‘•Ò‚ÌDispose‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
-                testeeObject.SelfImplDisposeCallCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àÀ‘•Ò‚ÌDispose‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
+                testeeObject.BaseImplDisposeCallCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚å®Ÿè£…è€…ã®Disposeã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
+                testeeObject.SelfImplDisposeCallCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚å®Ÿè£…è€…ã®Disposeã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
 
-                testeeObject.BaseImplReleaseUnmanagedResourceCallCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àÀ‘•Ò‚ÌReleaseUnmanagedResource‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
-                testeeObject.SelfImplReleaseUnmanagedResourceCallCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àÀ‘•Ò‚ÌReleaseUnmanagedResource‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
+                testeeObject.BaseImplReleaseUnmanagedResourceCallCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚å®Ÿè£…è€…ã®ReleaseUnmanagedResourceã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
+                testeeObject.SelfImplReleaseUnmanagedResourceCallCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚å®Ÿè£…è€…ã®ReleaseUnmanagedResourceã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
 
-                testeeObject.baseDisposable.ManagedContextDisposeCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àƒƒ“ƒo‚ÌDispose‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
-                testeeObject.selfDisposable.ManagedContextDisposeCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àƒƒ“ƒo‚ÌDispose‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
+                testeeObject.baseDisposable.ManagedContextDisposeCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚ãƒ¡ãƒ³ãƒã®Disposeã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
+                testeeObject.selfDisposable.ManagedContextDisposeCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚ãƒ¡ãƒ³ãƒã®Disposeã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
 
-                testeeObject.baseDisposable.UnmanagedContextDisposeCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àƒƒ“ƒo‚ÌDispose‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
-                testeeObject.selfDisposable.UnmanagedContextDisposeCount.Should().Be(1, "•¡”ƒXƒŒƒbƒh‚©‚ç“¯‚ÉDispose‚ªŒÄ‚Ño‚³‚ê‚Ä‚¢‚Ä‚àƒƒ“ƒo‚ÌDispose‚ÍÅ‰‚Ì‚P‰ñ‚É‘Î‚µ‚Ä‚Ì‚İ”r‘¼“I‚ÉŒÄ‚Ño‚³‚ê‚é‚Í‚¸B");
+                testeeObject.baseDisposable.UnmanagedContextDisposeCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚ãƒ¡ãƒ³ãƒã®Disposeã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
+                testeeObject.selfDisposable.UnmanagedContextDisposeCount.Should().Be(1, "è¤‡æ•°ã‚¹ãƒ¬ãƒƒãƒ‰ã‹ã‚‰åŒæ™‚ã«DisposeãŒå‘¼ã³å‡ºã•ã‚Œã¦ã„ã¦ã‚‚ãƒ¡ãƒ³ãƒã®Disposeã¯æœ€åˆã®ï¼‘å›ã«å¯¾ã—ã¦ã®ã¿æ’ä»–çš„ã«å‘¼ã³å‡ºã•ã‚Œã‚‹ã¯ãšã€‚");
 
-                unsetCountAtBaseDisposableMemberDisposeCalling.Should().Be(0, "eƒNƒ‰ƒX‚Ìƒƒ“ƒo‚ÌDispose‚ª”h¶ƒNƒ‰ƒX‚Ìƒƒ“ƒo‚ÌDispose‚æ‚èæ‚ÉŒÄ‚Ño‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î0‚Ì‚Í‚¸B");
+                unsetCountAtBaseDisposableMemberDisposeCalling.Should().Be(0, "è¦ªã‚¯ãƒ©ã‚¹ã®ãƒ¡ãƒ³ãƒã®DisposeãŒæ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã®ãƒ¡ãƒ³ãƒã®Disposeã‚ˆã‚Šå…ˆã«å‘¼ã³å‡ºã•ã‚Œã¦ã„ãªã‘ã‚Œã°0ã®ã¯ãšã€‚");
             }
         }
 
         [Fact]
-        public void readonlyƒtƒB[ƒ‹ƒh‚É‘Î‚·‚é©“®À‘•()
+        public void readonlyãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«å¯¾ã™ã‚‹è‡ªå‹•å®Ÿè£…()
         {
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
 
@@ -223,14 +223,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
             var testeeObject = new ReadonlyFieldClass(disposableMock.Object);
 
             testeeObject.Dispose();
-            disposableMock.Verify(v => v.Dispose(), Times.Once(), "Dispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚¢‚È‚¢B");
+            disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã„ãªã„ã€‚");
 
             testeeObject.Dispose();
-            disposableMock.Verify(v => v.Dispose(), Times.Once(), "‚Q‰ñ–ÚˆÈ~‚ÌDispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚µ‚Ü‚Á‚Ä‚¢‚éB");
+            disposableMock.Verify(v => v.Dispose(), Times.Once(), "ï¼’å›ç›®ä»¥é™ã®Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã—ã¾ã£ã¦ã„ã‚‹ã€‚");
         }
 
         [Fact]
-        public void ƒWƒFƒlƒŠƒbƒNŒ^ƒtƒB[ƒ‹ƒh‚É‘Î‚·‚é©“®À‘•()
+        public void ã‚¸ã‚§ãƒãƒªãƒƒã‚¯å‹ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«å¯¾ã™ã‚‹è‡ªå‹•å®Ÿè£…()
         {
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
 
@@ -239,14 +239,14 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
             var testeeObject = new GenericTypeFieldClass<IDisposable>(disposableMock.Object);
 
             testeeObject.Dispose();
-            disposableMock.Verify(v => v.Dispose(), Times.Once(), "Dispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚¢‚È‚¢B");
+            disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã„ãªã„ã€‚");
 
             testeeObject.Dispose();
-            disposableMock.Verify(v => v.Dispose(), Times.Once(), "‚Q‰ñ–ÚˆÈ~‚ÌDispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚µ‚Ü‚Á‚Ä‚¢‚éB");
+            disposableMock.Verify(v => v.Dispose(), Times.Once(), "ï¼’å›ç›®ä»¥é™ã®Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã—ã¾ã£ã¦ã„ã‚‹ã€‚");
         }
 
         [Fact]
-        public void IDisposableŒ^‚ÌƒtƒB[ƒ‹ƒh‚É‘Î‚·‚é©“®À‘•()
+        public void IDisposableå‹ã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«å¯¾ã™ã‚‹è‡ªå‹•å®Ÿè£…()
         {
             var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
 
@@ -255,34 +255,34 @@ namespace Benutomo.AutomaticDisposeImpl.Test.GeneretedClassesTests
             var testeeObject = new InterfaceFieldClass(disposableMock.Object);
 
             testeeObject.Dispose();
-            disposableMock.Verify(v => v.Dispose(), Times.Once(), "Dispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚¢‚È‚¢B");
+            disposableMock.Verify(v => v.Dispose(), Times.Once(), "Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã„ãªã„ã€‚");
 
             testeeObject.Dispose();
-            disposableMock.Verify(v => v.Dispose(), Times.Once(), "‚Q‰ñ–ÚˆÈ~‚ÌDispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚µ‚Ü‚Á‚Ä‚¢‚éB");
+            disposableMock.Verify(v => v.Dispose(), Times.Once(), "ï¼’å›ç›®ä»¥é™ã®Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã—ã¾ã£ã¦ã„ã‚‹ã€‚");
         }
 
         [Fact]
-        public void IDisposable‚ğ’¼ÚÀ‘•‚µ‚Ä‚¢‚éŒ^‚ÌƒtƒB[ƒ‹ƒh‚É‘Î‚·‚é©“®À‘•()
+        public void IDisposableã‚’ç›´æ¥å®Ÿè£…ã—ã¦ã„ã‚‹å‹ã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«å¯¾ã™ã‚‹è‡ªå‹•å®Ÿè£…()
         {
             var testeeObject = new ImplicitDisposableImplementClassFieldClass();
 
             testeeObject.Dispose();
-            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "Å‰‚ÌDispose‚ÌŒÄ‚Ño‚µ‚Í“`”À‚³‚ê‚È‚¯‚ê‚Î‚È‚ç‚È‚¢B");
+            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "æœ€åˆã®Disposeã®å‘¼ã³å‡ºã—ã¯ä¼æ¬ã•ã‚Œãªã‘ã‚Œã°ãªã‚‰ãªã„ã€‚");
 
             testeeObject.Dispose();
-            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "‚Q‰ñ–ÚˆÈ~‚ÌDispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚Í‚¢‚¯‚È‚¢B");
+            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "ï¼’å›ç›®ä»¥é™ã®Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã¯ã„ã‘ãªã„ã€‚");
         }
 
         [Fact]
-        public void IDisposable‚ğ’¼Ú–¾¦“I‚ÉÀ‘•‚µ‚Ä‚¢‚éŒ^‚ÌƒtƒB[ƒ‹ƒh‚É‘Î‚·‚é©“®À‘•()
+        public void IDisposableã‚’ç›´æ¥æ˜ç¤ºçš„ã«å®Ÿè£…ã—ã¦ã„ã‚‹å‹ã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«å¯¾ã™ã‚‹è‡ªå‹•å®Ÿè£…()
         {
             var testeeObject = new ExplicitDisposableImplemetnClassFieldClass();
 
             testeeObject.Dispose();
-            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "Å‰‚ÌDispose‚ÌŒÄ‚Ño‚µ‚Í“`”À‚³‚ê‚È‚¯‚ê‚Î‚È‚ç‚È‚¢B");
+            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "æœ€åˆã®Disposeã®å‘¼ã³å‡ºã—ã¯ä¼æ¬ã•ã‚Œãªã‘ã‚Œã°ãªã‚‰ãªã„ã€‚");
 
             testeeObject.Dispose();
-            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "‚Q‰ñ–ÚˆÈ~‚ÌDispose‚ÌŒÄ‚Ño‚µ‚ª“`”À‚µ‚Ä‚Í‚¢‚¯‚È‚¢B");
+            testeeObject.disposable.ManagedContextDisposeCount.Should().Be(1, "ï¼’å›ç›®ä»¥é™ã®Disposeã®å‘¼ã³å‡ºã—ãŒä¼æ¬ã—ã¦ã¯ã„ã‘ãªã„ã€‚");
         }
     }
 }
