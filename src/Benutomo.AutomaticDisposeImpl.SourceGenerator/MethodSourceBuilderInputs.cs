@@ -4,7 +4,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
     class MethodSourceBuilderInputs : IEquatable<MethodSourceBuilderInputs?>
     {
-        public TypeDefinitionInfo TargetTypeInfo;
+        public CsTypeDeclaration TargetType;
 
         public List<string> SyncDisposeMembersInDisposeMethod;
 
@@ -29,19 +29,19 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         public bool _isInheritalbeClass;
 
 
-        public MethodSourceBuilderInputs(INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData automaticDisposeImplAttributeData)
+        public MethodSourceBuilderInputs(INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, CsDeclarationProvider csDeclarationProvider, AttributeData automaticDisposeImplAttributeData)
         {
-            TargetTypeInfo = namedTypeSymbol.BuildTypeDefinitionInfo();
+            TargetType = csDeclarationProvider.GetTypeDeclaration(namedTypeSymbol);
 
             var automaticDisposeContextChecker = new AutomaticDisposeContextChecker(automaticDisposeImplAttributeData, usingSymbols);
 
-            _isIDisposableIntafeceImplementer = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable);
+            _isIDisposableIntafeceImplementer = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable, csDeclarationProvider.Compilation);
 
-            _isIAsyncDisposableIntafeceImplementer = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+            _isIAsyncDisposableIntafeceImplementer = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable, csDeclarationProvider.Compilation);
 
-            _isDisposableSubClass = namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IDisposable);
+            _isDisposableSubClass = namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IDisposable, csDeclarationProvider.Compilation);
 
-            _isAsyncDisposableSubClass = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IAsyncDisposable);
+            _isAsyncDisposableSubClass = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.BaseType.IsAssignableTo(usingSymbols.IAsyncDisposable, csDeclarationProvider.Compilation);
 
             _isInheritalbeClass = !namedTypeSymbol.IsValueType && !namedTypeSymbol.IsSealed;
 
@@ -80,8 +80,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                     if (!automaticDisposeContextChecker.IsEnableField(fieldSymbol)) continue;
 
-                    var isAssignableToIDisposable = fieldSymbol.IsAssignableTo(usingSymbols.IDisposable);
-                    var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && fieldSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+                    var isAssignableToIDisposable = fieldSymbol.IsAssignableTo(usingSymbols.IDisposable, csDeclarationProvider.Compilation);
+                    var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && fieldSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable, csDeclarationProvider.Compilation);
 
                     if (isAssignableToIDisposable)
                     {
@@ -107,8 +107,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                     if (!automaticDisposeContextChecker.IsEnableProperty(propertySymbol)) continue;
 
-                    var isAssignableToIDisposable = propertySymbol.IsAssignableTo(usingSymbols.IDisposable);
-                    var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && propertySymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+                    var isAssignableToIDisposable = propertySymbol.IsAssignableTo(usingSymbols.IDisposable, csDeclarationProvider.Compilation);
+                    var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && propertySymbol.IsAssignableTo(usingSymbols.IAsyncDisposable, csDeclarationProvider.Compilation);
 
                     if (isAssignableToIDisposable)
                     {
@@ -144,7 +144,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         public bool Equals(MethodSourceBuilderInputs? other)
         {
             var result = other is not null &&
-                   EqualityComparer<TypeDefinitionInfo>.Default.Equals(TargetTypeInfo, other.TargetTypeInfo) &&
+                   EqualityComparer<CsTypeDeclaration>.Default.Equals(TargetType, other.TargetType) &&
                    SyncDisposeMembersInDisposeMethod.SequenceEqual(other.SyncDisposeMembersInDisposeMethod) &&
                    SyncDisposeMembersInAsyncDisposeMethod.SequenceEqual(other.SyncDisposeMembersInAsyncDisposeMethod) &&
                    AsyncDisposeMembersInAsyncDisposeMethod.SequenceEqual(other.AsyncDisposeMembersInAsyncDisposeMethod) &&
@@ -163,7 +163,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
         public override int GetHashCode()
         {
             int hashCode = -160234080;
-            hashCode = hashCode * -1521134295 + EqualityComparer<TypeDefinitionInfo>.Default.GetHashCode(TargetTypeInfo);
+            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeDeclaration>.Default.GetHashCode(TargetType);
             hashCode = hashCode * -1521134295 + SyncDisposeMembersInDisposeMethod.Aggregate(0, (hash, v) => hash ^ EqualityComparer<string>.Default.GetHashCode(v));
             hashCode = hashCode * -1521134295 + SyncDisposeMembersInAsyncDisposeMethod.Aggregate(0, (hash, v) => hash ^ EqualityComparer<string>.Default.GetHashCode(v));
             hashCode = hashCode * -1521134295 + AsyncDisposeMembersInAsyncDisposeMethod.Aggregate(0, (hash, v) => hash ^ EqualityComparer<string>.Default.GetHashCode(v));

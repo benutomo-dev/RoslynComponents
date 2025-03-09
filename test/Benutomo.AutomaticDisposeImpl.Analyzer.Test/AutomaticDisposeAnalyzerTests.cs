@@ -773,7 +773,7 @@ partial class A : IDisposable
     void MyDispose(int n) {}
 }
 ";
-            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\gen_A_global_AutomaticDisposeImpl.cs";
+            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\A.cs";
 
             var expected2 = new[]
             {
@@ -877,7 +877,7 @@ partial class A : IAsyncDisposable
         [Fact]
         public async Task SG0014_不適当なシグネチャのメソッドにManagedObjectAsyncDisposeMethod属性を付与()
         {
-            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\gen_A_global_AutomaticDisposeImpl.cs";
+            const string genSourcePath = @"Benutomo.AutomaticDisposeImpl.SourceGenerator\Benutomo.AutomaticDisposeImpl.SourceGenerator.AutomaticDisposeGenerator\A.cs";
 
             var source = @"
 using System;

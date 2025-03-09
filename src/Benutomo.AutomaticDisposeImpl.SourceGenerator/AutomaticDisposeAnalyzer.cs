@@ -350,7 +350,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             }
             else
             {
-                AnalyzeAutomaticDisposeImplClass(ref context, namedTypeSymbol, usingSymbols, attributeData);
+                AnalyzeAutomaticDisposeImplClass(ref context, namedTypeSymbol, usingSymbols, attributeData, context.Compilation);
             }
         }
 
@@ -415,7 +415,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             }
         }
 
-        private static void AnalyzeAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData attributeData)
+        private static void AnalyzeAutomaticDisposeImplClass(ref SymbolAnalysisContext context, INamedTypeSymbol namedTypeSymbol, UsingSymbols usingSymbols, AttributeData attributeData, Compilation compilation)
         {
             var classDeclarationSyntaxes = enumerateAllDeclarationSyntaxes(namedTypeSymbol, context.CancellationToken).ToArray();
 
@@ -428,8 +428,8 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
             AutomaticDisposeContextChecker automaticDisposeContextChecker = new AutomaticDisposeContextChecker(attributeData, usingSymbols);
 
-            var isAssignableToIDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable);
-            var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable);
+            var isAssignableToIDisposable = namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable, compilation);
+            var isAssignableToIAsyncDisposable = usingSymbols.IAsyncDisposable is not null && namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable, compilation);
 
             List<ISymbol> unmanagedResourceReleaseMethodAttributeedMembers = [];
             List<ISymbol> managedObjectDisposeMethodAttributeedMembers = [];

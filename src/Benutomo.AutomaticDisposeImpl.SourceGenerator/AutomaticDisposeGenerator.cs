@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceGeneratorCommons.CSharp.Declarations;
+using System.Security;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {
@@ -16,17 +18,17 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     return UsingSymbols.CreateFrom(compilation);
                 });
 
-            // Where句を使用しない。
-            // https://github.com/dotnet/roslyn/issues/57991
-            // 今は、Where句を使用するとSource GeneratorがVSでインクリメンタルに実行されたときに
-            // 対象のコードの状態や編集内容などによって突然内部状態が壊れて機能しなくなる問題がおきる。
+            var csDeclarationProvider = context.CreateCsDeclarationProvider();
 
             var anotatedClasses = context.SyntaxProvider
                 .CreateSyntaxProvider(Predicate, Transform)
-                //.Where(v => v is not null)
+                .Where(v => v is not null)
                 .Combine(usingSymbols)
+                .Select((v, _) => (namedTypeSymbol: v.Left, usingSymbols: v.Right))
+                .Combine(csDeclarationProvider)
+                .Select((v, _) => (v.Left.namedTypeSymbol, v.Left.usingSymbols, csDeclarationProvider: v.Right))
                 .Select(PostTransform)
-                ;//.Where(v => v is not null);
+                .Where(v => v is not null);
 
             context.RegisterSourceOutput(anotatedClasses, Generate);
         }
@@ -60,10 +62,9 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             }
         }
 
-        MethodSourceBuilderInputs? PostTransform((INamedTypeSymbol? Left, UsingSymbols Right) v, CancellationToken ct)
+        MethodSourceBuilderInputs? PostTransform((INamedTypeSymbol? namedTypeSymbol, UsingSymbols usingSymbols, CsDeclarationProvider csDeclarationProvider) v, CancellationToken ct)
         {
-            var namedTypeSymbol = v.Left;
-            var usingSymbols = v.Right;
+            var (namedTypeSymbol, usingSymbols, csDeclarationProvider) = v;
 
             if (namedTypeSymbol is null) return null;
 
@@ -75,12 +76,12 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
                     return null;
                 }
 
-                if (!namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable) && (usingSymbols.IAsyncDisposable is null || !namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable)))
+                if (!namedTypeSymbol.IsAssignableTo(usingSymbols.IDisposable, csDeclarationProvider.Compilation) && (usingSymbols.IAsyncDisposable is null || !namedTypeSymbol.IsAssignableTo(usingSymbols.IAsyncDisposable, csDeclarationProvider.Compilation)))
                 {
                     return null;
                 }
 
-                var result = new MethodSourceBuilderInputs(namedTypeSymbol, usingSymbols, automaticDisposeImplAttributeData);
+                var result = new MethodSourceBuilderInputs(namedTypeSymbol, usingSymbols, csDeclarationProvider, automaticDisposeImplAttributeData);
 
                 return result;
             }
@@ -102,11 +103,11 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
             {
                 Span<char> initialBuffer = stackalloc char[80000];
 
-                using var sourceBuilder = new MethodSourceBuilder(context, sourceBuildInputs, initialBuffer);
+                using var sourceBuilder = new MethodSourceBuilder(context, sourceBuildInputs);
 
                 sourceBuilder.Build();
 
-                context.AddSource(sourceBuilder.HintName, sourceBuilder.SourceText);
+                sourceBuilder.Commit();
             }
             catch (OperationCanceledException)
             {
