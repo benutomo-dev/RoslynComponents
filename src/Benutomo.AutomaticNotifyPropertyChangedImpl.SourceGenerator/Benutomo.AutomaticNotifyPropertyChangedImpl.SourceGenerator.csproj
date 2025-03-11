@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <Version>0.0.0.42</Version>
+    <Version>0.0.0.44</Version>
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 
@@ -13,7 +13,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements for INotifyPropertyChanged.</Description>
-    <PackageVersion>1.0.0-alpha12</PackageVersion>
+    <PackageVersion>1.2.0-alpha1</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;inotifypropertychanged;propertychanged</PackageTags>

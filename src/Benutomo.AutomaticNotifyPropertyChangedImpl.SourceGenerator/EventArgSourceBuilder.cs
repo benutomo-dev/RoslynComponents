@@ -57,7 +57,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             AppendLine("#pragma warning disable CS0619 // Obsolete属性でマークされたメソッドの呼び出しに対するエラーを抑止");
             AppendLine("#pragma warning disable CS0436");
 
-            using (BeginTypeDeclaration(" // This is implementation class by AutomaticNotifyPropertyChangedImpl."))
+            using (BeginTypeDeclaration(" // [PropertyChangedEventArgs] This is implementation class by AutomaticNotifyPropertyChangedImpl."))
             {
                 WriteBody();
             }

@@ -17,11 +17,15 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
     {
         public const string DefferedNotificationMethodSuffix = "WithDefferedNotification";
 
-        public CsTypeDeclaration ContainingType;
+        public CsTypeDeclaration ContainingTypeDeclaration;
 
-        public string InternalPropertyName;
+        public CsTypeRefWithNullability PropertyType;
 
-        public ImmutableArray<string> PropertyEventArgNames;
+        public bool PropertyTypeIsInterlockExchangeable;
+
+        public string TargetPropertyName;
+
+        public EquatableArray<string> PropertyEventArgNames;
 
         public string DefaultNotificationPropertyName;
 
@@ -33,25 +37,13 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public string DefferedNotificationDisposableName;
 
-        public string PropertyType;
-
-        public bool PropertyTypeIsReferenceType;
-
-        public bool PropertyTypeIsSystemString;
-
-        public bool PropertyTypeIsInterlockExchangeable;
-
-        public NullableAnnotation PropertyTypeNullableAnnotation;
-
-        public ImmutableArray<SyntaxReference> PropertyDeclaringSyntaxReferences;
-
         public bool IsEventArgsOnly;
 
         public bool EnabledNotifyPropertyChanging;
 
         public bool EnabledNotifyPropertyChanged;
 
-        public ImmutableArray<ExplicitImplementationArgs> ExplicitInterfaceImplementations;
+        public EquatableArray<ExplicitImplementationArgs> ExplicitInterfaceImplementations;
 
         public GenerateMemberAccessibility ChangedEventAccessibility = GenerateMemberAccessibility.None;
 
@@ -63,9 +55,9 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public MethodSourceBuildInputs(IPropertySymbol propertySymbol, UsingSymbols usingSymbols, AttributeData enableNotificationSupportAttributeData, CsDeclarationProvider csDeclarationProvider)
         {
-            ContainingType = csDeclarationProvider.GetTypeDeclaration(propertySymbol.ContainingType);
+            ContainingTypeDeclaration = csDeclarationProvider.GetTypeDeclaration(propertySymbol.ContainingType);
 
-            InternalPropertyName = propertySymbol.Name;
+            TargetPropertyName = propertySymbol.Name;
             if (propertySymbol.ExplicitInterfaceImplementations.Length > 0)
             {
                 PropertyEventArgNames = propertySymbol.ExplicitInterfaceImplementations.Select(v => v.Name).Distinct().ToImmutableArray();
@@ -89,15 +81,9 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 DefferedNotificationDisposableName = $"___{propertySymbol.Name}WithDefferedNotificationDisposable";
             }
 
-            StringBuilder typeNameBuilder = new StringBuilder();
-            typeNameBuilder.AppendFullTypeNameWithNamespaceAlias(propertySymbol.Type);
-            PropertyType = typeNameBuilder.ToString();
-            PropertyTypeIsReferenceType = propertySymbol.Type.IsReferenceType;
-            PropertyTypeIsSystemString = propertySymbol.Type.SpecialType == SpecialType.System_String;
-            PropertyTypeIsInterlockExchangeable = propertySymbol.Type.IsInterlockedExchangeable();
-            PropertyTypeNullableAnnotation = propertySymbol.Type.NullableAnnotation;
+            PropertyType = csDeclarationProvider.GetTypeReference(propertySymbol.Type);
 
-            PropertyDeclaringSyntaxReferences = propertySymbol.DeclaringSyntaxReferences;
+            PropertyTypeIsInterlockExchangeable = propertySymbol.Type.IsInterlockedExchangeable();
 
             IsEventArgsOnly = enableNotificationSupportAttributeData.NamedArguments.Where(v => v.Key == "EventArgsOnly").Select(v => (bool)(v.Value.Value ?? false)).FirstOrDefault();
 
@@ -105,28 +91,28 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             EnabledNotifyPropertyChanged = propertySymbol.ContainingType.AllInterfaces.Any(v => SymbolEqualityComparer.Default.Equals(v, usingSymbols.INotifyPropertyChanged));
 
             var defaultEnableExplicitInterfaceImplementations = propertySymbol.ExplicitInterfaceImplementations.Length > 0;
+            
+            GenerateMemberAccessibility defaultAccessibility = (propertySymbol.GetMethod?.DeclaredAccessibility, propertySymbol.DeclaredAccessibility) switch
+            {
+                (Accessibility.Public,               _) => GenerateMemberAccessibility.Public,
+                (Accessibility.Protected,            _) => GenerateMemberAccessibility.Protected,
+                (Accessibility.ProtectedOrInternal,  _) => GenerateMemberAccessibility.ProrectedInternal,
+                (Accessibility.ProtectedAndInternal, _) => GenerateMemberAccessibility.PrivateProrected,
+                (Accessibility.Internal,             _) => GenerateMemberAccessibility.Internal,
+                (Accessibility.Private,              _) => GenerateMemberAccessibility.Private,
+                (Accessibility.NotApplicable, Accessibility.Public)               => GenerateMemberAccessibility.Public,
+                (Accessibility.NotApplicable, Accessibility.Protected)            => GenerateMemberAccessibility.Protected,
+                (Accessibility.NotApplicable, Accessibility.ProtectedOrInternal)  => GenerateMemberAccessibility.ProrectedInternal,
+                (Accessibility.NotApplicable, Accessibility.ProtectedAndInternal) => GenerateMemberAccessibility.PrivateProrected,
+                (Accessibility.NotApplicable, Accessibility.Internal)             => GenerateMemberAccessibility.Internal,
+                (Accessibility.NotApplicable, Accessibility.Private)              => GenerateMemberAccessibility.Private,
+                _ => GenerateMemberAccessibility.Private,
+            };
 
             ImmutableArray<ExplicitImplementationArgs>.Builder? explicitImplementationsBuilder = null;
 
             foreach (var attributeData in propertySymbol.GetAttributes())
             {
-                GenerateMemberAccessibility defaultAccessibility = (propertySymbol.GetMethod?.DeclaredAccessibility, propertySymbol.DeclaredAccessibility) switch
-                {
-                    (Accessibility.Public, _) => GenerateMemberAccessibility.Public,
-                    (Accessibility.Protected, _) => GenerateMemberAccessibility.Protected,
-                    (Accessibility.ProtectedOrInternal, _) => GenerateMemberAccessibility.ProrectedInternal,
-                    (Accessibility.ProtectedAndInternal, _) => GenerateMemberAccessibility.PrivateProrected,
-                    (Accessibility.Internal, _) => GenerateMemberAccessibility.Internal,
-                    (Accessibility.Private, _) => GenerateMemberAccessibility.Private,
-                    (Accessibility.NotApplicable, Accessibility.Public) => GenerateMemberAccessibility.Public,
-                    (Accessibility.NotApplicable, Accessibility.Protected) => GenerateMemberAccessibility.Protected,
-                    (Accessibility.NotApplicable, Accessibility.ProtectedOrInternal) => GenerateMemberAccessibility.ProrectedInternal,
-                    (Accessibility.NotApplicable, Accessibility.ProtectedAndInternal) => GenerateMemberAccessibility.PrivateProrected,
-                    (Accessibility.NotApplicable, Accessibility.Internal) => GenerateMemberAccessibility.Internal,
-                    (Accessibility.NotApplicable, Accessibility.Private) => GenerateMemberAccessibility.Private,
-                    _ => GenerateMemberAccessibility.Private,
-                };
-
                 if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, usingSymbols.ChangedEventAttribute))
                 {
                     (ChangedEventAccessibility, var enabledxplicitInterfaceImplementations) = resolveGenerateMemberAccessibility(
@@ -195,7 +181,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 ChangedEventAccessibility = GenerateMemberAccessibility.Private;
             }
 
-            if (ChangedEventAccessibility == GenerateMemberAccessibility.None && ExplicitInterfaceImplementations.Any(v => v.EventType == ExplicitImplementationEventType.ChangedEventHandler))
+            if (ChangedEventAccessibility == GenerateMemberAccessibility.None && ExplicitInterfaceImplementations.Values.Any(v => v.EventType == ExplicitImplementationEventType.ChangedEventHandler))
             {
                 // 明示的実装のためのprivateでイベントを用意する。
                 ChangedEventAccessibility = GenerateMemberAccessibility.PrivateForExplicitImplimetOnly;
@@ -207,13 +193,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                 ChangingEventAccessibility = GenerateMemberAccessibility.Private;
             }
 
-            if (ChangingEventAccessibility == GenerateMemberAccessibility.None && ExplicitInterfaceImplementations.Any(v => v.EventType == ExplicitImplementationEventType.ChangingEventHandler))
+            if (ChangingEventAccessibility == GenerateMemberAccessibility.None && ExplicitInterfaceImplementations.Values.Any(v => v.EventType == ExplicitImplementationEventType.ChangingEventHandler))
             {
                 // 明示的実装のためのprivateでイベントを用意する。
                 ChangingEventAccessibility = GenerateMemberAccessibility.PrivateForExplicitImplimetOnly;
             }
-
-
 
             return;
 
@@ -348,12 +332,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public bool Equals(MethodSourceBuildInputs? other)
         {
             var result = other is not null &&
-                   EqualityComparer<CsTypeDeclaration>.Default.Equals(ContainingType, other.ContainingType) &&
-                   PropertyEventArgNames.SequenceEqual(other.PropertyEventArgNames) &&
-                   PropertyType == other.PropertyType &&
-                   PropertyTypeIsReferenceType == other.PropertyTypeIsReferenceType &&
+                   EqualityComparer<CsTypeDeclaration>.Default.Equals(ContainingTypeDeclaration, other.ContainingTypeDeclaration) &&
+                   EqualityComparer<EquatableArray<string> >.Default.Equals(PropertyEventArgNames, other.PropertyEventArgNames) &&
+                   EqualityComparer<CsTypeRefWithNullability>.Default.Equals(PropertyType, other.PropertyType) &&
                    PropertyTypeIsInterlockExchangeable == other.PropertyTypeIsInterlockExchangeable &&
-                   PropertyTypeNullableAnnotation == other.PropertyTypeNullableAnnotation &&
                    IsEventArgsOnly == other.IsEventArgsOnly &&
                    EnabledNotifyPropertyChanging == other.EnabledNotifyPropertyChanging &&
                    EnabledNotifyPropertyChanged == other.EnabledNotifyPropertyChanged &&
@@ -368,12 +350,10 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
         public override int GetHashCode()
         {
             int hashCode = 126218788;
-            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeDeclaration>.Default.GetHashCode(ContainingType);
+            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeDeclaration>.Default.GetHashCode(ContainingTypeDeclaration);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PropertyEventArgNames[0]);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PropertyType);
-            hashCode = hashCode * -1521134295 + PropertyTypeIsReferenceType.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeRefWithNullability>.Default.GetHashCode(PropertyType);
             hashCode = hashCode * -1521134295 + PropertyTypeIsInterlockExchangeable.GetHashCode();
-            hashCode = hashCode * -1521134295 + PropertyTypeNullableAnnotation.GetHashCode();
             hashCode = hashCode * -1521134295 + IsEventArgsOnly.GetHashCode();
             hashCode = hashCode * -1521134295 + EnabledNotifyPropertyChanging.GetHashCode();
             hashCode = hashCode * -1521134295 + EnabledNotifyPropertyChanged.GetHashCode();

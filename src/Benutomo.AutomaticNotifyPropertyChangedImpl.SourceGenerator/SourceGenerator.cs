@@ -1,6 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator.Embedding;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceGeneratorCommons.CSharp.Declarations;
 using System.Collections.Immutable;
 
 namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
@@ -20,13 +20,11 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             var csDeclarationProvider = context.CreateCsDeclarationProvider();
 
-            var anotatedProperties = context.SyntaxProvider.CreateSyntaxProvider(IsAttributeAttachedPropertyDeclarationSystax, ToPropertySymbol);
-
-            var methodSourceBuildInputArgs = anotatedProperties
+            var methodSourceBuildInputArgs = context.SyntaxProvider.ForAttributeWithMetadataName(StaticSourceAttribute.GetFullyQualifiedMetadataName(typeof(EnableNotificationSupportAttribute)), isPropertyDeclaration, transform)
                 .Combine(enableNotificationSupportAttributeSymbol)
                 .Combine(csDeclarationProvider)
-                .Select((v, _) => (propertySymbol: v.Left.Left, usingSymbols: v.Left.Right, csDeclarationProvider: v.Right))
-                .Select(ToMethodSourceBuildInputArgs);
+                .Select((v, _) => (v.Left.Left.propertySymbol, v.Left.Left.enableNotificationSupportAttribute, usingSymbols: v.Left.Right, csDeclarationProvider: v.Right))
+                .Select(toMethodSourceBuildInputArgs);
 
             context.RegisterSourceOutput(methodSourceBuildInputArgs, GenerateMethod);
 
@@ -36,9 +34,35 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
             context.RegisterSourceOutput(propertyNameInputArgs, GenerateEventArg);
 
+
+            static bool isPropertyDeclaration(SyntaxNode node, CancellationToken cancellationToken)
+            {
+                return node is PropertyDeclarationSyntax;
+            }
+
+            static (IPropertySymbol? propertySymbol, AttributeData enableNotificationSupportAttribute) transform(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
+            {
+                var propertySymbol = context.TargetSymbol as IPropertySymbol;
+                DebugSGen.AssertIsNotNull(propertySymbol);
+                DebugSGen.Assert(context.Attributes.Length == 1);
+                return (propertySymbol, context.Attributes[0]);
+            }
+
+            MethodSourceBuildInputs? toMethodSourceBuildInputArgs((IPropertySymbol? propertySymbol, AttributeData enableNotificationSupportAttribute, UsingSymbols usingSymbols, CsDeclarationProvider csDeclarationProvider) args, CancellationToken cancellationToken)
+            {
+                var (propertySymbol, enableNotificationSupportAttribute, usingSymbols, csDeclarationProvider) = args;
+
+                if (propertySymbol is null)
+                    return null;
+
+                var result = new MethodSourceBuildInputs(propertySymbol, usingSymbols, enableNotificationSupportAttribute, csDeclarationProvider);
+
+                return result;
+            }
+
             IEnumerable<EventArgSourceBuilderInputs> toPropertyInputArgs(ImmutableArray<MethodSourceBuildInputs?> sourceBuildInputs, CancellationToken cancellationToken)
             {
-                foreach (var propertiesInClass in sourceBuildInputs.Where(v => !cancellationToken.IsCancellationRequested && v is not null).ToLookup(v => v!.ContainingType))
+                foreach (var propertiesInClass in sourceBuildInputs.Where(v => !cancellationToken.IsCancellationRequested && v is not null).ToLookup(v => v!.ContainingTypeDeclaration))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -46,12 +70,12 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
                         .Concat(
                             propertiesInClass
                                 .Where(v => v?.EnabledNotifyPropertyChanged == true)
-                                .SelectMany(v => v!.PropertyEventArgNames.Select(name => (name, PropertyEventArgClass.Changed)))
+                                .SelectMany(v => v!.PropertyEventArgNames.Values.Select(name => (name, PropertyEventArgClass.Changed)))
                         )
                         .Concat(
                             propertiesInClass
                                 .Where(v => v?.EnabledNotifyPropertyChanging == true)
-                                .SelectMany(v => v!.PropertyEventArgNames.Select(name => (name, PropertyEventArgClass.Changing)))
+                                .SelectMany(v => v!.PropertyEventArgNames.Values.Select(name => (name, PropertyEventArgClass.Changing)))
                         )
                         .Distinct()
                         .ToImmutableArray();
@@ -61,59 +85,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             }
         }
 
-        bool IsAttributeAttachedPropertyDeclarationSystax(SyntaxNode node, CancellationToken cancellationToken)
-        {
-            //WriteLogLine("Predicate");
 
-            return node is PropertyDeclarationSyntax
-            {
-                AttributeLists.Count: > 0
-            };
-        }
-
-        IPropertySymbol? ToPropertySymbol(GeneratorSyntaxContext context, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var propertyDeclarationSyntax = (PropertyDeclarationSyntax)context.Node;
-
-                var propertySymbol = context.SemanticModel.GetDeclaredSymbol(propertyDeclarationSyntax, cancellationToken) as IPropertySymbol;
-
-                return propertySymbol;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-        }
-
-        MethodSourceBuildInputs? ToMethodSourceBuildInputArgs((IPropertySymbol? propertySymbol, UsingSymbols usingSymbols, CsDeclarationProvider csDeclarationProvider) v, CancellationToken ct)
-        {
-            var (propertySymbol, usingSymbols, csDeclarationProvider) = v;
-
-            if (propertySymbol is null) return null;
-
-            try
-            {
-                var enableNotificationSupportAttributeData = propertySymbol.GetAttributes().FirstOrDefault(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, usingSymbols.EnableNotificationSupportAttribute));
-                if (enableNotificationSupportAttributeData is null)
-                {
-                    return null;
-                }
-
-                var result = new MethodSourceBuildInputs(propertySymbol, usingSymbols, enableNotificationSupportAttributeData, csDeclarationProvider);
-
-                return result;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
         void GenerateMethod(SourceProductionContext context, MethodSourceBuildInputs? sourceBuildInputs)
         {

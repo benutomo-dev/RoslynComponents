@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceGeneratorCommons.CSharp.Declarations;
-using System.Security;
 
 namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 {

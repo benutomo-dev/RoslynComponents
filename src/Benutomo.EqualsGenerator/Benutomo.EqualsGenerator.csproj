@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<Version>2.4.0.0</Version>
+		<Version>2.5.0.0</Version>
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 
@@ -14,7 +14,7 @@
 		<DevelopmentDependency>true</DevelopmentDependency>
 		<PackageId>Benutomo.EqualsGenerator</PackageId>
 		<Description>A Source Generator that automatically implements the Equals method of IEquatable&lt;T&gt;</Description>
-		<PackageVersion>1.1.0-alpha1</PackageVersion>
+		<PackageVersion>1.2.0-alpha1</PackageVersion>
 		<Authors>benutomo</Authors>
 		<Copyright>© benutomo.</Copyright>
 		<PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;iequatable;equals;gethashcode</PackageTags>
