@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <Version>0.0.0.1</Version>
+
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <!-- NuGet -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageId>Benutomo.StaticSource.SourceGenerator</PackageId>
+    <Description>A Source Generator that automatically import static source for source generator.</Description>
+    <PackageVersion>$(Version)</PackageVersion>
+    <Authors>benutomo</Authors>
+    <Copyright>© benutomo.</Copyright>
+    <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation</PackageTags>
+    <PackageProjectUrl>https://github.com/benutomo-dev/RoslynComponents</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
+    <PackageReference Include="Polyfill" Version="7.21.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="SourceGeneratorCommons" />
+    <Using Include="SourceGeneratorCommons.Collections.Generic" />
+    <Using Include="SourceGeneratorCommons.CSharp.Declarations" />
+  </ItemGroup>
+
+  <Import Project="..\SourceGeneratorCommons\SourceGeneratorCommons.projitems" Label="Shared" />
+
+</Project>

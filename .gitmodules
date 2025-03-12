@@ -1,0 +1,3 @@
+[submodule "src/SourceGeneratorCommons"]
+	path = src/SourceGeneratorCommons
+	url = https://github.com/benutomo-dev/SourceGeneratorCommons
