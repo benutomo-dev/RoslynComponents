@@ -73,7 +73,7 @@ namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
 
                         if (true
                             && !SymbolEqualityComparer.Default.Equals(methodSymbol.ReturnType, usingSymbols.Task)
-                            && !SymbolEqualityComparer.Default.Equals(methodSymbol.ReturnType, usingSymbols.ValueTask)
+                            && !(usingSymbols.ValueTask is not null && SymbolEqualityComparer.Default.Equals(methodSymbol.ReturnType, usingSymbols.ValueTask))
                             )
                         {
                             return false;
