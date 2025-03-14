@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <Version>2.2.0.1</Version>
+    <Version>2.2.0.2</Version>
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 
@@ -13,7 +13,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageId>Benutomo.AutomaticDisposeImpl.SourceGenerator</PackageId>
     <Description>A Source Generator that automatically implements the Dispose method of IDisposable and the DisposeAsync method of IAsyncDisposable.</Description>
-    <PackageVersion>2.2.1-alpha1</PackageVersion>
+    <PackageVersion>2.2.2-alpha1</PackageVersion>
     <Authors>benutomo</Authors>
     <Copyright>© benutomo.</Copyright>
     <PackageTags>codegen;codegeneration;codegenerator;sourcegen;sourcegeneration;sourcegenerator;source;generation;idisposable;iasyncdisposable;disepose;disposeasync</PackageTags>
