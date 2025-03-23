@@ -18,7 +18,7 @@ internal sealed record class ProviderOutput(
 
 internal sealed record class EmitInput(
     CsTypeDeclaration TargetType,
-    EquatableArray<CsTypeRefWithNullability> EqualsOverrideTargetTypes,
+    EquatableArray<CsTypeRefWithAnnotation> EqualsOverrideTargetTypes,
     EquatableArray<TargetMember> TargetMembers,
     AutomaticEqualsImplOptions AutomaticEqualsImplOptions,
     string IncludeUsingStatements

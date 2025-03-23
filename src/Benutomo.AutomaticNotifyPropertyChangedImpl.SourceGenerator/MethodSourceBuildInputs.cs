@@ -19,7 +19,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
 
         public CsTypeDeclaration ContainingTypeDeclaration;
 
-        public CsTypeRefWithNullability PropertyType;
+        public CsTypeRefWithAnnotation PropertyType;
 
         public bool PropertyTypeIsInterlockExchangeable;
 
@@ -334,7 +334,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             var result = other is not null &&
                    EqualityComparer<CsTypeDeclaration>.Default.Equals(ContainingTypeDeclaration, other.ContainingTypeDeclaration) &&
                    EqualityComparer<EquatableArray<string> >.Default.Equals(PropertyEventArgNames, other.PropertyEventArgNames) &&
-                   EqualityComparer<CsTypeRefWithNullability>.Default.Equals(PropertyType, other.PropertyType) &&
+                   EqualityComparer<CsTypeRefWithAnnotation>.Default.Equals(PropertyType, other.PropertyType) &&
                    PropertyTypeIsInterlockExchangeable == other.PropertyTypeIsInterlockExchangeable &&
                    IsEventArgsOnly == other.IsEventArgsOnly &&
                    EnabledNotifyPropertyChanging == other.EnabledNotifyPropertyChanging &&
@@ -352,7 +352,7 @@ namespace Benutomo.AutomaticNotifyPropertyChangedImpl.SourceGenerator
             int hashCode = 126218788;
             hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeDeclaration>.Default.GetHashCode(ContainingTypeDeclaration);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PropertyEventArgNames[0]);
-            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeRefWithNullability>.Default.GetHashCode(PropertyType);
+            hashCode = hashCode * -1521134295 + EqualityComparer<CsTypeRefWithAnnotation>.Default.GetHashCode(PropertyType);
             hashCode = hashCode * -1521134295 + PropertyTypeIsInterlockExchangeable.GetHashCode();
             hashCode = hashCode * -1521134295 + IsEventArgsOnly.GetHashCode();
             hashCode = hashCode * -1521134295 + EnabledNotifyPropertyChanging.GetHashCode();
