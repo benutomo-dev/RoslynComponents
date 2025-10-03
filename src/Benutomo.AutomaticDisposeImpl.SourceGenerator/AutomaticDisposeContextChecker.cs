@@ -1,64 +1,63 @@
 ﻿using Benutomo.AutomaticDisposeImpl.SourceGenerator.Embedding;
 using Microsoft.CodeAnalysis;
 
-namespace Benutomo.AutomaticDisposeImpl.SourceGenerator
+namespace Benutomo.AutomaticDisposeImpl.SourceGenerator;
+
+class AutomaticDisposeContextChecker
 {
-    class AutomaticDisposeContextChecker
+    internal AutomaticDisposeImplMode Mode { get; }
+
+    UsingSymbols _usingSymbols { get; }
+
+    internal AutomaticDisposeContextChecker(AttributeData automaticDisposeImplAttributeData, UsingSymbols usingSymbols)
     {
-        internal AutomaticDisposeImplMode Mode { get; }
+        var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == nameof(AutomaticDisposeImplAttribute.Mode)).Value.Value;
 
-        UsingSymbols _usingSymbols { get; }
+        var defaultMode = defaultModeValue is int defaultModeRawValue ? (AutomaticDisposeImplMode)defaultModeRawValue : AutomaticDisposeImplMode.Explicit;
 
-        internal AutomaticDisposeContextChecker(AttributeData automaticDisposeImplAttributeData, UsingSymbols usingSymbols)
+        Mode = defaultMode switch
         {
-            var defaultModeValue = automaticDisposeImplAttributeData.NamedArguments.SingleOrDefault(arg => arg.Key == nameof(AutomaticDisposeImplAttribute.Mode)).Value.Value;
+            AutomaticDisposeImplMode.Implicit => AutomaticDisposeImplMode.Implicit,
+            AutomaticDisposeImplMode.Explicit => AutomaticDisposeImplMode.Explicit,
+            _ => AutomaticDisposeImplMode.Explicit,
+        };
 
-            var defaultMode = defaultModeValue is int defaultModeRawValue ? (AutomaticDisposeImplMode)defaultModeRawValue : AutomaticDisposeImplMode.Explicit;
+        _usingSymbols = usingSymbols;
+    }
 
-            Mode = defaultMode switch
-            {
-                AutomaticDisposeImplMode.Implicit => AutomaticDisposeImplMode.Implicit,
-                AutomaticDisposeImplMode.Explicit => AutomaticDisposeImplMode.Explicit,
-                _ => AutomaticDisposeImplMode.Explicit,
-            };
-
-            _usingSymbols = usingSymbols;
+    public bool IsEnableField(IFieldSymbol fieldSymbol)
+    {
+        if (fieldSymbol.IsAttributedBy(_usingSymbols.DisableAutomaticDisposeAttribute))
+        {
+            return false;
         }
 
-        public bool IsEnableField(IFieldSymbol fieldSymbol)
+        if (Mode == AutomaticDisposeImplMode.Explicit)
         {
-            if (fieldSymbol.IsAttributedBy(_usingSymbols.DisableAutomaticDisposeAttribute))
+            if (!fieldSymbol.IsAttributedBy(_usingSymbols.EnableAutomaticDisposeAttribute))
             {
                 return false;
             }
-
-            if (Mode == AutomaticDisposeImplMode.Explicit)
-            {
-                if (!fieldSymbol.IsAttributedBy(_usingSymbols.EnableAutomaticDisposeAttribute))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
-        public bool IsEnableProperty(IPropertySymbol propertySymbol)
+        return true;
+    }
+
+    public bool IsEnableProperty(IPropertySymbol propertySymbol)
+    {
+        if (propertySymbol.IsAttributedBy(_usingSymbols.DisableAutomaticDisposeAttribute))
         {
-            if (propertySymbol.IsAttributedBy(_usingSymbols.DisableAutomaticDisposeAttribute))
+            return false;
+        }
+
+        if (Mode == AutomaticDisposeImplMode.Explicit)
+        {
+            if (!propertySymbol.IsAttributedBy(_usingSymbols.EnableAutomaticDisposeAttribute))
             {
                 return false;
             }
-
-            if (Mode == AutomaticDisposeImplMode.Explicit)
-            {
-                if (!propertySymbol.IsAttributedBy(_usingSymbols.EnableAutomaticDisposeAttribute))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
+
+        return true;
     }
 }
