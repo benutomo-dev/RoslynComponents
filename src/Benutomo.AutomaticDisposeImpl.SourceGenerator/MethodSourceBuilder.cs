@@ -166,7 +166,7 @@ class MethodSourceBuilder : IDisposable
     {
         AppendLine();
         PutIndentSpace(); AppendLine("[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]");
-        PutIndentSpace(); AppendLine("public bool IsDisposed => (global::System.Threading.Thread.VolatileRead(ref __generator_internal_disposeState) != __generator_internal_BeNotInitiatedAnyDispose);");
+        PutIndentSpace(); AppendLine("public bool IsDisposed => (global::System.Threading.Volatile.Read(ref __generator_internal_disposeState) != __generator_internal_BeNotInitiatedAnyDispose);");
     }
 
     void WriteFinalizer()
@@ -208,9 +208,9 @@ class MethodSourceBuilder : IDisposable
                     AppendLine();
                     PutIndentSpace(); AppendLine("global::System.GC.SuppressFinalize(this);");
                 }
-
+                
                 AppendLine();
-                PutIndentSpace(); AppendLine("global::System.Threading.Thread.VolatileWrite(ref __generator_internal_disposeState, __generator_internal_DisposeAlreadyCompleted);");
+                PutIndentSpace(); AppendLine("global::System.Threading.Volatile.Write(ref __generator_internal_disposeState, __generator_internal_DisposeAlreadyCompleted);");
             }
         }
     }
@@ -357,7 +357,7 @@ class MethodSourceBuilder : IDisposable
                 }
 
                 AppendLine();
-                PutIndentSpace(); AppendLine("global::System.Threading.Thread.VolatileWrite(ref __generator_internal_disposeState, __generator_internal_DisposeAlreadyCompleted);");
+                PutIndentSpace(); AppendLine("global::System.Threading.Volatile.Write(ref __generator_internal_disposeState, __generator_internal_DisposeAlreadyCompleted);");
             }
         }
         AppendLine("#pragma warning restore CS1998");
